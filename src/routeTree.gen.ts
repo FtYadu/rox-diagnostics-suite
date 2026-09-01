@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
 import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
+import { Route as ShellProgrammingRouteImport } from './routes/_shell.programming'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
@@ -35,6 +36,11 @@ const ShellDashboardRoute = ShellDashboardRouteImport.update({
 const ShellHealthScanRoute = ShellHealthScanRouteImport.update({
   id: '/health-scan',
   path: '/health-scan',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellProgrammingRoute = ShellProgrammingRouteImport.update({
+  id: '/programming',
+  path: '/programming',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellServiceFunctionsRoute = ShellServiceFunctionsRouteImport.update({
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/programming': typeof ShellProgrammingRoute
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/vehicle': typeof ShellVehicleRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/programming': typeof ShellProgrammingRoute
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/vehicle': typeof ShellVehicleRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   '/_shell': typeof ShellRouteWithChildren
   '/_shell/dashboard': typeof ShellDashboardRoute
   '/_shell/health-scan': typeof ShellHealthScanRoute
+  '/_shell/programming': typeof ShellProgrammingRoute
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/programming'
     | '/service-functions'
     | '/vehicle'
     | '/ecus/$ecuId'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/programming'
     | '/service-functions'
     | '/vehicle'
     | '/ecus/$ecuId'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/_shell'
     | '/_shell/dashboard'
     | '/_shell/health-scan'
+    | '/_shell/programming'
     | '/_shell/service-functions'
     | '/_shell/vehicle'
     | '/_shell/ecus/$ecuId'
@@ -153,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellHealthScanRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/programming': {
+      id: '/_shell/programming'
+      path: '/programming'
+      fullPath: '/programming'
+      preLoaderRoute: typeof ShellProgrammingRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/service-functions': {
       id: '/_shell/service-functions'
       path: '/service-functions'
@@ -187,6 +206,7 @@ declare module '@tanstack/react-router' {
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
   ShellHealthScanRoute: typeof ShellHealthScanRoute
+  ShellProgrammingRoute: typeof ShellProgrammingRoute
   ShellServiceFunctionsRoute: typeof ShellServiceFunctionsRoute
   ShellVehicleRoute: typeof ShellVehicleRoute
   ShellEcusEcuIdRoute: typeof ShellEcusEcuIdRoute
@@ -196,6 +216,7 @@ interface ShellRouteChildren {
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDashboardRoute: ShellDashboardRoute,
   ShellHealthScanRoute: ShellHealthScanRoute,
+  ShellProgrammingRoute: ShellProgrammingRoute,
   ShellServiceFunctionsRoute: ShellServiceFunctionsRoute,
   ShellVehicleRoute: ShellVehicleRoute,
   ShellEcusEcuIdRoute: ShellEcusEcuIdRoute,
