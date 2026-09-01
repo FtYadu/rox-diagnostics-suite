@@ -57,7 +57,7 @@ function SignInPage() {
       return;
     }
     setError(null);
-    signIn(email);
+    signIn(email, false);
     void navigate({ to: "/dashboard" });
   };
 

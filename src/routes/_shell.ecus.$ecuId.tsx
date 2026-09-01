@@ -10,9 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { flowsForEcu, getEcu, identDidsFor, processesForEcu } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
-import { LiveDataPanel } from "@/features/diagnostics/live-data-panel";
-import { ProcessRunner } from "@/features/diagnostics/process-runner";
-import { SeverityPill } from "@/features/diagnostics/severity-pill";
+import type { DtcRecord } from "@/features/bridge/types";
+import { LiveDataWorkbench } from "@/features/diagnostics/live-data-workbench";
+import { DtcTable } from "@/features/dtc/dtc-table";
+import { ActuatorPanel } from "@/features/processes/actuator-panel";
+import { ProcessList } from "@/features/processes/process-list";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/_shell/ecus/$ecuId")({
@@ -37,7 +39,7 @@ const TABS = [
   { value: "identification", label: "Identification" },
   { value: "dtcs", label: "DTCs" },
   { value: "live-data", label: "Live data" },
-  { value: "routines", label: "Routines" },
+  { value: "routines", label: "Routines & actuators" },
   { value: "functions", label: "Service functions" },
   { value: "programming", label: "Programming" },
 ];
@@ -49,7 +51,8 @@ function EcuDetailPage() {
   const { bridge } = useBridge();
   const scan = useAppStore((s) => s.scan);
   const applyDtcResult = useAppStore((s) => s.applyDtcResult);
-  const addJob = useAppStore((s) => s.addJob);
+  const appendEvent = useAppStore((s) => s.appendEvent);
+  const [tab, setTab] = useState("identification");
   const [busy, setBusy] = useState(false);
 
   const identification = useQuery({
@@ -85,20 +88,34 @@ function EcuDetailPage() {
 
   const state = scan[ecu.id] ?? { status: "not-scanned" as const, dtcCount: 0 };
 
-  const clear = async () => {
+  const clearAll = async () => {
     setBusy(true);
     const { cleared } = await bridge.clearDtcs(ecu);
     applyDtcResult({ ecuId: ecu.id, responded: true, dtcs: [] });
     await dtcQuery.refetch();
-    addJob({
-      title: `Clear DTCs · ${ecu.id}`,
-      kind: "clear-dtc",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "completed",
-      summary: `${cleared} codes cleared`,
+    appendEvent({
+      kind: "dtc-clear",
+      title: `Clear fault memory · ${ecu.id}`,
+      detail: `${cleared} codes cleared with 14 FF FF FF.`,
+      ecuId: ecu.id,
+      status: "ok",
     });
     setBusy(false);
     toast.success(`${cleared} codes cleared on ${ecu.id}`);
+  };
+
+  const clearRecords = async (records: DtcRecord[]) => {
+    const codes = records.map((record) => record.code);
+    const { cleared } = await bridge.clearDtcs(ecu, codes);
+    await dtcQuery.refetch();
+    appendEvent({
+      kind: "dtc-clear",
+      title: `Clear ${codes.length} code${codes.length === 1 ? "" : "s"} · ${ecu.id}`,
+      detail: `${cleared} cleared: ${codes.join(", ")}`,
+      ecuId: ecu.id,
+      status: "ok",
+    });
+    toast.success(`${cleared} code${cleared === 1 ? "" : "s"} cleared`);
   };
 
   return (
@@ -129,7 +146,7 @@ function EcuDetailPage() {
               <RefreshCw className={dtcQuery.isFetching ? "size-4 animate-spin" : "size-4"} />
               Re-read
             </Button>
-            <Button className="rounded-full" onClick={() => void clear()} disabled={busy}>
+            <Button className="rounded-full" onClick={() => void clearAll()} disabled={busy}>
               <Eraser className="size-4" />
               Clear DTCs
             </Button>
@@ -137,7 +154,7 @@ function EcuDetailPage() {
         }
       />
 
-      <Tabs defaultValue="identification" className="space-y-4">
+      <Tabs value={tab} onValueChange={setTab} className="space-y-4">
         <TabsList className="h-11 w-full justify-start gap-1 overflow-x-auto rounded-full bg-secondary/70 p-1">
           {TABS.map((tab) => (
             <TabsTrigger
@@ -188,58 +205,35 @@ function EcuDetailPage() {
                 </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent>
               {dtcQuery.isFetching && (
-                <p className="text-sm text-muted-foreground">Reading 19 02…</p>
+                <p className="mb-3 text-sm text-muted-foreground">Reading 19 02…</p>
               )}
-              {dtcQuery.data && !dtcQuery.data.responded && (
+              {dtcQuery.data && !dtcQuery.data.responded ? (
                 <p className="text-sm text-warning">
                   No response from {ecu.id} — check bus wiring and power supply.
                 </p>
+              ) : (
+                <DtcTable
+                  records={dtcQuery.data?.dtcs ?? []}
+                  onClear={clearRecords}
+                  emptyMessage="No stored faults."
+                />
               )}
-              {dtcQuery.data?.responded && dtcQuery.data.dtcs.length === 0 && (
-                <p className="text-sm text-success">No stored faults.</p>
-              )}
-              {(dtcQuery.data?.dtcs ?? []).map((dtc) => (
-                <div
-                  key={dtc.code}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl bg-secondary/40 px-4 py-3 hairline"
-                >
-                  <div className="min-w-0">
-                    <p className="font-mono text-sm font-medium">{dtc.code}</p>
-                    <p className="truncate text-xs text-muted-foreground">{dtc.name}</p>
-                  </div>
-                  <SeverityPill severity={dtc.severity} />
-                </div>
-              ))}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="live-data">
-          <LiveDataPanel ecuId={ecu.id} />
+          <LiveDataWorkbench ecu={ecu} />
         </TabsContent>
 
         <TabsContent value="routines">
-          <Card className="rounded-2xl border-hairline shadow-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Routines (0x31)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {ecu.routines.length === 0 && (
-                <p className="text-sm text-muted-foreground">No routines defined for this ECU.</p>
-              )}
-              {ecu.routines.map((routine) => (
-                <div key={routine} className="rounded-xl bg-secondary/40 px-4 py-3 text-sm hairline">
-                  {routine}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <ActuatorPanel ecu={ecu} />
         </TabsContent>
 
         <TabsContent value="functions">
-          <ProcessRunner processes={processesForEcu(ecu.id)} />
+          <ProcessList processes={processesForEcu(ecu.id)} />
         </TabsContent>
 
         <TabsContent value="programming">

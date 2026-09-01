@@ -41,7 +41,7 @@ const PACKAGES = [
 
 function ProgrammingPage() {
   const { bridge, connection } = useBridge();
-  const addJob = useAppStore((s) => s.addJob);
+  const appendEvent = useAppStore((s) => s.appendEvent);
   const [flow, setFlow] = useState<ProgrammingFlow>(programmingFlows[0]!);
   const [pkg, setPkg] = useState(PACKAGES[0]!);
   const [events, setEvents] = useState<ProgrammingProgressEvent[]>([]);
@@ -59,12 +59,11 @@ function ProgrammingPage() {
       setEvents((prev) => [...prev, event]);
     });
     setRunning(false);
-    addJob({
-      title: `${flow.name} · ${pkg}`,
+    appendEvent({
       kind: "programming",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: result.ok ? "completed" : "failed",
-      summary: result.message,
+      title: `${flow.name} · ${pkg}`,
+      detail: result.message,
+      status: result.ok ? "ok" : "failed",
     });
     if (result.ok) toast.success(result.message);
     else toast.error(result.message);

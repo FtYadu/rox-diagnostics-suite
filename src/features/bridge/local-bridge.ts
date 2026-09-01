@@ -3,10 +3,13 @@ import type {
   ConnectionInfo,
   DiagnosticBridge,
   EcuDtcResult,
+  FreezeFrame,
   IdentificationEntry,
   LiveDataSignal,
-  ProcessStepEvent,
   ProgrammingProgressEvent,
+  RoutineExecution,
+  SecurityAccessResult,
+  StepExecution,
 } from "./types";
 
 export const LOCAL_BRIDGE_URL = "ws://127.0.0.1:9097";
@@ -25,9 +28,9 @@ type BridgeMessage = {
 };
 
 /**
- * WebSocket client for the future local hardware agent. The agent is expected to
- * expose a tiny JSON-RPC style protocol on ws://127.0.0.1:9097. When no agent is
- * running the connection fails fast and the app falls back to the simulator.
+ * WebSocket client for the local hardware agent. The agent exposes a small
+ * JSON-RPC style protocol on ws://127.0.0.1:9097. When no agent is running the
+ * connection fails fast and the app falls back to the simulator.
  */
 export class LocalBridge implements DiagnosticBridge {
   readonly mode = "local" as const;
@@ -122,23 +125,43 @@ export class LocalBridge implements DiagnosticBridge {
     return this.call<EcuDtcResult>("readDtcs", { ecu: ecu.id });
   }
 
-  clearDtcs(ecu: Ecu): Promise<{ cleared: number }> {
-    return this.call<{ cleared: number }>("clearDtcs", { ecu: ecu.id });
+  clearDtcs(ecu: Ecu, codes?: string[]): Promise<{ cleared: number }> {
+    return this.call<{ cleared: number }>("clearDtcs", { ecu: ecu.id, codes: codes ?? null });
+  }
+
+  readFreezeFrame(ecu: Ecu, code: string): Promise<FreezeFrame> {
+    return this.call<FreezeFrame>("readFreezeFrame", { ecu: ecu.id, code });
   }
 
   readLiveData(ecu: Ecu, dids: string[]): Promise<LiveDataSignal[]> {
     return this.call<LiveDataSignal[]>("readLiveData", { ecu: ecu.id, dids });
   }
 
-  runProcess(
+  requestSecurityAccess(ecu: Ecu, level: number): Promise<SecurityAccessResult> {
+    return this.call<SecurityAccessResult>("requestSecurityAccess", { ecu: ecu.id, level });
+  }
+
+  executeStep(
     process: ServiceProcess,
-    onStep: (event: ProcessStepEvent) => void,
-  ): Promise<{ ok: boolean; message: string }> {
-    return this.call<{ ok: boolean; message: string }>(
-      "runProcess",
-      { ecu: process.ecu, process: process.name },
-      (payload) => onStep(payload as ProcessStepEvent),
-    );
+    stepIndex: number,
+    label: string,
+    input?: string,
+  ): Promise<StepExecution> {
+    return this.call<StepExecution>("executeStep", {
+      ecu: process.ecu,
+      process: process.name,
+      stepIndex,
+      label,
+      input: input ?? null,
+    });
+  }
+
+  runRoutine(
+    ecu: Ecu,
+    routine: string,
+    action: "start" | "stop" | "status",
+  ): Promise<RoutineExecution> {
+    return this.call<RoutineExecution>("runRoutine", { ecu: ecu.id, routine, action });
   }
 
   startProgramming(

@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
-import { ecus } from "@/data/vehicle-data";
-import { LiveDataPanel } from "@/features/diagnostics/live-data-panel";
+import { ecus, getEcu } from "@/data/vehicle-data";
+import { LiveDataWorkbench } from "@/features/diagnostics/live-data-workbench";
 
 export const Route = createFileRoute("/_shell/live-data")({
   head: () => ({
@@ -25,12 +25,13 @@ export const Route = createFileRoute("/_shell/live-data")({
 
 function LiveDataPage() {
   const [ecuId, setEcuId] = useState(ecus[0]!.id);
+  const ecu = getEcu(ecuId) ?? ecus[0]!;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Live data"
-        subtitle="Real-time measured values streamed from the selected control unit"
+        subtitle="Multi-signal streaming with charting, 100–500 ms sampling and CSV recording"
         actions={
           <select
             value={ecuId}
@@ -46,7 +47,7 @@ function LiveDataPage() {
           </select>
         }
       />
-      <LiveDataPanel ecuId={ecuId} />
+      <LiveDataWorkbench key={ecu.id} ecu={ecu} />
     </div>
   );
 }

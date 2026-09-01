@@ -14,7 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      job_events: {
+        Row: {
+          client_event_id: string
+          created_at: string
+          detail: string
+          ecu_id: string | null
+          id: string
+          job_id: string
+          kind: string
+          occurred_at: string
+          payload: Json | null
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          client_event_id: string
+          created_at?: string
+          detail?: string
+          ecu_id?: string | null
+          id?: string
+          job_id: string
+          kind: string
+          occurred_at?: string
+          payload?: Json | null
+          status?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          client_event_id?: string
+          created_at?: string
+          detail?: string
+          ecu_id?: string | null
+          id?: string
+          job_id?: string
+          kind?: string
+          occurred_at?: string
+          payload?: Json | null
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_events_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          actions_count: number
+          created_at: string
+          dtc_critical: number
+          dtc_total: number
+          ended_at: string | null
+          id: string
+          kind: string
+          started_at: string
+          status: string
+          summary: string
+          technician: string
+          title: string
+          updated_at: string
+          user_id: string
+          vin: string
+        }
+        Insert: {
+          actions_count?: number
+          created_at?: string
+          dtc_critical?: number
+          dtc_total?: number
+          ended_at?: string | null
+          id: string
+          kind: string
+          started_at?: string
+          status?: string
+          summary?: string
+          technician: string
+          title: string
+          updated_at?: string
+          user_id: string
+          vin: string
+        }
+        Update: {
+          actions_count?: number
+          created_at?: string
+          dtc_critical?: number
+          dtc_total?: number
+          ended_at?: string | null
+          id?: string
+          kind?: string
+          started_at?: string
+          status?: string
+          summary?: string
+          technician?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          vin?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
