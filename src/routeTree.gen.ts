@@ -10,33 +10,177 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
+import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
+import { Route as ShellJobHistoryRouteImport } from './routes/_shell.job-history'
+import { Route as ShellLiveDataRouteImport } from './routes/_shell.live-data'
+import { Route as ShellProgrammingRouteImport } from './routes/_shell.programming'
+import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
+import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
+import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
+import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
+import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
+import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShellRoute = ShellRouteImport.update({
+  id: '/_shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellDashboardRoute = ShellDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellHealthScanRoute = ShellHealthScanRouteImport.update({
+  id: '/health-scan',
+  path: '/health-scan',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellJobHistoryRoute = ShellJobHistoryRouteImport.update({
+  id: '/job-history',
+  path: '/job-history',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellLiveDataRoute = ShellLiveDataRouteImport.update({
+  id: '/live-data',
+  path: '/live-data',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellProgrammingRoute = ShellProgrammingRouteImport.update({
+  id: '/programming',
+  path: '/programming',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellReportsRoute = ShellReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellServiceFunctionsRoute = ShellServiceFunctionsRouteImport.update({
+  id: '/service-functions',
+  path: '/service-functions',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellSettingsRoute = ShellSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellVehicleRoute = ShellVehicleRouteImport.update({
+  id: '/vehicle',
+  path: '/vehicle',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellEcusIndexRoute = ShellEcusIndexRouteImport.update({
+  id: '/ecus/',
+  path: '/ecus/',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellEcusEcuIdRoute = ShellEcusEcuIdRouteImport.update({
+  id: '/ecus/$ecuId',
+  path: '/ecus/$ecuId',
+  getParentRoute: () => ShellRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof ShellDashboardRoute
+  '/health-scan': typeof ShellHealthScanRoute
+  '/job-history': typeof ShellJobHistoryRoute
+  '/live-data': typeof ShellLiveDataRoute
+  '/programming': typeof ShellProgrammingRoute
+  '/reports': typeof ShellReportsRoute
+  '/service-functions': typeof ShellServiceFunctionsRoute
+  '/settings': typeof ShellSettingsRoute
+  '/vehicle': typeof ShellVehicleRoute
+  '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
+  '/ecus/': typeof ShellEcusIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof ShellDashboardRoute
+  '/health-scan': typeof ShellHealthScanRoute
+  '/job-history': typeof ShellJobHistoryRoute
+  '/live-data': typeof ShellLiveDataRoute
+  '/programming': typeof ShellProgrammingRoute
+  '/reports': typeof ShellReportsRoute
+  '/service-functions': typeof ShellServiceFunctionsRoute
+  '/settings': typeof ShellSettingsRoute
+  '/vehicle': typeof ShellVehicleRoute
+  '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
+  '/ecus': typeof ShellEcusIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_shell': typeof ShellRouteWithChildren
+  '/_shell/dashboard': typeof ShellDashboardRoute
+  '/_shell/health-scan': typeof ShellHealthScanRoute
+  '/_shell/job-history': typeof ShellJobHistoryRoute
+  '/_shell/live-data': typeof ShellLiveDataRoute
+  '/_shell/programming': typeof ShellProgrammingRoute
+  '/_shell/reports': typeof ShellReportsRoute
+  '/_shell/service-functions': typeof ShellServiceFunctionsRoute
+  '/_shell/settings': typeof ShellSettingsRoute
+  '/_shell/vehicle': typeof ShellVehicleRoute
+  '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
+  '/_shell/ecus/': typeof ShellEcusIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/health-scan'
+    | '/job-history'
+    | '/live-data'
+    | '/programming'
+    | '/reports'
+    | '/service-functions'
+    | '/settings'
+    | '/vehicle'
+    | '/ecus/$ecuId'
+    | '/ecus/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/health-scan'
+    | '/job-history'
+    | '/live-data'
+    | '/programming'
+    | '/reports'
+    | '/service-functions'
+    | '/settings'
+    | '/vehicle'
+    | '/ecus/$ecuId'
+    | '/ecus'
+  id:
+    | '__root__'
+    | '/'
+    | '/_shell'
+    | '/_shell/dashboard'
+    | '/_shell/health-scan'
+    | '/_shell/job-history'
+    | '/_shell/live-data'
+    | '/_shell/programming'
+    | '/_shell/reports'
+    | '/_shell/service-functions'
+    | '/_shell/settings'
+    | '/_shell/vehicle'
+    | '/_shell/ecus/$ecuId'
+    | '/_shell/ecus/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ShellRoute: typeof ShellRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +192,126 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_shell': {
+      id: '/_shell'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell/dashboard': {
+      id: '/_shell/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ShellDashboardRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/health-scan': {
+      id: '/_shell/health-scan'
+      path: '/health-scan'
+      fullPath: '/health-scan'
+      preLoaderRoute: typeof ShellHealthScanRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/job-history': {
+      id: '/_shell/job-history'
+      path: '/job-history'
+      fullPath: '/job-history'
+      preLoaderRoute: typeof ShellJobHistoryRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/live-data': {
+      id: '/_shell/live-data'
+      path: '/live-data'
+      fullPath: '/live-data'
+      preLoaderRoute: typeof ShellLiveDataRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/programming': {
+      id: '/_shell/programming'
+      path: '/programming'
+      fullPath: '/programming'
+      preLoaderRoute: typeof ShellProgrammingRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/reports': {
+      id: '/_shell/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ShellReportsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/service-functions': {
+      id: '/_shell/service-functions'
+      path: '/service-functions'
+      fullPath: '/service-functions'
+      preLoaderRoute: typeof ShellServiceFunctionsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/settings': {
+      id: '/_shell/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof ShellSettingsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/vehicle': {
+      id: '/_shell/vehicle'
+      path: '/vehicle'
+      fullPath: '/vehicle'
+      preLoaderRoute: typeof ShellVehicleRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/ecus/': {
+      id: '/_shell/ecus/'
+      path: '/ecus'
+      fullPath: '/ecus/'
+      preLoaderRoute: typeof ShellEcusIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/ecus/$ecuId': {
+      id: '/_shell/ecus/$ecuId'
+      path: '/ecus/$ecuId'
+      fullPath: '/ecus/$ecuId'
+      preLoaderRoute: typeof ShellEcusEcuIdRouteImport
+      parentRoute: typeof ShellRoute
+    }
   }
 }
 
+interface ShellRouteChildren {
+  ShellDashboardRoute: typeof ShellDashboardRoute
+  ShellHealthScanRoute: typeof ShellHealthScanRoute
+  ShellJobHistoryRoute: typeof ShellJobHistoryRoute
+  ShellLiveDataRoute: typeof ShellLiveDataRoute
+  ShellProgrammingRoute: typeof ShellProgrammingRoute
+  ShellReportsRoute: typeof ShellReportsRoute
+  ShellServiceFunctionsRoute: typeof ShellServiceFunctionsRoute
+  ShellSettingsRoute: typeof ShellSettingsRoute
+  ShellVehicleRoute: typeof ShellVehicleRoute
+  ShellEcusEcuIdRoute: typeof ShellEcusEcuIdRoute
+  ShellEcusIndexRoute: typeof ShellEcusIndexRoute
+}
+
+const ShellRouteChildren: ShellRouteChildren = {
+  ShellDashboardRoute: ShellDashboardRoute,
+  ShellHealthScanRoute: ShellHealthScanRoute,
+  ShellJobHistoryRoute: ShellJobHistoryRoute,
+  ShellLiveDataRoute: ShellLiveDataRoute,
+  ShellProgrammingRoute: ShellProgrammingRoute,
+  ShellReportsRoute: ShellReportsRoute,
+  ShellServiceFunctionsRoute: ShellServiceFunctionsRoute,
+  ShellSettingsRoute: ShellSettingsRoute,
+  ShellVehicleRoute: ShellVehicleRoute,
+  ShellEcusEcuIdRoute: ShellEcusEcuIdRoute,
+  ShellEcusIndexRoute: ShellEcusIndexRoute,
+}
+
+const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ShellRoute: ShellRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
