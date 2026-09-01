@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
 import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
+import { Route as ShellJobHistoryRouteImport } from './routes/_shell.job-history'
 import { Route as ShellLiveDataRouteImport } from './routes/_shell.live-data'
 import { Route as ShellProgrammingRouteImport } from './routes/_shell.programming'
 import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
@@ -38,6 +39,11 @@ const ShellDashboardRoute = ShellDashboardRouteImport.update({
 const ShellHealthScanRoute = ShellHealthScanRouteImport.update({
   id: '/health-scan',
   path: '/health-scan',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellJobHistoryRoute = ShellJobHistoryRouteImport.update({
+  id: '/job-history',
+  path: '/job-history',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellLiveDataRoute = ShellLiveDataRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/job-history': typeof ShellJobHistoryRoute
   '/live-data': typeof ShellLiveDataRoute
   '/programming': typeof ShellProgrammingRoute
   '/reports': typeof ShellReportsRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/job-history': typeof ShellJobHistoryRoute
   '/live-data': typeof ShellLiveDataRoute
   '/programming': typeof ShellProgrammingRoute
   '/reports': typeof ShellReportsRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_shell': typeof ShellRouteWithChildren
   '/_shell/dashboard': typeof ShellDashboardRoute
   '/_shell/health-scan': typeof ShellHealthScanRoute
+  '/_shell/job-history': typeof ShellJobHistoryRoute
   '/_shell/live-data': typeof ShellLiveDataRoute
   '/_shell/programming': typeof ShellProgrammingRoute
   '/_shell/reports': typeof ShellReportsRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/job-history'
     | '/live-data'
     | '/programming'
     | '/reports'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/job-history'
     | '/live-data'
     | '/programming'
     | '/reports'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/_shell'
     | '/_shell/dashboard'
     | '/_shell/health-scan'
+    | '/_shell/job-history'
     | '/_shell/live-data'
     | '/_shell/programming'
     | '/_shell/reports'
@@ -187,6 +199,13 @@ declare module '@tanstack/react-router' {
       path: '/health-scan'
       fullPath: '/health-scan'
       preLoaderRoute: typeof ShellHealthScanRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/job-history': {
+      id: '/_shell/job-history'
+      path: '/job-history'
+      fullPath: '/job-history'
+      preLoaderRoute: typeof ShellJobHistoryRouteImport
       parentRoute: typeof ShellRoute
     }
     '/_shell/live-data': {
@@ -244,6 +263,7 @@ declare module '@tanstack/react-router' {
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
   ShellHealthScanRoute: typeof ShellHealthScanRoute
+  ShellJobHistoryRoute: typeof ShellJobHistoryRoute
   ShellLiveDataRoute: typeof ShellLiveDataRoute
   ShellProgrammingRoute: typeof ShellProgrammingRoute
   ShellReportsRoute: typeof ShellReportsRoute
@@ -256,6 +276,7 @@ interface ShellRouteChildren {
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDashboardRoute: ShellDashboardRoute,
   ShellHealthScanRoute: ShellHealthScanRoute,
+  ShellJobHistoryRoute: ShellJobHistoryRoute,
   ShellLiveDataRoute: ShellLiveDataRoute,
   ShellProgrammingRoute: ShellProgrammingRoute,
   ShellReportsRoute: ShellReportsRoute,
