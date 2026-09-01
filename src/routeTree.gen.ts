@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
 import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
+import { Route as ShellLiveDataRouteImport } from './routes/_shell.live-data'
 import { Route as ShellProgrammingRouteImport } from './routes/_shell.programming'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
@@ -36,6 +37,11 @@ const ShellDashboardRoute = ShellDashboardRouteImport.update({
 const ShellHealthScanRoute = ShellHealthScanRouteImport.update({
   id: '/health-scan',
   path: '/health-scan',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellLiveDataRoute = ShellLiveDataRouteImport.update({
+  id: '/live-data',
+  path: '/live-data',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellProgrammingRoute = ShellProgrammingRouteImport.update({
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/live-data': typeof ShellLiveDataRoute
   '/programming': typeof ShellProgrammingRoute
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/vehicle': typeof ShellVehicleRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
+  '/live-data': typeof ShellLiveDataRoute
   '/programming': typeof ShellProgrammingRoute
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/vehicle': typeof ShellVehicleRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_shell': typeof ShellRouteWithChildren
   '/_shell/dashboard': typeof ShellDashboardRoute
   '/_shell/health-scan': typeof ShellHealthScanRoute
+  '/_shell/live-data': typeof ShellLiveDataRoute
   '/_shell/programming': typeof ShellProgrammingRoute
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/live-data'
     | '/programming'
     | '/service-functions'
     | '/vehicle'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/health-scan'
+    | '/live-data'
     | '/programming'
     | '/service-functions'
     | '/vehicle'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_shell'
     | '/_shell/dashboard'
     | '/_shell/health-scan'
+    | '/_shell/live-data'
     | '/_shell/programming'
     | '/_shell/service-functions'
     | '/_shell/vehicle'
@@ -163,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/health-scan'
       fullPath: '/health-scan'
       preLoaderRoute: typeof ShellHealthScanRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/live-data': {
+      id: '/_shell/live-data'
+      path: '/live-data'
+      fullPath: '/live-data'
+      preLoaderRoute: typeof ShellLiveDataRouteImport
       parentRoute: typeof ShellRoute
     }
     '/_shell/programming': {
@@ -206,6 +225,7 @@ declare module '@tanstack/react-router' {
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
   ShellHealthScanRoute: typeof ShellHealthScanRoute
+  ShellLiveDataRoute: typeof ShellLiveDataRoute
   ShellProgrammingRoute: typeof ShellProgrammingRoute
   ShellServiceFunctionsRoute: typeof ShellServiceFunctionsRoute
   ShellVehicleRoute: typeof ShellVehicleRoute
@@ -216,6 +236,7 @@ interface ShellRouteChildren {
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDashboardRoute: ShellDashboardRoute,
   ShellHealthScanRoute: ShellHealthScanRoute,
+  ShellLiveDataRoute: ShellLiveDataRoute,
   ShellProgrammingRoute: ShellProgrammingRoute,
   ShellServiceFunctionsRoute: ShellServiceFunctionsRoute,
   ShellVehicleRoute: ShellVehicleRoute,
