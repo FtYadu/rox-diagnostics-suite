@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
+import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 
@@ -29,6 +30,11 @@ const ShellDashboardRoute = ShellDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellHealthScanRoute = ShellHealthScanRouteImport.update({
+  id: '/health-scan',
+  path: '/health-scan',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellEcusIndexRoute = ShellEcusIndexRouteImport.update({
   id: '/ecus/',
   path: '/ecus/',
@@ -43,12 +49,14 @@ const ShellEcusEcuIdRoute = ShellEcusEcuIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/health-scan': typeof ShellHealthScanRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus/': typeof ShellEcusIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ShellDashboardRoute
+  '/health-scan': typeof ShellHealthScanRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus': typeof ShellEcusIndexRoute
 }
@@ -57,19 +65,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
   '/_shell/dashboard': typeof ShellDashboardRoute
+  '/_shell/health-scan': typeof ShellHealthScanRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/_shell/ecus/': typeof ShellEcusIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/ecus/$ecuId' | '/ecus/'
+  fullPaths: '/' | '/dashboard' | '/health-scan' | '/ecus/$ecuId' | '/ecus/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/ecus/$ecuId' | '/ecus'
+  to: '/' | '/dashboard' | '/health-scan' | '/ecus/$ecuId' | '/ecus'
   id:
     | '__root__'
     | '/'
     | '/_shell'
     | '/_shell/dashboard'
+    | '/_shell/health-scan'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
   fileRoutesById: FileRoutesById
@@ -102,6 +112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellDashboardRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/health-scan': {
+      id: '/_shell/health-scan'
+      path: '/health-scan'
+      fullPath: '/health-scan'
+      preLoaderRoute: typeof ShellHealthScanRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/ecus/': {
       id: '/_shell/ecus/'
       path: '/ecus'
@@ -121,12 +138,14 @@ declare module '@tanstack/react-router' {
 
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
+  ShellHealthScanRoute: typeof ShellHealthScanRoute
   ShellEcusEcuIdRoute: typeof ShellEcusEcuIdRoute
   ShellEcusIndexRoute: typeof ShellEcusIndexRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
   ShellDashboardRoute: ShellDashboardRoute,
+  ShellHealthScanRoute: ShellHealthScanRoute,
   ShellEcusEcuIdRoute: ShellEcusEcuIdRoute,
   ShellEcusIndexRoute: ShellEcusIndexRoute,
 }
