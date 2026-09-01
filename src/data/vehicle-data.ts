@@ -117,3 +117,6 @@ export const severityLabel = (severity: number): "Low" | "Medium" | "High" =>
   severity >= 3 ? "High" : severity === 2 ? "Medium" : "Low";
 
 export const processCategories = Array.from(new Set(processes.map((p) => p.category))).sort();
+
+/** Stable identity for a process (the seed data has no id field). */
+export const processKey = (process: ServiceProcess): string => `${process.ecu}:${process.name}`;

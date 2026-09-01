@@ -59,7 +59,8 @@ function DashboardPage() {
   const jobs = useAppStore((s) => s.jobs);
   const scan = useAppStore((s) => s.scan);
   const applyDtcResult = useAppStore((s) => s.applyDtcResult);
-  const addJob = useAppStore((s) => s.addJob);
+  const appendEvent = useAppStore((s) => s.appendEvent);
+  const startNewJob = useAppStore((s) => s.startNewJob);
   const [busy, setBusy] = useState<string | null>(null);
 
   const scanned = Object.values(scan);
@@ -79,12 +80,11 @@ function DashboardPage() {
       applyDtcResult(result);
       found += result.dtcs.length;
     }
-    addJob({
+    appendEvent({
+      kind: "scan",
       title: "Read all DTCs",
-      kind: "health-scan",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "completed",
-      summary: `${ecus.length} ECUs queried · ${found} stored DTCs`,
+      detail: `${ecus.length} ECUs queried · ${found} stored DTCs`,
+      status: "ok",
     });
     setBusy(null);
     toast.success(`Read complete — ${found} stored DTCs across ${ecus.length} ECUs`);
@@ -98,25 +98,18 @@ function DashboardPage() {
       cleared += result.cleared;
       applyDtcResult({ ecuId: ecu.id, responded: true, dtcs: [] });
     }
-    addJob({
+    appendEvent({
+      kind: "dtc-clear",
       title: "Clear all DTCs",
-      kind: "clear-dtc",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "completed",
-      summary: `${cleared} codes cleared`,
+      detail: `${cleared} codes cleared across ${ecus.length} control units`,
+      status: "ok",
     });
     setBusy(null);
     toast.success(`Cleared ${cleared} codes across the vehicle`);
   };
 
   const newJob = () => {
-    addJob({
-      title: "New workshop job",
-      kind: "manual",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "in-progress",
-      summary: "Job opened from dashboard",
-    });
+    startNewJob({ title: "New workshop job", kind: "manual" });
     toast.success("Job created");
     void navigate({ to: "/job-history" });
   };

@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ecus, severityLabel } from "@/data/vehicle-data";
-import type { Dtc } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
-import { SeverityPill } from "@/features/diagnostics/severity-pill";
+import type { DtcRecord } from "@/features/bridge/types";
+import { DtcTable } from "@/features/dtc/dtc-table";
 import { useAppStore } from "@/store/app-store";
 import type { EcuScanState } from "@/store/app-store";
 
@@ -34,8 +34,6 @@ export const Route = createFileRoute("/_shell/health-scan")({
   component: HealthScanPage,
 });
 
-type FoundDtc = Dtc & { ecuId: string };
-
 function HealthScanPage() {
   const navigate = useNavigate();
   const { bridge } = useBridge();
@@ -43,11 +41,13 @@ function HealthScanPage() {
   const setEcuState = useAppStore((s) => s.setEcuState);
   const applyDtcResult = useAppStore((s) => s.applyDtcResult);
   const resetScan = useAppStore((s) => s.resetScan);
-  const addJob = useAppStore((s) => s.addJob);
+  const appendEvent = useAppStore((s) => s.appendEvent);
+  const ensureJob = useAppStore((s) => s.ensureJob);
+  const updateJob = useAppStore((s) => s.updateJob);
 
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [found, setFound] = useState<FoundDtc[]>([]);
+  const [found, setFound] = useState<DtcRecord[]>([]);
   const [completedAt, setCompletedAt] = useState<string | null>(null);
   const cancelled = useRef(false);
 
@@ -59,14 +59,14 @@ function HealthScanPage() {
     setCompletedAt(null);
     resetScan();
 
-    const collected: FoundDtc[] = [];
+    const collected: DtcRecord[] = [];
     for (let index = 0; index < ecus.length; index += 1) {
       if (cancelled.current) break;
       const ecu = ecus[index]!;
       setEcuState(ecu.id, { status: "scanning", dtcCount: 0 });
       const result = await bridge.readDtcs(ecu);
       applyDtcResult(result);
-      result.dtcs.forEach((dtc) => collected.push({ ...dtc, ecuId: ecu.id }));
+      collected.push(...result.dtcs);
       setFound([...collected]);
       setProgress(Math.round(((index + 1) / ecus.length) * 100));
     }
@@ -77,12 +77,19 @@ function HealthScanPage() {
       return;
     }
     setCompletedAt(new Date().toISOString());
-    addJob({
-      title: "Full health scan",
-      kind: "health-scan",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "completed",
+    const critical = collected.filter((dtc) => dtc.severity === 3).length;
+    const jobId = ensureJob({ title: "Full health scan", kind: "health-scan" });
+    updateJob(jobId, {
+      dtcTotal: collected.length,
+      dtcCritical: critical,
       summary: `${ecus.length} ECUs scanned · ${collected.length} stored DTCs`,
+    });
+    appendEvent({
+      jobId,
+      kind: "scan",
+      title: "Full health scan",
+      detail: `${ecus.length} ECUs scanned · ${collected.length} stored DTCs · ${collected.filter((dtc) => dtc.severity === 3).length} critical`,
+      status: "ok",
     });
     toast.success(`Scan complete — ${collected.length} stored DTCs`);
   };
@@ -96,14 +103,32 @@ function HealthScanPage() {
       applyDtcResult({ ecuId: ecu.id, responded: true, dtcs: [] });
     }
     setFound([]);
-    addJob({
+    appendEvent({
+      kind: "dtc-clear",
       title: "Clear all DTCs after scan",
-      kind: "clear-dtc",
-      technician: useAppStore.getState().user?.name ?? "Technician",
-      status: "completed",
-      summary: `${cleared} codes cleared across ${faulted.length} ECUs`,
+      detail: `${cleared} codes cleared across ${faulted.length} control units`,
+      status: "ok",
     });
     toast.success(`${cleared} codes cleared`);
+  };
+
+  const clearRecords = async (records: DtcRecord[]) => {
+    let cleared = 0;
+    for (const ecu of ecus) {
+      const codes = records.filter((record) => record.ecuId === ecu.id).map((r) => r.code);
+      if (codes.length === 0) continue;
+      const result = await bridge.clearDtcs(ecu, codes);
+      cleared += result.cleared;
+    }
+    const keys = new Set(records.map((record) => `${record.ecuId}:${record.code}`));
+    setFound((prev) => prev.filter((item) => !keys.has(`${item.ecuId}:${item.code}`)));
+    appendEvent({
+      kind: "dtc-clear",
+      title: `Clear ${records.length} code${records.length === 1 ? "" : "s"} from scan`,
+      detail: records.map((record) => `${record.ecuId} ${record.code}`).join(", "),
+      status: "ok",
+    });
+    toast.success(`${cleared} code${cleared === 1 ? "" : "s"} cleared`);
   };
 
   const severityCounts = {
@@ -219,28 +244,14 @@ function HealthScanPage() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Findings</CardTitle>
           </CardHeader>
-          <CardContent className="max-h-[560px] space-y-2 overflow-y-auto">
-            {found.length === 0 && (
+          <CardContent className="max-h-[560px] overflow-y-auto">
+            {found.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {running ? "Collecting fault memory…" : "No stored faults found yet."}
               </p>
+            ) : (
+              <DtcTable records={found} showEcu onClear={clearRecords} />
             )}
-            {found.map((dtc) => (
-              <Link
-                key={`${dtc.ecuId}-${dtc.code}`}
-                to="/ecus/$ecuId"
-                params={{ ecuId: dtc.ecuId }}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl bg-secondary/40 px-4 py-3 hairline hover:bg-accent/40"
-              >
-                <div className="min-w-0">
-                  <p className="font-mono text-sm font-medium">
-                    {dtc.ecuId} · {dtc.code}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">{dtc.name}</p>
-                </div>
-                <SeverityPill severity={dtc.severity} />
-              </Link>
-            ))}
           </CardContent>
         </Card>
       </div>

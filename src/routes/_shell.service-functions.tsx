@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Input } from "@/components/ui/input";
 import { ecus, processCategories, processes } from "@/data/vehicle-data";
-import { ProcessRunner } from "@/features/diagnostics/process-runner";
+import { ProcessList } from "@/features/processes/process-list";
+import { securityLabel } from "@/features/processes/step-model";
 
 export const Route = createFileRoute("/_shell/service-functions")({
   head: () => ({
@@ -29,18 +30,20 @@ function ServiceFunctionsPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [ecuFilter, setEcuFilter] = useState<string>("all");
+  const [security, setSecurity] = useState<string>("all");
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return processes.filter((process) => {
       if (category !== "all" && process.category !== category) return false;
       if (ecuFilter !== "all" && process.ecu !== ecuFilter) return false;
+      if (security !== "all" && String(process.securityLevel) !== security) return false;
       if (!needle) return true;
       return (
         process.name.toLowerCase().includes(needle) || process.ecu.toLowerCase().includes(needle)
       );
     });
-  }, [query, category, ecuFilter]);
+  }, [query, category, ecuFilter, security]);
 
   return (
     <div className="space-y-6">
@@ -49,7 +52,7 @@ function ServiceFunctionsPage() {
         subtitle={`${processes.length} guided processes across ${new Set(processes.map((p) => p.ecu)).size} control units`}
       />
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -86,9 +89,26 @@ function ServiceFunctionsPage() {
             </option>
           ))}
         </select>
+        <select
+          value={security}
+          onChange={(event) => setSecurity(event.target.value)}
+          aria-label="Filter by security level"
+          className="h-11 rounded-full bg-secondary/60 px-4 text-sm hairline"
+        >
+          <option value="all">All security levels</option>
+          {[0, 1, 17].map((level) => (
+            <option key={level} value={String(level)}>
+              {securityLabel(level)}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <ProcessRunner processes={filtered} showEcu />
+      <p className="text-xs text-muted-foreground numerals">
+        {filtered.length} of {processes.length} processes
+      </p>
+
+      <ProcessList processes={filtered} showEcu />
     </div>
   );
 }
