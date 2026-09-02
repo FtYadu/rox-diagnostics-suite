@@ -14,10 +14,19 @@ import type {
 
 export const LOCAL_BRIDGE_URL = "ws://127.0.0.1:9097";
 
+const CONNECT_TIMEOUT_MS = 2500;
+const CALL_TIMEOUT_MS = 15_000;
+const KEEPALIVE_MS = 4000;
+
+export type LocalBridgeEvent =
+  | { type: "status"; info: ConnectionInfo }
+  | { type: "disconnected"; reason: string };
+
 type PendingEntry = {
   resolve: (value: unknown) => void;
   reject: (reason: Error) => void;
   onEvent?: (payload: unknown) => void;
+  timer?: ReturnType<typeof setTimeout>;
 };
 
 type BridgeMessage = {
@@ -26,6 +35,24 @@ type BridgeMessage = {
   payload?: unknown;
   message?: string;
 };
+
+const asString = (value: unknown, fallback: string) =>
+  typeof value === "string" && value.length > 0 ? value : fallback;
+
+/** Agents differ slightly in field naming; normalise into ConnectionInfo. */
+const normalizeInfo = (payload: unknown): ConnectionInfo => {
+  const raw = (payload ?? {}) as Record<string, unknown>;
+  const voltage = Number(raw["batteryVoltage"] ?? raw["voltage"] ?? 0);
+  return {
+    mode: "local",
+    vciName: asString(raw["vciName"] ?? raw["device"], ""),
+    vciSerial: asString(raw["vciSerial"] ?? raw["serial"], "—"),
+    protocol: asString(raw["protocol"], "DoIP / CAN FD"),
+    batteryVoltage: Number.isFinite(voltage) ? voltage : 0,
+    ignitionOn: Boolean(raw["ignitionOn"] ?? raw["ignition"]),
+  };
+};
+
 
 /**
  * WebSocket client for the local hardware agent. The agent exposes a small
@@ -41,6 +68,22 @@ export class LocalBridge implements DiagnosticBridge {
 
   private counter = 0;
 
+  private keepAlive: ReturnType<typeof setInterval> | null = null;
+
+  private closedByUs = false;
+
+  private listeners = new Set<(event: LocalBridgeEvent) => void>();
+
+  /** Subscribe to connection lifecycle events (status/battery updates, drops). */
+  subscribe(listener: (event: LocalBridgeEvent) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private emit(event: LocalBridgeEvent) {
+    this.listeners.forEach((listener) => listener(event));
+  }
+
   private async socketReady(): Promise<WebSocket> {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) return this.socket;
     if (typeof WebSocket === "undefined") {
@@ -48,11 +91,18 @@ export class LocalBridge implements DiagnosticBridge {
     }
 
     return new Promise<WebSocket>((resolve, reject) => {
-      const socket = new WebSocket(LOCAL_BRIDGE_URL);
+      let socket: WebSocket;
+      try {
+        socket = new WebSocket(LOCAL_BRIDGE_URL);
+      } catch {
+        reject(new Error("Local bridge agent unreachable on 127.0.0.1:9097"));
+        return;
+      }
+
       const timer = setTimeout(() => {
         socket.close();
         reject(new Error("Local bridge agent did not respond on 127.0.0.1:9097"));
-      }, 2500);
+      }, CONNECT_TIMEOUT_MS);
 
       socket.onopen = () => {
         clearTimeout(timer);
@@ -64,9 +114,14 @@ export class LocalBridge implements DiagnosticBridge {
         reject(new Error("Local bridge agent unreachable on 127.0.0.1:9097"));
       };
       socket.onclose = () => {
+        clearTimeout(timer);
         this.socket = null;
+        this.stopKeepAlive();
         this.pending.forEach((entry) => entry.reject(new Error("Local bridge connection closed")));
         this.pending.clear();
+        if (!this.closedByUs) {
+          this.emit({ type: "disconnected", reason: "VCI bridge agent connection lost" });
+        }
       };
       socket.onmessage = (event) => this.handleMessage(event);
     });
@@ -79,7 +134,15 @@ export class LocalBridge implements DiagnosticBridge {
     } catch {
       return;
     }
-    if (!message.id) return;
+
+    if (!message.id) {
+      // Unsolicited agent push, e.g. VCI unplugged or voltage change.
+      if (message.type === "event" && message.payload) {
+        this.emit({ type: "status", info: normalizeInfo(message.payload) });
+      }
+      return;
+    }
+
     const entry = this.pending.get(message.id);
     if (!entry) return;
 
@@ -88,6 +151,7 @@ export class LocalBridge implements DiagnosticBridge {
       return;
     }
     this.pending.delete(message.id);
+    if (entry.timer) clearTimeout(entry.timer);
     if (message.type === "error") {
       entry.reject(new Error(message.message ?? "Local bridge error"));
       return;
@@ -99,23 +163,77 @@ export class LocalBridge implements DiagnosticBridge {
     method: string,
     params: Record<string, unknown>,
     onEvent?: (payload: unknown) => void,
+    timeoutMs = CALL_TIMEOUT_MS,
   ): Promise<T> {
     const socket = await this.socketReady();
     this.counter += 1;
     const id = `${Date.now()}-${this.counter}`;
     return new Promise<T>((resolve, reject) => {
+      const timer = onEvent
+        ? undefined
+        : setTimeout(() => {
+            this.pending.delete(id);
+            reject(new Error(`Local bridge timed out on ${method}`));
+          }, timeoutMs);
+
       this.pending.set(id, {
-        resolve: (value) => resolve(value as T),
-        reject,
+        resolve: (value) => {
+          if (timer) clearTimeout(timer);
+          resolve(value as T);
+        },
+        reject: (reason) => {
+          if (timer) clearTimeout(timer);
+          reject(reason);
+        },
         ...(onEvent ? { onEvent } : {}),
+        ...(timer ? { timer } : {}),
       });
       socket.send(JSON.stringify({ id, method, params }));
     });
   }
 
-  connect(): Promise<ConnectionInfo> {
-    return this.call<ConnectionInfo>("connect", {});
+  private startKeepAlive() {
+    this.stopKeepAlive();
+    if (typeof setInterval === "undefined") return;
+    this.keepAlive = setInterval(() => {
+      void this.call<unknown>("status", {}, undefined, 4000)
+        .then((payload) => {
+          if (payload) this.emit({ type: "status", info: normalizeInfo(payload) });
+        })
+        .catch((cause: unknown) => {
+          this.emit({
+            type: "disconnected",
+            reason: cause instanceof Error ? cause.message : "VCI bridge agent stopped responding",
+          });
+          this.close();
+        });
+    }, KEEPALIVE_MS);
   }
+
+  private stopKeepAlive() {
+    if (this.keepAlive) clearInterval(this.keepAlive);
+    this.keepAlive = null;
+  }
+
+  /** Closes the socket without emitting a disconnect event. */
+  close() {
+    this.closedByUs = true;
+    this.stopKeepAlive();
+    this.socket?.close();
+    this.socket = null;
+  }
+
+  async connect(): Promise<ConnectionInfo> {
+    this.closedByUs = false;
+    const payload = await this.call<unknown>("connect", {}, undefined, CONNECT_TIMEOUT_MS);
+    const info = normalizeInfo(payload);
+    if (!info.vciName) {
+      throw new Error("No VCI reported by the local bridge agent");
+    }
+    this.startKeepAlive();
+    return info;
+  }
+
 
   readIdentification(ecu: Ecu): Promise<IdentificationEntry[]> {
     return this.call<IdentificationEntry[]>("readIdentification", { ecu: ecu.id });
