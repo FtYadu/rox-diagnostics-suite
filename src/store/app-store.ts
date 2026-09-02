@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { BridgeMode, EcuDtcResult } from "@/features/bridge/types";
+import type { BridgeMode, DtcRecord, EcuDtcResult } from "@/features/bridge/types";
 import { pushJob, pushJobEvent } from "@/features/jobs/job-cloud";
 import { jobEventId, jobId as newJobId } from "@/features/jobs/types";
 import { isVinValid, normalizeVin } from "@/features/vehicle/vin";
@@ -38,6 +38,8 @@ type AppState = {
   /** Most recently used VINs, newest first, for the VIN picker. */
   vinHistory: string[];
   scan: Record<string, EcuScanState>;
+  /** DTC records collected by the most recent scan, used for reports. */
+  scanDtcs: DtcRecord[];
   jobs: Job[];
   activeJobId: string | null;
   signIn: (email: string, cloud?: boolean) => void;
@@ -82,6 +84,7 @@ export const useAppStore = create<AppState>()(
       vin: "",
       vinHistory: [],
       scan: {},
+      scanDtcs: [],
       jobs: seedJobs,
       activeJobId: null,
 
@@ -108,6 +111,10 @@ export const useAppStore = create<AppState>()(
 
       applyDtcResult: (result) =>
         set({
+          scanDtcs: [
+            ...get().scanDtcs.filter((record) => record.ecuId !== result.ecuId),
+            ...result.dtcs,
+          ],
           scan: {
             ...get().scan,
             [result.ecuId]: {
@@ -118,7 +125,7 @@ export const useAppStore = create<AppState>()(
           },
         }),
 
-      resetScan: () => set({ scan: {} }),
+      resetScan: () => set({ scan: {}, scanDtcs: [] }),
 
       ensureJob: (input) => {
         const state = get();
@@ -218,6 +225,7 @@ export const useAppStore = create<AppState>()(
         sidebarCollapsed: state.sidebarCollapsed,
         vin: state.vin,
         vinHistory: state.vinHistory,
+        scanDtcs: state.scanDtcs,
         jobs: state.jobs,
         activeJobId: state.activeJobId,
       }),

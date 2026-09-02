@@ -18,6 +18,7 @@ export type JobEventKind =
   | "routine"
   | "programming"
   | "recording"
+  | "report"
   | "note";
 
 export type JobEvent = {
