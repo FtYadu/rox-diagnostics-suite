@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { processKey, processesForEcu, type Ecu, type ServiceProcess } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
+import { describeNrcWithHint } from "@/features/bridge/types";
 import type { TraceLine } from "@/features/bridge/types";
 import { TraceConsole } from "@/features/diagnostics/trace-console";
 import { GuidedRunner } from "@/features/processes/guided-runner";

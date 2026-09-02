@@ -227,3 +227,9 @@ export const nrcHint = (nrc: string): string | undefined => NRC_HINTS[normalizeN
 /** `0x33 securityAccessDenied` for traces and toasts. */
 export const describeNrc = (nrc: string): string => `${normalizeNrc(nrc)} ${nrcMeaning(nrc)}`;
 
+
+/** `0x33 securityAccessDenied — Security access required. Unlock the ECU…` */
+export const describeNrcWithHint = (nrc: string): string => {
+  const hint = nrcHint(nrc);
+  return hint ? `${describeNrc(nrc)} — ${hint}` : describeNrc(nrc);
+};
