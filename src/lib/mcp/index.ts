@@ -28,5 +28,7 @@ export default defineMcp({
     listJobsTool,
     getJobTool,
     addJobNoteTool,
-  ] as McpDefinitionInput["tools"],
+    // Tools omit `outputSchema`; the SDK's optional-property typing needs the cast
+  // under exactOptionalPropertyTypes.
+  ] as unknown as McpDefinitionInput["tools"],
 });
