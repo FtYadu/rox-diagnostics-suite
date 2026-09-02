@@ -226,12 +226,14 @@ export class SimulatorBridge implements DiagnosticBridge {
     const attempts = (this.securityAttempts.get(seed) ?? 0) + 1;
     this.securityAttempts.set(seed, attempts);
 
-    const failRoll = Math.random();
-    if (failRoll < 0.1) {
-      const nrc = failRoll < 0.05 ? "0x35" : attempts > 3 ? "0x36" : "0x33";
+    // Realistic but forgiving: roughly 1 in 20 first unlocks is rejected, and a
+    // retry always succeeds so a technician never gets stuck on the simulator.
+    if (attempts === 1 && Math.random() < 0.05) {
+      const nrc = Math.random() < 0.4 ? "0x35" : "0x33";
       trace.push(line("rx", `7F 27 ${nrc.slice(2)}`));
       return { ok: false, level, trace, error: { nrc, meaning: nrcMeaning(nrc) } };
     }
+
 
     const seedBytes = randomBytes(4);
     trace.push(line("rx", `67 ${sub} ${seedBytes}`));
