@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Cpu, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +74,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function ConsentPage() {
   const details = Route.useLoaderData();
   const { authorization_id: authorizationId } = Route.useSearch();
-  const router = Route.useRouter();
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
