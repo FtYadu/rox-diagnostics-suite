@@ -239,8 +239,8 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
     headStyles: { fillColor: [INK.r, INK.g, INK.b], textColor: 255, fontSize: 8.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
-      0: { cellWidth: 56, fontStyle: "bold" },
-      1: { cellWidth: 205 },
+      0: { cellWidth: 68, fontStyle: "bold" },
+      1: { cellWidth: 193 },
       2: { cellWidth: 86 },
       3: { cellWidth: 40, halign: "right" },
       4: { cellWidth: 112 },
