@@ -31,6 +31,87 @@
       ],
       "routines": {},
       "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" }, "17": { "algorithm": "xor", "mask": "17 3B 91 C4" } }
+    },
+    "IBCM": {
+      "address": "0x1002",
+      "identification": [
+        { "did": "F190", "label": "VIN", "encoding": "ascii", "length": 17 },
+        { "did": "F187", "label": "Part number", "encoding": "ascii" },
+        { "did": "F189", "label": "Software version", "encoding": "ascii" },
+        { "did": "F18A", "label": "Supplier", "encoding": "ascii" },
+        { "did": "F18C", "label": "Serial number", "encoding": "ascii" }
+      ],
+      "liveData": [
+        { "did": "F186", "label": "Supply voltage", "unit": "V", "length": 2, "factor": 0.001, "min": 8, "max": 16 },
+        { "did": "F421", "label": "Interior temperature", "unit": "°C", "length": 1, "offset": -40, "min": -40, "max": 85 }
+      ],
+      "snapshot": [
+        { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1 }
+      ],
+      "routines": {},
+      "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" } }
+    },
+    "ACU": {
+      "address": "0x1010",
+      "identification": [
+        { "did": "F190", "label": "VIN", "encoding": "ascii", "length": 17 },
+        { "did": "F187", "label": "Part number", "encoding": "ascii" },
+        { "did": "F189", "label": "Software version", "encoding": "ascii" },
+        { "did": "F18A", "label": "Supplier", "encoding": "ascii" },
+        { "did": "F18C", "label": "Serial number", "encoding": "ascii" }
+      ],
+      "liveData": [
+        { "did": "F186", "label": "Supply voltage", "unit": "V", "length": 2, "factor": 0.001, "min": 8, "max": 16 },
+        { "did": "F430", "label": "Driver belt switch", "length": 1, "min": 0, "max": 1 }
+      ],
+      "snapshot": [
+        { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1 }
+      ],
+      "routines": {},
+      "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" } }
+    },
+    "ESC": {
+      "address": "0x1020",
+      "identification": [
+        { "did": "F190", "label": "VIN", "encoding": "ascii", "length": 17 },
+        { "did": "F187", "label": "Part number", "encoding": "ascii" },
+        { "did": "F189", "label": "Software version", "encoding": "ascii" },
+        { "did": "F18A", "label": "Supplier", "encoding": "ascii" },
+        { "did": "F18C", "label": "Serial number", "encoding": "ascii" }
+      ],
+      "liveData": [
+        { "did": "F186", "label": "Supply voltage", "unit": "V", "length": 2, "factor": 0.001, "min": 8, "max": 16 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1, "min": 0, "max": 240 }
+      ],
+      "snapshot": [
+        { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1 }
+      ],
+      "routines": {},
+      "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" } }
+    },
+    "BMS": {
+      "address": "0x1030",
+      "identification": [
+        { "did": "F190", "label": "VIN", "encoding": "ascii", "length": 17 },
+        { "did": "F187", "label": "Part number", "encoding": "ascii" },
+        { "did": "F189", "label": "Software version", "encoding": "ascii" },
+        { "did": "F18A", "label": "Supplier", "encoding": "ascii" },
+        { "did": "F18C", "label": "Serial number", "encoding": "ascii" }
+      ],
+      "liveData": [
+        { "did": "F186", "label": "Supply voltage", "unit": "V", "length": 2, "factor": 0.001, "min": 8, "max": 16 },
+        { "did": "F450", "label": "Pack voltage", "unit": "V", "length": 2, "factor": 0.1, "min": 250, "max": 450 },
+        { "did": "F451", "label": "State of charge", "unit": "%", "length": 1, "factor": 0.5, "min": 0, "max": 100 }
+      ],
+      "snapshot": [
+        { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1 }
+      ],
+      "routines": {},
+      "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" } }
     }
   },
   "processes": {}
