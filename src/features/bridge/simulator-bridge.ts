@@ -268,7 +268,7 @@ export class SimulatorBridge implements DiagnosticBridge {
 
     // ~3% of first attempts return a plausible NRC; the retry of the same step
     // always passes so guided processes stay completable.
-    const stepKey = `${process.id}:${stepIndex}`;
+    const stepKey = `${process.ecu}:${process.name}:${stepIndex}`;
     const stepAttempts = (this.stepAttempts.get(stepKey) ?? 0) + 1;
     this.stepAttempts.set(stepKey, stepAttempts);
     if (stepAttempts === 1 && Math.random() < 0.03) {

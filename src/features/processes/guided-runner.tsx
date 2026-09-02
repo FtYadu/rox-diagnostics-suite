@@ -140,7 +140,7 @@ export function GuidedRunner({
         if (!result.ok) {
           setState(index, "failed");
           const reason = result.error
-            ? `${result.error.nrc} ${result.error.meaning}`
+            ? describeNrcWithHint(result.error.nrc)
             : "security access rejected";
           setFailure(`Security access L${step.level} failed — ${reason}`);
           finish(false, `Security access L${step.level} rejected (${reason}).`, nextTrace);
@@ -162,7 +162,7 @@ export function GuidedRunner({
         if (!result.ok) {
           setState(index, "failed");
           const reason = result.error
-            ? `${result.error.nrc} ${result.error.meaning}`
+            ? describeNrcWithHint(result.error.nrc)
             : result.message;
           setFailure(reason);
           finish(false, `Step "${step.title}" failed — ${reason}`, nextTrace);
