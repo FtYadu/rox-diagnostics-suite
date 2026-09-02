@@ -263,9 +263,14 @@ export class SimulatorBridge implements DiagnosticBridge {
     trace.push(line("tx", `${sid} ${input ? "F1 90" : randomBytes(2)}`));
     await wait(220 + Math.random() * 320);
 
-    const failRoll = Math.random();
-    if (failRoll < 0.07) {
-      const nrc = failRoll < 0.03 ? "0x22" : failRoll < 0.05 ? "0x31" : "0x72";
+    // ~3% of first attempts return a plausible NRC; the retry of the same step
+    // always passes so guided processes stay completable.
+    const stepKey = `${process.id}:${stepIndex}`;
+    const stepAttempts = (this.stepAttempts.get(stepKey) ?? 0) + 1;
+    this.stepAttempts.set(stepKey, stepAttempts);
+    if (stepAttempts === 1 && Math.random() < 0.03) {
+      const roll = Math.random();
+      const nrc = roll < 0.5 ? "0x22" : roll < 0.8 ? "0x31" : "0x7E";
       trace.push(line("rx", `7F ${sid} ${nrc.slice(2)}`));
       return {
         ok: false,
@@ -274,6 +279,7 @@ export class SimulatorBridge implements DiagnosticBridge {
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
+
 
     trace.push(line("rx", `${hex(parseInt(sid, 16) + 0x40)} ${randomBytes(2)}`));
     return {
