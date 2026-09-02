@@ -110,6 +110,9 @@ export class SimulatorBridge implements DiagnosticBridge {
 
   private runningRoutines = new Set<string>();
 
+  private stepAttempts = new Map<string, number>();
+
+
   private battery = round(randomBetween(12.4, 14.2), 1);
 
   async connect(): Promise<ConnectionInfo> {
