@@ -14,10 +14,19 @@ import type {
 
 export const LOCAL_BRIDGE_URL = "ws://127.0.0.1:9097";
 
+const CONNECT_TIMEOUT_MS = 2500;
+const CALL_TIMEOUT_MS = 15_000;
+const KEEPALIVE_MS = 4000;
+
+export type LocalBridgeEvent =
+  | { type: "status"; info: ConnectionInfo }
+  | { type: "disconnected"; reason: string };
+
 type PendingEntry = {
   resolve: (value: unknown) => void;
   reject: (reason: Error) => void;
   onEvent?: (payload: unknown) => void;
+  timer?: ReturnType<typeof setTimeout>;
 };
 
 type BridgeMessage = {
@@ -26,6 +35,24 @@ type BridgeMessage = {
   payload?: unknown;
   message?: string;
 };
+
+const asString = (value: unknown, fallback: string) =>
+  typeof value === "string" && value.length > 0 ? value : fallback;
+
+/** Agents differ slightly in field naming; normalise into ConnectionInfo. */
+const normalizeInfo = (payload: unknown): ConnectionInfo => {
+  const raw = (payload ?? {}) as Record<string, unknown>;
+  const voltage = Number(raw["batteryVoltage"] ?? raw["voltage"] ?? 0);
+  return {
+    mode: "local",
+    vciName: asString(raw["vciName"] ?? raw["device"], ""),
+    vciSerial: asString(raw["vciSerial"] ?? raw["serial"], "—"),
+    protocol: asString(raw["protocol"], "DoIP / CAN FD"),
+    batteryVoltage: Number.isFinite(voltage) ? voltage : 0,
+    ignitionOn: Boolean(raw["ignitionOn"] ?? raw["ignition"]),
+  };
+};
+
 
 /**
  * WebSocket client for the local hardware agent. The agent exposes a small
