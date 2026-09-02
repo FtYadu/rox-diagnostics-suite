@@ -198,8 +198,8 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
       0: { cellWidth: 60, font: "courier", fontStyle: "bold" },
-      1: { cellWidth: 52 },
-      2: { cellWidth: 170 },
+      1: { cellWidth: 66 },
+      2: { cellWidth: 156 },
       3: { cellWidth: 62 },
       4: { cellWidth: 115 },
       5: { cellWidth: 40, halign: "right" },
@@ -207,9 +207,9 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
     margin: { left: MARGIN, right: MARGIN },
     didParseCell: (data) => {
       if (data.section === "body" && data.column.index === 3) {
-        const raw = String(data.cell.raw);
-        if (raw.startsWith("3")) data.cell.styles.textColor = [200, 40, 35];
-        else if (raw.startsWith("2")) data.cell.styles.textColor = [170, 110, 0];
+        const label = String(data.cell.raw).split("·")[1]?.trim();
+        if (label === "High") data.cell.styles.textColor = [200, 40, 35];
+        else if (label === "Medium") data.cell.styles.textColor = [170, 110, 0];
       }
     },
   });
