@@ -1,5 +1,5 @@
 import { auth, defineMcp } from "@lovable.dev/mcp-js";
-import type { AnyToolDefinition } from "@lovable.dev/mcp-js";
+import type { McpDefinitionInput } from "@lovable.dev/mcp-js";
 import listEcusTool from "./tools/list-ecus";
 import getEcuTool from "./tools/get-ecu";
 import listServiceProcessesTool from "./tools/list-service-processes";
@@ -28,5 +28,5 @@ export default defineMcp({
     listJobsTool,
     getJobTool,
     addJobNoteTool,
-  ] as readonly AnyToolDefinition[],
+  ] as McpDefinitionInput["tools"],
 });
