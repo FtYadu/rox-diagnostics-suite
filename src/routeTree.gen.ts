@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
 import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
 import { Route as ShellJobHistoryRouteImport } from './routes/_shell.job-history'
@@ -20,6 +22,7 @@ import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 
@@ -32,6 +35,17 @@ const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShellDashboardRoute = ShellDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -77,6 +91,11 @@ const ShellVehicleRoute = ShellVehicleRouteImport.update({
   path: '/vehicle',
   getParentRoute: () => ShellRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShellEcusIndexRoute = ShellEcusIndexRouteImport.update({
   id: '/ecus/',
   path: '/ecus/',
@@ -90,6 +109,8 @@ const ShellEcusEcuIdRoute = ShellEcusEcuIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
   '/job-history': typeof ShellJobHistoryRoute
@@ -99,11 +120,14 @@ export interface FileRoutesByFullPath {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus/': typeof ShellEcusIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
   '/job-history': typeof ShellJobHistoryRoute
@@ -113,6 +137,7 @@ export interface FileRoutesByTo {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus': typeof ShellEcusIndexRoute
 }
@@ -120,6 +145,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_shell/dashboard': typeof ShellDashboardRoute
   '/_shell/health-scan': typeof ShellHealthScanRoute
   '/_shell/job-history': typeof ShellJobHistoryRoute
@@ -129,6 +156,7 @@ export interface FileRoutesById {
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/_shell/ecus/': typeof ShellEcusIndexRoute
 }
@@ -136,6 +164,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/health-scan'
     | '/job-history'
@@ -145,11 +175,14 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/health-scan'
     | '/job-history'
@@ -159,12 +192,15 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus'
   id:
     | '__root__'
     | '/'
     | '/_shell'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/_shell/dashboard'
     | '/_shell/health-scan'
     | '/_shell/job-history'
@@ -174,6 +210,7 @@ export interface FileRouteTypes {
     | '/_shell/service-functions'
     | '/_shell/settings'
     | '/_shell/vehicle'
+    | '/.lovable/oauth/consent'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
   fileRoutesById: FileRoutesById
@@ -181,6 +218,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ShellRoute: typeof ShellRouteWithChildren
+  McpRoute: typeof McpRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +237,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_shell/dashboard': {
@@ -262,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellVehicleRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_shell/ecus/': {
       id: '/_shell/ecus/'
       path: '/ecus'
@@ -312,6 +373,10 @@ const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ShellRoute: ShellRouteWithChildren,
+  McpRoute: McpRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

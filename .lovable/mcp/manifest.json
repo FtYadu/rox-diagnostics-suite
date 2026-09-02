@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "sdk_version": "1.0.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://uzppdwipcbspaxhicieu.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "rox-diagnostics-suite",
+      "version": "0.1.0",
+      "title": "Rox Diagnostics Suite"
+    },
+    "tools": [
+      {
+        "name": "list_ecus",
+        "title": "List ECUs",
+        "description": "List the ROX 01 (R11_Oversea) control units, optionally filtered by domain or a text search on ECU id/name.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "string",
+              "description": "Domain filter, e.g. Powertrain, Chassis, ADAS."
+            },
+            "search": {
+              "type": "string",
+              "description": "Text match on ECU id or full name."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_ecu",
+        "title": "Get ECU detail",
+        "description": "Return one ECU's detail: domain, identification DIDs, routines, fault codes with severity, and available service processes.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "ecuId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "ECU id, e.g. EMS, BMS, ESC."
+            },
+            "includeDtcs": {
+              "type": "boolean",
+              "description": "Include the full DTC list (default true)."
+            }
+          },
+          "required": [
+            "ecuId"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_service_processes",
+        "title": "List service functions",
+        "description": "Search the ROX 01 guided service functions (resets, coding, immobiliser, calibration, actuator tests) by ECU, category, security level or free text.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "ecuId": {
+              "type": "string",
+              "description": "Restrict to one ECU id."
+            },
+            "category": {
+              "type": "string",
+              "description": "Category, e.g. Reset, Coding, Calibration."
+            },
+            "securityLevel": {
+              "type": "integer",
+              "description": "Security level: 0 none, 1 extended, 17 immobiliser."
+            },
+            "search": {
+              "type": "string",
+              "description": "Text match on the process name."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Max rows (default 25)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_jobs",
+        "title": "List diagnostic jobs",
+        "description": "List the signed-in technician's diagnostic jobs (VIN, kind, status, DTC totals), newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "vin": {
+              "type": "string",
+              "description": "Filter by VIN."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "in-progress",
+                "completed",
+                "failed"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max rows (default 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_job",
+        "title": "Get job detail",
+        "description": "Return one of the signed-in technician's jobs with its action timeline (scan, DTC clear, service, programming, notes).",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "jobId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Job id, e.g. JOB-12345."
+            }
+          },
+          "required": [
+            "jobId"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_job_note",
+        "title": "Add job note",
+        "description": "Append a technician note to one of the signed-in user's diagnostic jobs.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "jobId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Job id, e.g. JOB-12345."
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Short note title."
+            },
+            "detail": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "description": "Note body."
+            },
+            "ecuId": {
+              "type": "string",
+              "description": "Related ECU id, if any."
+            }
+          },
+          "required": [
+            "jobId",
+            "title",
+            "detail"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
