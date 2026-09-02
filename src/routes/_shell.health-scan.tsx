@@ -12,6 +12,7 @@ import { ecus, severityLabel } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
 import type { DtcRecord } from "@/features/bridge/types";
 import { DtcTable } from "@/features/dtc/dtc-table";
+import { ScanReportDialog } from "@/features/reports/report-dialog";
 import { useAppStore } from "@/store/app-store";
 import type { EcuScanState } from "@/store/app-store";
 
@@ -49,6 +50,7 @@ function HealthScanPage() {
   const [progress, setProgress] = useState(0);
   const [found, setFound] = useState<DtcRecord[]>([]);
   const [completedAt, setCompletedAt] = useState<string | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
   const cancelled = useRef(false);
 
   const runScan = async () => {
@@ -177,14 +179,21 @@ function HealthScanPage() {
             <Button
               variant="secondary"
               className="rounded-full"
-              onClick={() => void navigate({ to: "/reports" })}
+              onClick={() => setReportOpen(true)}
               disabled={!completedAt}
             >
               <FileText className="size-4" />
-              Generate report
+              PDF report
             </Button>
           </>
         }
+      />
+
+      <ScanReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        dtcs={found}
+        completedAt={completedAt}
       />
 
       <Card className="rounded-2xl border-hairline shadow-card">
@@ -259,7 +268,14 @@ function HealthScanPage() {
       {!running && completedAt && (
         <p className="flex items-center gap-2 text-xs text-muted-foreground">
           <RefreshCw className="size-3.5" />
-          Last completed {new Date(completedAt).toLocaleTimeString()}
+          Last completed {new Date(completedAt).toLocaleTimeString()} ·{" "}
+          <button
+            type="button"
+            onClick={() => setReportOpen(true)}
+            className="font-medium text-primary hover:underline"
+          >
+            Download PDF report
+          </button>
         </p>
       )}
     </div>
