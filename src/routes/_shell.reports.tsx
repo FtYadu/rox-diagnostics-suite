@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, FileText } from "lucide-react";
+import { Download, FileDown, FileText } from "lucide-react";
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { StatusDot, STATUS_LABEL } from "@/components/status/status-dot";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ecus, getEcu, vehicle } from "@/data/vehicle-data";
+import { ScanReportDialog } from "@/features/reports/report-dialog";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/_shell/reports")({
@@ -30,6 +32,8 @@ function ReportsPage() {
   const scan = useAppStore((s) => s.scan);
   const vin = useAppStore((s) => s.vin);
   const user = useAppStore((s) => s.user);
+  const scanDtcs = useAppStore((s) => s.scanDtcs);
+  const [reportOpen, setReportOpen] = useState(false);
   const entries = Object.entries(scan);
   const totalDtcs = entries.reduce((sum, [, state]) => sum + state.dtcCount, 0);
 
@@ -63,12 +67,29 @@ function ReportsPage() {
         title="Reports"
         subtitle="Export the latest scan results as a shareable service record"
         actions={
-          <Button className="rounded-full" onClick={download} disabled={entries.length === 0}>
-            <Download className="size-4" />
-            Download report
-          </Button>
+          <>
+            <Button
+              className="rounded-full"
+              onClick={() => setReportOpen(true)}
+              disabled={entries.length === 0}
+            >
+              <FileDown className="size-4" />
+              Download PDF
+            </Button>
+            <Button
+              variant="secondary"
+              className="rounded-full"
+              onClick={download}
+              disabled={entries.length === 0}
+            >
+              <Download className="size-4" />
+              Plain text
+            </Button>
+          </>
         }
       />
+
+      <ScanReportDialog open={reportOpen} onOpenChange={setReportOpen} dtcs={scanDtcs} />
 
       {entries.length === 0 ? (
         <Card className="rounded-2xl border-hairline shadow-card">

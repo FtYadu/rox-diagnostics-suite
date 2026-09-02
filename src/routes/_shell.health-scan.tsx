@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Eraser, FileText, Play, RefreshCw, Square } from "lucide-react";
 import { useRef, useState } from "react";
@@ -36,7 +36,6 @@ export const Route = createFileRoute("/_shell/health-scan")({
 });
 
 function HealthScanPage() {
-  const navigate = useNavigate();
   const { bridge } = useBridge();
   const scan = useAppStore((s) => s.scan);
   const setEcuState = useAppStore((s) => s.setEcuState);
