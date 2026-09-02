@@ -10,6 +10,7 @@ import {
   Sun,
   UserRound,
 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { vehicle } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
+import { VinDialog } from "@/features/vehicle/vin-dialog";
 import { useAppStore } from "@/store/app-store";
 
 export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
@@ -31,6 +33,7 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const signOut = useAppStore((s) => s.signOut);
   const user = useAppStore((s) => s.user);
   const vin = useAppStore((s) => s.vin);
+  const [vinOpen, setVinOpen] = useState(false);
 
   const bridgeLabel =
     usingFallback || status === "offline"
@@ -62,13 +65,22 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
       </Button>
 
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="flex min-w-0 items-center gap-2 rounded-full bg-secondary/70 px-3 py-1.5 hairline">
+        <button
+          type="button"
+          onClick={() => setVinOpen(true)}
+          aria-label={vin ? `Change VIN, currently ${vin}` : "Set the vehicle VIN"}
+          className="flex min-h-11 min-w-0 items-center gap-2 rounded-full bg-secondary/70 px-3 py-1.5 transition-colors hairline hover:bg-accent/50"
+        >
           <Car className="size-4 shrink-0 text-primary" />
           <span className="truncate text-xs font-medium">{vehicle.name}</span>
-          <span className="hidden truncate font-mono text-[11px] text-muted-foreground sm:inline numerals">
-            {vin}
-          </span>
-        </span>
+          {vin ? (
+            <span className="hidden truncate font-mono text-[11px] text-muted-foreground sm:inline numerals">
+              {vin}
+            </span>
+          ) : (
+            <span className="hidden text-[11px] font-medium text-warning sm:inline">Set VIN</span>
+          )}
+        </button>
       </div>
 
       <span
@@ -122,6 +134,8 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <VinDialog open={vinOpen} onOpenChange={setVinOpen} />
     </header>
   );
 }

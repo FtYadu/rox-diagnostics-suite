@@ -69,8 +69,6 @@ const nameFromEmail = (email: string) => {
     .join(" ");
 };
 
-const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
-
 /** No demo jobs: history only ever shows work actually performed on a real VIN. */
 const seedJobs: Job[] = [];
 

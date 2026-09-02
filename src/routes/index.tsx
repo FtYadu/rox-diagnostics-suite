@@ -7,6 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { vehicle } from "@/data/vehicle-data";
+import { VinPicker } from "@/features/vehicle/vin-picker";
+import { checkVin } from "@/features/vehicle/vin";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/")({
@@ -31,10 +33,14 @@ export const Route = createFileRoute("/")({
 function SignInPage() {
   const navigate = useNavigate();
   const signIn = useAppStore((s) => s.signIn);
+  const setVin = useAppStore((s) => s.setVin);
+  const storedVin = useAppStore((s) => s.vin);
+  const vinHistory = useAppStore((s) => s.vinHistory);
   const user = useAppStore((s) => s.user);
   const theme = useAppStore((s) => s.theme);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [vin, setVinDraft] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,13 +56,23 @@ function SignInPage() {
     if (user) void navigate({ to: "/dashboard" });
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (storedVin) setVinDraft(storedVin);
+  }, [storedVin]);
+
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email.includes("@") || password.length < 4) {
       setError("Enter your dealer email and a password of at least 4 characters.");
       return;
     }
+    const parsedVin = checkVin(vin);
+    if (!parsedVin.ok) {
+      setError(`Vehicle VIN: ${parsedVin.error}.`);
+      return;
+    }
     setError(null);
+    setVin(parsedVin.vin);
     signIn(email, false);
     void navigate({ to: "/dashboard" });
   };
@@ -139,6 +155,14 @@ function SignInPage() {
                 className="h-11 rounded-xl"
               />
             </div>
+
+            <VinPicker
+              value={vin}
+              onChange={setVinDraft}
+              recent={vinHistory}
+              label="Vehicle VIN"
+              hint="The VIN of the car on the lift — every job you run is filed against it."
+            />
 
             <div className="flex items-center justify-between pt-1">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
