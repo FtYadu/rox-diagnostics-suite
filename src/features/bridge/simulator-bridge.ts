@@ -301,8 +301,10 @@ export class SimulatorBridge implements DiagnosticBridge {
     await wait(300 + Math.random() * 280);
 
     const key = `${ecu.id}:${routine}`;
-    if (Math.random() < 0.06) {
-      const nrc = "0x22";
+    // Only "start" can be refused, ~2.5% of the time; stop/status always answer
+    // so a running actuator can always be shut down.
+    if (action === "start" && Math.random() < 0.025) {
+      const nrc = Math.random() < 0.7 ? "0x22" : "0x31";
       trace.push(line("rx", `7F 31 ${nrc.slice(2)}`));
       return {
         ok: false,
@@ -311,6 +313,7 @@ export class SimulatorBridge implements DiagnosticBridge {
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
+
 
     trace.push(line("rx", `71 ${sub} ${rid.slice(0, 2)} ${rid.slice(2)} ${randomBytes(1)}`));
     if (action === "start") this.runningRoutines.add(key);
