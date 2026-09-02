@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import type { BridgeMode, EcuDtcResult } from "@/features/bridge/types";
 import { pushJob, pushJobEvent } from "@/features/jobs/job-cloud";
 import { jobEventId, jobId as newJobId } from "@/features/jobs/types";
+import { isVinValid, normalizeVin } from "@/features/vehicle/vin";
 import type { Job, JobEvent, JobKind } from "@/features/jobs/types";
 
 export type { Job, JobEvent, JobKind } from "@/features/jobs/types";
@@ -34,6 +35,8 @@ type AppState = {
   bridgeMode: BridgeMode;
   sidebarCollapsed: boolean;
   vin: string;
+  /** Most recently used VINs, newest first, for the VIN picker. */
+  vinHistory: string[];
   scan: Record<string, EcuScanState>;
   jobs: Job[];
   activeJobId: string | null;
@@ -68,104 +71,8 @@ const nameFromEmail = (email: string) => {
 
 const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
 
-const seedJobs: Job[] = [
-  {
-    id: "JOB-24817",
-    title: "Full health scan",
-    kind: "health-scan",
-    vin: "HJ4ABBHK4RN000080",
-    technician: "M. Halvorsen",
-    createdAt: minutesAgo(42),
-    endedAt: minutesAgo(38),
-    status: "completed",
-    summary: "41 ECUs scanned · 3 stored DTCs",
-    dtcTotal: 3,
-    dtcCritical: 1,
-    events: [
-      {
-        id: "EVT-seed-1",
-        kind: "scan",
-        title: "Health scan started",
-        detail: "Sequential 19 02 read across 41 control units",
-        status: "info",
-        at: minutesAgo(42),
-      },
-      {
-        id: "EVT-seed-2",
-        kind: "dtc-read",
-        title: "3 stored DTCs found",
-        detail: "ESC, IBCM, TBOX reported faults",
-        status: "ok",
-        at: minutesAgo(38),
-      },
-    ],
-  },
-  {
-    id: "JOB-24812",
-    title: "ADCU_MCU reflash 0.98",
-    kind: "programming",
-    vin: "HJ4ABBHK4RN000080",
-    technician: "M. Halvorsen",
-    createdAt: minutesAgo(300),
-    endedAt: minutesAgo(288),
-    status: "completed",
-    summary: "MCU Reflash Flow 0.98 · 5 phases",
-    dtcTotal: 0,
-    dtcCritical: 0,
-    events: [
-      {
-        id: "EVT-seed-3",
-        kind: "programming",
-        title: "MCU Reflash Flow 0.98 completed",
-        detail: "5 phases · package MCU_0.98_release",
-        status: "ok",
-        at: minutesAgo(288),
-      },
-    ],
-  },
-  {
-    id: "JOB-24803",
-    title: "IBCM brake bleeding",
-    kind: "service",
-    vin: "HJ4ABBHK4RN000080",
-    technician: "K. Lund",
-    createdAt: minutesAgo(1560),
-    endedAt: minutesAgo(1548),
-    status: "completed",
-    summary: "Service routine finished, no faults",
-    dtcTotal: 0,
-    dtcCritical: 0,
-    events: [],
-  },
-  {
-    id: "JOB-24798",
-    title: "Clear all DTCs",
-    kind: "clear-dtc",
-    vin: "HJ4ABBHK4RN000080",
-    technician: "K. Lund",
-    createdAt: minutesAgo(1800),
-    endedAt: minutesAgo(1798),
-    status: "completed",
-    summary: "7 codes cleared across 4 ECUs",
-    dtcTotal: 7,
-    dtcCritical: 2,
-    events: [],
-  },
-  {
-    id: "JOB-24791",
-    title: "ACU write VIN",
-    kind: "service",
-    vin: "HJ4ABBHK4RN000080",
-    technician: "A. Osei",
-    createdAt: minutesAgo(3060),
-    endedAt: minutesAgo(3054),
-    status: "failed",
-    summary: "Readback mismatch — aborted",
-    dtcTotal: 0,
-    dtcCritical: 0,
-    events: [],
-  },
-];
+/** No demo jobs: history only ever shows work actually performed on a real VIN. */
+const seedJobs: Job[] = [];
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -174,7 +81,8 @@ export const useAppStore = create<AppState>()(
       theme: "dark",
       bridgeMode: "simulator",
       sidebarCollapsed: false,
-      vin: "HJ4ABBHK4RN000080",
+      vin: "",
+      vinHistory: [],
       scan: {},
       jobs: seedJobs,
       activeJobId: null,
@@ -186,7 +94,17 @@ export const useAppStore = create<AppState>()(
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
       setBridgeMode: (bridgeMode) => set({ bridgeMode }),
       toggleSidebar: () => set({ sidebarCollapsed: !get().sidebarCollapsed }),
-      setVin: (vin) => set({ vin }),
+      setVin: (raw) => {
+        const vin = normalizeVin(raw);
+        if (!isVinValid(vin)) {
+          set({ vin });
+          return;
+        }
+        set({
+          vin,
+          vinHistory: [vin, ...get().vinHistory.filter((entry) => entry !== vin)].slice(0, 8),
+        });
+      },
 
       setEcuState: (ecuId, state) => set({ scan: { ...get().scan, [ecuId]: state } }),
 
@@ -215,7 +133,7 @@ export const useAppStore = create<AppState>()(
           id: newJobId(),
           title: input.title,
           kind: input.kind,
-          vin: input.vin ?? state.vin,
+          vin: normalizeVin(input.vin ?? state.vin) || "VIN NOT SET",
           technician: input.technician ?? state.user?.name ?? "Technician",
           createdAt: new Date().toISOString(),
           status: "in-progress",
@@ -301,6 +219,7 @@ export const useAppStore = create<AppState>()(
         bridgeMode: state.bridgeMode,
         sidebarCollapsed: state.sidebarCollapsed,
         vin: state.vin,
+        vinHistory: state.vinHistory,
         jobs: state.jobs,
         activeJobId: state.activeJobId,
       }),
