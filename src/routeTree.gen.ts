@@ -22,6 +22,7 @@ import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 
@@ -90,6 +91,11 @@ const ShellVehicleRoute = ShellVehicleRouteImport.update({
   path: '/vehicle',
   getParentRoute: () => ShellRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShellEcusIndexRoute = ShellEcusIndexRouteImport.update({
   id: '/ecus/',
   path: '/ecus/',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus/': typeof ShellEcusIndexRoute
 }
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus': typeof ShellEcusIndexRoute
 }
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/_shell/ecus/': typeof ShellEcusIndexRoute
 }
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus/'
   fileRoutesByTo: FileRoutesByTo
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus'
   id:
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_shell/service-functions'
     | '/_shell/settings'
     | '/_shell/vehicle'
+    | '/.lovable/oauth/consent'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
   fileRoutesById: FileRoutesById
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   ShellRoute: typeof ShellRouteWithChildren
   McpRoute: typeof McpRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellVehicleRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_shell/ecus/': {
       id: '/_shell/ecus/'
       path: '/ecus'
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
