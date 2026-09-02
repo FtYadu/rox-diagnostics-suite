@@ -1,0 +1,37 @@
+{
+  "vci": {
+    "name": "ROX VCI (DoIP)",
+    "serial": "set-me",
+    "protocol": "DoIP / CAN FD"
+  },
+  "tester": {
+    "sourceAddress": "0x0E00"
+  },
+  "vehicleStatus": {
+    "ecu": "CCU",
+    "batteryVoltage": { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+    "ignition": { "did": "F187", "label": "Ignition state", "length": 1 }
+  },
+  "ecus": {
+    "CCU": {
+      "address": "0x1001",
+      "identification": [
+        { "did": "F190", "label": "VIN", "encoding": "ascii", "length": 17 },
+        { "did": "F187", "label": "Part number", "encoding": "ascii" },
+        { "did": "F189", "label": "Software version", "encoding": "ascii" },
+        { "did": "F18A", "label": "Supplier", "encoding": "ascii" },
+        { "did": "F18C", "label": "Serial number", "encoding": "ascii" }
+      ],
+      "liveData": [
+        { "did": "F186", "label": "Supply voltage", "unit": "V", "length": 2, "factor": 0.001, "min": 8, "max": 16 }
+      ],
+      "snapshot": [
+        { "did": "F186", "label": "Battery voltage", "unit": "V", "length": 2, "factor": 0.001 },
+        { "did": "F40D", "label": "Vehicle speed", "unit": "km/h", "length": 1 }
+      ],
+      "routines": {},
+      "security": { "1": { "algorithm": "xor", "mask": "5A A5 5A A5" }, "17": { "algorithm": "xor", "mask": "17 3B 91 C4" } }
+    }
+  },
+  "processes": {}
+}

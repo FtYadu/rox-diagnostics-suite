@@ -1,0 +1,17 @@
+{
+  "name": "rox-vci-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local hardware agent for ROX Diagnostics. Bridges the browser app (ws://127.0.0.1:9097) to a real VCI over DoIP/UDS.",
+  "scripts": {
+    "start": "node --experimental-strip-types src/main.ts",
+    "start:bun": "bun run src/main.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
