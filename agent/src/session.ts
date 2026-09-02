@@ -40,7 +40,11 @@ const decodeSignal = (signal: SignalConfig, raw: Uint8Array): number | string =>
 export class VehicleSession {
   readonly trace: TraceLine[] = [];
 
-  constructor(private readonly client: DoipClient) {}
+  private readonly client: DoipClient;
+
+  constructor(client: DoipClient) {
+    this.client = client;
+  }
 
   private push(line: TraceLine) {
     this.trace.push(line);

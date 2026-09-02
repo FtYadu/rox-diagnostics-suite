@@ -89,10 +89,14 @@ export class DoipClient {
 
   private testerPresent: NodeJS.Timeout | null = null;
 
-  constructor(
-    private readonly host: string,
-    private readonly sourceAddress: number,
-  ) {}
+  private readonly host: string;
+
+  private readonly sourceAddress: number;
+
+  constructor(host: string, sourceAddress: number) {
+    this.host = host;
+    this.sourceAddress = sourceAddress;
+  }
 
   get connected(): boolean {
     return this.socket !== null && !this.socket.destroyed;
