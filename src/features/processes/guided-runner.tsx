@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getEcu, processKey, type ServiceProcess } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
+import { describeNrcWithHint } from "@/features/bridge/types";
 import type { TraceLine } from "@/features/bridge/types";
 import { TraceConsole } from "@/features/diagnostics/trace-console";
 import { buildRunnerSteps, securityLabel, type RunnerStep } from "@/features/processes/step-model";
@@ -140,7 +141,7 @@ export function GuidedRunner({
         if (!result.ok) {
           setState(index, "failed");
           const reason = result.error
-            ? `${result.error.nrc} ${result.error.meaning}`
+            ? describeNrcWithHint(result.error.nrc)
             : "security access rejected";
           setFailure(`Security access L${step.level} failed — ${reason}`);
           finish(false, `Security access L${step.level} rejected (${reason}).`, nextTrace);
@@ -162,7 +163,7 @@ export function GuidedRunner({
         if (!result.ok) {
           setState(index, "failed");
           const reason = result.error
-            ? `${result.error.nrc} ${result.error.meaning}`
+            ? describeNrcWithHint(result.error.nrc)
             : result.message;
           setFailure(reason);
           finish(false, `Step "${step.title}" failed — ${reason}`, nextTrace);

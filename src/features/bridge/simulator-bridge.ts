@@ -110,6 +110,9 @@ export class SimulatorBridge implements DiagnosticBridge {
 
   private runningRoutines = new Set<string>();
 
+  private stepAttempts = new Map<string, number>();
+
+
   private battery = round(randomBetween(12.4, 14.2), 1);
 
   async connect(): Promise<ConnectionInfo> {
@@ -226,12 +229,14 @@ export class SimulatorBridge implements DiagnosticBridge {
     const attempts = (this.securityAttempts.get(seed) ?? 0) + 1;
     this.securityAttempts.set(seed, attempts);
 
-    const failRoll = Math.random();
-    if (failRoll < 0.1) {
-      const nrc = failRoll < 0.05 ? "0x35" : attempts > 3 ? "0x36" : "0x33";
+    // Realistic but forgiving: roughly 1 in 20 first unlocks is rejected, and a
+    // retry always succeeds so a technician never gets stuck on the simulator.
+    if (attempts === 1 && Math.random() < 0.05) {
+      const nrc = Math.random() < 0.4 ? "0x35" : "0x33";
       trace.push(line("rx", `7F 27 ${nrc.slice(2)}`));
       return { ok: false, level, trace, error: { nrc, meaning: nrcMeaning(nrc) } };
     }
+
 
     const seedBytes = randomBytes(4);
     trace.push(line("rx", `67 ${sub} ${seedBytes}`));
@@ -261,9 +266,14 @@ export class SimulatorBridge implements DiagnosticBridge {
     trace.push(line("tx", `${sid} ${input ? "F1 90" : randomBytes(2)}`));
     await wait(220 + Math.random() * 320);
 
-    const failRoll = Math.random();
-    if (failRoll < 0.07) {
-      const nrc = failRoll < 0.03 ? "0x22" : failRoll < 0.05 ? "0x31" : "0x72";
+    // ~3% of first attempts return a plausible NRC; the retry of the same step
+    // always passes so guided processes stay completable.
+    const stepKey = `${process.ecu}:${process.name}:${stepIndex}`;
+    const stepAttempts = (this.stepAttempts.get(stepKey) ?? 0) + 1;
+    this.stepAttempts.set(stepKey, stepAttempts);
+    if (stepAttempts === 1 && Math.random() < 0.03) {
+      const roll = Math.random();
+      const nrc = roll < 0.5 ? "0x22" : roll < 0.8 ? "0x31" : "0x7E";
       trace.push(line("rx", `7F ${sid} ${nrc.slice(2)}`));
       return {
         ok: false,
@@ -272,6 +282,7 @@ export class SimulatorBridge implements DiagnosticBridge {
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
+
 
     trace.push(line("rx", `${hex(parseInt(sid, 16) + 0x40)} ${randomBytes(2)}`));
     return {
@@ -293,8 +304,10 @@ export class SimulatorBridge implements DiagnosticBridge {
     await wait(300 + Math.random() * 280);
 
     const key = `${ecu.id}:${routine}`;
-    if (Math.random() < 0.06) {
-      const nrc = "0x22";
+    // Only "start" can be refused, ~2.5% of the time; stop/status always answer
+    // so a running actuator can always be shut down.
+    if (action === "start" && Math.random() < 0.025) {
+      const nrc = Math.random() < 0.7 ? "0x22" : "0x31";
       trace.push(line("rx", `7F 31 ${nrc.slice(2)}`));
       return {
         ok: false,
@@ -303,6 +316,7 @@ export class SimulatorBridge implements DiagnosticBridge {
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
+
 
     trace.push(line("rx", `71 ${sub} ${rid.slice(0, 2)} ${rid.slice(2)} ${randomBytes(1)}`));
     if (action === "start") this.runningRoutines.add(key);

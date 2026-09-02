@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { processKey, processesForEcu, type Ecu, type ServiceProcess } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
+import { describeNrcWithHint } from "@/features/bridge/types";
 import type { TraceLine } from "@/features/bridge/types";
 import { TraceConsole } from "@/features/diagnostics/trace-console";
 import { GuidedRunner } from "@/features/processes/guided-runner";
@@ -41,7 +42,7 @@ export function ActuatorPanel({ ecu }: { ecu: Ecu }) {
       [routine]: {
         running: action === "start" && result.ok,
         line: result.error
-          ? `${result.error.nrc} ${result.error.meaning}`
+          ? describeNrcWithHint(result.error.nrc)
           : result.message,
         ok: result.ok,
       },
