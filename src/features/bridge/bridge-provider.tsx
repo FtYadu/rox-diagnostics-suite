@@ -19,6 +19,7 @@ const BridgeContext = createContext<BridgeContextValue | null>(null);
 export function BridgeProvider({ children }: { children: ReactNode }) {
   const bridgeMode = useAppStore((s) => s.bridgeMode);
   const simulator = useRef(new SimulatorBridge());
+  const localRef = useRef<LocalBridge | null>(null);
   const [status, setStatus] = useState<BridgeStatus>("idle");
   const [connection, setConnection] = useState<ConnectionInfo | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
@@ -30,33 +31,66 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    let retry: ReturnType<typeof setTimeout> | null = null;
+    let unsubscribe: (() => void) | null = null;
     setStatus("connecting");
     setError(null);
 
-    const run = async () => {
-      if (bridgeMode === "local") {
-        try {
-          const local = new LocalBridge();
-          const info = await local.connect();
-          if (cancelled) return;
-          setActiveBridge(local);
-          setConnection(info);
-          setUsingFallback(false);
-          setStatus("connected");
-          return;
-        } catch (cause) {
-          if (cancelled) return;
-          setError(cause instanceof Error ? cause.message : "Local bridge unavailable");
-          setUsingFallback(true);
-          const info = await simulator.current.connect();
-          if (cancelled) return;
-          setActiveBridge(simulator.current);
-          setConnection({ ...info, vciName: "Simulator fallback" });
-          setStatus("offline");
+    const fallbackToSimulator = async (reason: string) => {
+      if (cancelled) return;
+      setError(reason);
+      setUsingFallback(true);
+      const info = await simulator.current.connect();
+      if (cancelled) return;
+      setActiveBridge(simulator.current);
+      setConnection({ ...info, vciName: "Simulator fallback" });
+      setStatus("offline");
+      // Keep probing for the hardware agent so plugging in the VCI recovers on its own.
+      retry = setTimeout(() => {
+        if (!cancelled) void connectLocal();
+      }, 5000);
+    };
+
+    const connectLocal = async () => {
+      unsubscribe?.();
+      localRef.current?.close();
+      const local = new LocalBridge();
+      localRef.current = local;
+      try {
+        const info = await local.connect();
+        if (cancelled) {
+          local.close();
           return;
         }
+        unsubscribe = local.subscribe((event) => {
+          if (cancelled) return;
+          if (event.type === "status") {
+            setConnection(event.info);
+            return;
+          }
+          void fallbackToSimulator(event.reason);
+        });
+        setActiveBridge(local);
+        setConnection(info);
+        setUsingFallback(false);
+        setError(null);
+        setStatus("connected");
+      } catch (cause) {
+        local.close();
+        await fallbackToSimulator(
+          cause instanceof Error ? cause.message : "Local bridge unavailable",
+        );
+      }
+    };
+
+    const run = async () => {
+      if (bridgeMode === "local") {
+        await connectLocal();
+        return;
       }
 
+      localRef.current?.close();
+      localRef.current = null;
       const info = await simulator.current.connect();
       if (cancelled) return;
       setActiveBridge(simulator.current);
@@ -68,6 +102,10 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     void run();
     return () => {
       cancelled = true;
+      if (retry) clearTimeout(retry);
+      unsubscribe?.();
+      localRef.current?.close();
+      localRef.current = null;
     };
   }, [bridgeMode, attempt]);
 
@@ -78,6 +116,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;
 }
+
 
 export function useBridge(): BridgeContextValue {
   const context = useContext(BridgeContext);
