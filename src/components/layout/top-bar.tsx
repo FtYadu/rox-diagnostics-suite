@@ -25,21 +25,20 @@ import { useBridge } from "@/features/bridge/bridge-provider";
 import { useAppStore } from "@/store/app-store";
 
 export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
-  const { status, connection, usingFallback } = useBridge();
+  const { bridge, status, connection, usingFallback } = useBridge();
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const signOut = useAppStore((s) => s.signOut);
   const user = useAppStore((s) => s.user);
   const vin = useAppStore((s) => s.vin);
-  const mode = useAppStore((s) => s.bridgeMode);
 
   const bridgeLabel =
     usingFallback || status === "offline"
       ? "Bridge offline — using Simulator"
-      : mode === "local"
-        ? "Hardware connected"
-        : status === "connecting"
-          ? "Connecting…"
+      : status === "connecting"
+        ? "Connecting…"
+        : bridge.mode === "local" && status === "connected"
+          ? "Hardware connected"
           : "Simulator";
 
   const bridgeTone =
@@ -48,6 +47,7 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
       : status === "connected"
         ? "bg-success/15 text-success"
         : "bg-muted text-muted-foreground";
+
 
   return (
     <header className="glass-chrome sticky top-0 z-30 flex items-center gap-3 border-b px-3 py-2.5 sm:px-5">
