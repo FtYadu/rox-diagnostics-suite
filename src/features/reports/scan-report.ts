@@ -69,7 +69,7 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(170, 172, 180);
-  doc.text(`ROX Diagnostics · ${vehicle.name} (${vehicle.code})`, MARGIN, 68);
+  doc.text(`ROX Diagnostics · ${vehicle.name}`, MARGIN, 68);
   doc.text(`Generated ${formatDateTime(generatedAt)}`, MARGIN, 84);
 
   doc.setTextColor(ACCENT.r, ACCENT.g, ACCENT.b);
@@ -108,7 +108,7 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
       ["VIN", input.vin || "Not set", "Technician", input.technician],
       [
         "Vehicle",
-        `${vehicle.name} (${vehicle.code})`,
+        vehicle.name,
         "Scan completed",
         input.completedAt ? formatDateTime(input.completedAt) : "Not completed",
       ],
@@ -197,12 +197,12 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
     headStyles: { fillColor: [INK.r, INK.g, INK.b], textColor: 255, fontSize: 8.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
-      0: { cellWidth: 62, font: "courier", fontStyle: "bold" },
+      0: { cellWidth: 60, font: "courier", fontStyle: "bold" },
       1: { cellWidth: 52 },
-      2: { cellWidth: 158 },
+      2: { cellWidth: 170 },
       3: { cellWidth: 62 },
-      4: { cellWidth: 90 },
-      5: { cellWidth: 34, halign: "right" },
+      4: { cellWidth: 115 },
+      5: { cellWidth: 40, halign: "right" },
     },
     margin: { left: MARGIN, right: MARGIN },
     didParseCell: (data) => {
@@ -215,7 +215,11 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
   });
 
   // --- Per-ECU results -------------------------------------------------------
-  const ecuStart = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 26;
+  let ecuStart = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 26;
+  if (ecuStart > doc.internal.pageSize.getHeight() - 170) {
+    doc.addPage();
+    ecuStart = MARGIN + 24;
+  }
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.setTextColor(INK.r, INK.g, INK.b);
@@ -236,10 +240,10 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
       0: { cellWidth: 56, fontStyle: "bold" },
-      1: { cellWidth: 200 },
-      2: { cellWidth: 84 },
+      1: { cellWidth: 205 },
+      2: { cellWidth: 86 },
       3: { cellWidth: 40, halign: "right" },
-      4: { cellWidth: 116 },
+      4: { cellWidth: 112 },
     },
     margin: { left: MARGIN, right: MARGIN },
   });
