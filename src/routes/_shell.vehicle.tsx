@@ -51,7 +51,7 @@ function VehiclePage() {
           <CardTitle className="text-base">Identification</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
-          <Field label="VIN" value={vin} mono />
+          <Field label="VIN" value={vin || "Not set — use the VIN chip in the top bar"} mono />
           <Field label="Example VIN" value={vehicle.vinExample} mono />
           <Field label="Model" value={vehicle.name} />
           <Field label="Project code" value={vehicle.code} />

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DOMAIN_ORDER, ecus, vehicle } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
+import { VinDialog } from "@/features/vehicle/vin-dialog";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/_shell/dashboard")({
@@ -62,6 +63,8 @@ function DashboardPage() {
   const appendEvent = useAppStore((s) => s.appendEvent);
   const startNewJob = useAppStore((s) => s.startNewJob);
   const [busy, setBusy] = useState<string | null>(null);
+  const [vinOpen, setVinOpen] = useState(false);
+  const [pendingJob, setPendingJob] = useState(false);
 
   const scanned = Object.values(scan);
   const totalDtcs = scanned.reduce((sum, entry) => sum + entry.dtcCount, 0);
@@ -108,10 +111,15 @@ function DashboardPage() {
     toast.success(`Cleared ${cleared} codes across the vehicle`);
   };
 
-  const newJob = () => {
-    startNewJob({ title: "New workshop job", kind: "manual" });
-    toast.success("Job created");
+  const createJob = (jobVin: string) => {
+    startNewJob({ title: "New workshop job", kind: "manual", vin: jobVin });
+    toast.success(`Job created for ${jobVin}`);
     void navigate({ to: "/job-history" });
+  };
+
+  const newJob = () => {
+    setPendingJob(true);
+    setVinOpen(true);
   };
 
   return (
@@ -172,8 +180,24 @@ function DashboardPage() {
               <p className="text-lg font-semibold tracking-tight">{vehicle.name}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">VIN</p>
-              <p className="font-mono text-sm numerals">{vin}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">VIN</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPendingJob(false);
+                    setVinOpen(true);
+                  }}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  {vin ? "Change" : "Set VIN"}
+                </button>
+              </div>
+              {vin ? (
+                <p className="font-mono text-sm numerals">{vin}</p>
+              ) : (
+                <p className="text-sm text-warning">No VIN set for this vehicle</p>
+              )}
             </div>
             <div className="flex gap-6 pt-1">
               <div>
@@ -222,6 +246,24 @@ function DashboardPage() {
         />
       </div>
 
+      <VinDialog
+        open={vinOpen}
+        onOpenChange={(open) => {
+          setVinOpen(open);
+          if (!open) setPendingJob(false);
+        }}
+        title={pendingJob ? "New workshop job" : "Vehicle identification"}
+        description={
+          pendingJob
+            ? "Confirm the VIN of the vehicle this job belongs to."
+            : "Every job, scan and trace is filed against this VIN."
+        }
+        confirmLabel={pendingJob ? "Create job" : "Use this VIN"}
+        onConfirm={(confirmed) => {
+          if (pendingJob) createJob(confirmed);
+        }}
+      />
+
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <Card className="rounded-2xl border-hairline shadow-card">
           <CardHeader className="flex-row items-center justify-between pb-2">
@@ -231,6 +273,12 @@ function DashboardPage() {
             </Link>
           </CardHeader>
           <CardContent className="p-0">
+            {jobs.length === 0 && (
+              <p className="px-6 py-8 text-center text-sm text-muted-foreground">
+                No jobs yet — run a health scan or service function and it will be filed against the
+                current VIN.
+              </p>
+            )}
             <ul className="divide-y divide-border">
               {jobs.slice(0, 5).map((job) => (
                 <li
@@ -240,7 +288,8 @@ function DashboardPage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{job.title}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {job.id} · {job.technician} · {job.summary}
+                      <span className="font-mono numerals">{job.vin}</span> · {job.technician} ·{" "}
+                      {job.summary}
                     </p>
                   </div>
                   <span

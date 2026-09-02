@@ -56,6 +56,7 @@ function JobHistoryPage() {
   const jobs = useAppStore((s) => s.jobs);
   const mergeJobs = useAppStore((s) => s.mergeJobs);
   const [kind, setKind] = useState<Job["kind"] | "all">("all");
+  const [vin, setVinFilter] = useState<string>("all");
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const cloud = useQuery({
@@ -68,9 +69,17 @@ function JobHistoryPage() {
     if (cloud.data && cloud.data.length > 0) mergeJobs(cloud.data);
   }, [cloud.data, mergeJobs]);
 
+  const vins = useMemo(
+    () => [...new Set(jobs.map((job) => job.vin).filter(Boolean))],
+    [jobs],
+  );
+
   const filtered = useMemo(
-    () => (kind === "all" ? jobs : jobs.filter((job) => job.kind === kind)),
-    [jobs, kind],
+    () =>
+      jobs
+        .filter((job) => kind === "all" || job.kind === kind)
+        .filter((job) => vin === "all" || job.vin === vin),
+    [jobs, kind, vin],
   );
 
   const active = jobs.find((job) => job.id === activeId) ?? null;
@@ -79,7 +88,7 @@ function JobHistoryPage() {
     <div className="space-y-6">
       <PageHeader
         title="Job history"
-        subtitle={`${jobs.length} recorded jobs · ${jobs.reduce((sum, job) => sum + job.events.length, 0)} logged actions`}
+        subtitle={`${jobs.length} recorded jobs · ${vins.length} ${vins.length === 1 ? "vehicle" : "vehicles"} · ${jobs.reduce((sum, job) => sum + job.events.length, 0)} logged actions`}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -105,10 +114,50 @@ function JobHistoryPage() {
         )}
       </div>
 
+      {vins.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] text-muted-foreground">VIN</span>
+          <button
+            type="button"
+            onClick={() => setVinFilter("all")}
+            className={`min-h-11 rounded-full px-3 text-[11px] font-medium transition-colors hairline ${
+              vin === "all"
+                ? "bg-primary/15 text-primary"
+                : "bg-secondary/50 text-muted-foreground hover:bg-accent/40"
+            }`}
+          >
+            All vehicles
+          </button>
+          {vins.map((entry) => (
+            <button
+              key={entry}
+              type="button"
+              onClick={() => setVinFilter(entry)}
+              className={`min-h-11 rounded-full px-3 font-mono text-[11px] transition-colors hairline numerals ${
+                vin === entry
+                  ? "bg-primary/15 text-primary"
+                  : "bg-secondary/50 text-muted-foreground hover:bg-accent/40"
+              }`}
+            >
+              {entry}
+            </button>
+          ))}
+        </div>
+      )}
+
       <Card className="rounded-2xl border-hairline shadow-card">
         <CardContent className="space-y-1.5 p-4">
-          {filtered.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">No jobs of this type.</p>
+          {jobs.length === 0 ? (
+            <p className="p-6 text-center text-sm text-muted-foreground">
+              No jobs recorded yet. Set the VIN in the top bar, then run a health scan or service
+              function — each run is filed here with its trace.
+            </p>
+          ) : (
+            filtered.length === 0 && (
+              <p className="p-6 text-center text-sm text-muted-foreground">
+                No jobs match this filter.
+              </p>
+            )
           )}
           {filtered.map((job) => (
             <button
