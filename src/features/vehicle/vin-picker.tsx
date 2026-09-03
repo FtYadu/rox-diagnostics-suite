@@ -89,7 +89,11 @@ export function VinPicker({
             disabled={reading}
             className="h-11 shrink-0 rounded-xl px-4"
           >
-            {reading ? <Loader2 className="size-4 animate-spin" /> : <ScanLine className="size-4" />}
+            {reading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ScanLine className="size-4" />
+            )}
             <span className="hidden sm:inline">Read from vehicle</span>
           </Button>
         )}

@@ -1,11 +1,19 @@
 import { readFileSync } from "node:fs";
 
 import { DoipClient } from "./doip.ts";
-import { type SignalConfig, dtcMeta, ecuConfig, loadConfig, parseHex } from "./config.ts";
+import {
+  type SignalConfig,
+  dtcMeta,
+  dtcStatusMask,
+  ecuConfig,
+  loadConfig,
+  parseHex,
+} from "./config.ts";
 import {
   SID,
   UdsNegativeResponse,
   bytesToHex,
+  classifyDtc,
   decodeAscii,
   decodeNumber,
   decodeStatusByte,
@@ -29,7 +37,8 @@ const traceLine = (direction: TraceLine["direction"], text: string): TraceLine =
 const decodeSignal = (signal: SignalConfig, raw: Uint8Array): number | string => {
   if (signal.encoding === "ascii") return decodeAscii(raw);
   if (signal.encoding === "hex") return bytesToHex(raw);
-  const value = decodeNumber(raw, signal.signed ?? false) * (signal.factor ?? 1) + (signal.offset ?? 0);
+  const value =
+    decodeNumber(raw, signal.signed ?? false) * (signal.factor ?? 1) + (signal.offset ?? 0);
   return Number.parseFloat(value.toFixed(3));
 };
 
@@ -42,6 +51,11 @@ export class VehicleSession {
 
   private readonly client: DoipClient;
 
+  /** ECU ids currently held in a non-default session (tester-present is running). */
+  private readonly keptAlive = new Set<string>();
+
+  private idleTimer: NodeJS.Timeout | null = null;
+
   constructor(client: DoipClient) {
     this.client = client;
   }
@@ -51,10 +65,15 @@ export class VehicleSession {
     if (this.trace.length > 500) this.trace.splice(0, this.trace.length - 500);
   }
 
-  /** Sends one UDS request and traces both directions. */
+  private get timing() {
+    return loadConfig().timing;
+  }
+
+  /** Sends one UDS request and traces both directions. P2/P2* come from config. */
   async send(ecuId: string, data: Uint8Array, timeoutMs?: number): Promise<Uint8Array> {
     const address = parseHex(ecuConfig(ecuId).address);
     this.push(traceLine("tx", `${ecuId} ${bytesToHex(data)}`));
+    this.touch();
     try {
       const response = await this.client.sendUds(address, data, timeoutMs);
       this.push(traceLine("rx", `${ecuId} ${bytesToHex(response)}`));
@@ -73,8 +92,46 @@ export class VehicleSession {
     return this.trace.splice(0);
   }
 
+  /** Drops the session keep-alive when the technician stops working (4 × S3). */
+  private touch() {
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    if (this.keptAlive.size === 0) return;
+    this.idleTimer = setTimeout(() => {
+      this.push(traceLine("info", "idle — stopping tester present, session falls back to default"));
+      this.stopKeepAlive();
+    }, this.timing.s3 * 4);
+    this.idleTimer.unref?.();
+  }
+
+  private stopKeepAlive() {
+    this.keptAlive.clear();
+    this.client.stopTesterPresent();
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    this.idleTimer = null;
+  }
+
+  /**
+   * Any session other than default (0x01) must be refreshed inside S3, otherwise the ECU
+   * silently drops back to default halfway through a routine.
+   */
   async enterSession(ecuId: string, level: 0x01 | 0x03 | 0x02 = 0x03): Promise<void> {
     await this.send(ecuId, request(SID.diagnosticSessionControl, level));
+    if (level === 0x01) {
+      this.stopKeepAlive();
+      return;
+    }
+    this.keptAlive.add(ecuId);
+    this.client.startTesterPresent(
+      parseHex(ecuConfig(ecuId).address),
+      Math.max(Math.floor(this.timing.s3 / 2), 200),
+    );
+    this.push(traceLine("info", `${ecuId} session 0x${hex(level)} held with 3E 80`));
+    this.touch();
+  }
+
+  /** Called on disconnect: stop keep-alive so nothing keeps writing to a dead socket. */
+  dispose() {
+    this.stopKeepAlive();
   }
 
   async readIdentification(ecuId: string) {
@@ -82,10 +139,7 @@ export class VehicleSession {
     const entries: Array<{ did: string; label: string; value: string }> = [];
     for (const signal of signals) {
       try {
-        const response = await this.send(
-          ecuId,
-          request(SID.readDataByIdentifier, signal.did),
-        );
+        const response = await this.send(ecuId, request(SID.readDataByIdentifier, signal.did));
         const lengths = new Map([[signal.did.toUpperCase(), signal.length ?? response.length - 3]]);
         const values = parseDidResponse(response, lengths);
         const raw = values.get(signal.did.toUpperCase()) ?? response.slice(3);
@@ -105,28 +159,36 @@ export class VehicleSession {
     return entries;
   }
 
+  /**
+   * 19 02 <mask> with the mask that belongs to this ECU, then classify each record from
+   * its real status bits — nothing here is simulated.
+   */
   async readDtcs(ecuId: string) {
+    const mask = dtcStatusMask(ecuId);
     const response = await this.send(
       ecuId,
-      request(SID.readDtcInformation, 0x02, 0xff),
-      8000,
+      request(SID.readDtcInformation, 0x02, mask),
+      this.timing.p2Star,
     );
     const now = new Date().toISOString();
     const dtcs = parseDtcResponse(response).map((raw) => {
       const meta = dtcMeta(ecuId, raw.code);
+      const status = decodeStatusByte(raw.statusByte);
       return {
         code: raw.code,
         name: meta?.name ?? "Unknown fault code (not in vehicle data)",
         severity: meta?.severity ?? 2,
         ecuId,
-        status: decodeStatusByte(raw.statusByte),
+        status,
+        state: classifyDtc(raw.statusByte),
         statusByte: `0x${hex(raw.statusByte)}`,
+        statusMask: `0x${hex(mask)}`,
         occurrences: 1,
         firstSeen: now,
         lastSeen: now,
       };
     });
-    return { ecuId, responded: true, dtcs };
+    return { ecuId, responded: true, statusMask: `0x${hex(mask)}`, dtcs };
   }
 
   async clearDtcs(ecuId: string, codes?: string[] | null) {
@@ -146,7 +208,7 @@ export class VehicleSession {
     const response = await this.send(
       ecuId,
       request(SID.readDtcInformation, 0x06, encodeDtc(code), 0xff),
-      8000,
+      this.timing.p2Star,
     );
     // 59 06 <3 DTC bytes> <status> <recordNumber> <numberOfIdentifiers> [DID(2) value...]
     const recordNumber = response[6] ?? 0xff;
@@ -177,7 +239,8 @@ export class VehicleSession {
 
   async readLiveData(ecuId: string, dids: string[]) {
     const catalog = ecuConfig(ecuId).liveData ?? [];
-    const wanted = dids.length > 0 ? dids.map((did) => did.toUpperCase()) : catalog.map((s) => s.did);
+    const wanted =
+      dids.length > 0 ? dids.map((did) => did.toUpperCase()) : catalog.map((s) => s.did);
     const signals: Array<{
       id: string;
       label: string;
@@ -191,7 +254,11 @@ export class VehicleSession {
       const signal = catalog.find((entry) => entry.did.toUpperCase() === did.toUpperCase());
       if (!signal) continue;
       try {
-        const response = await this.send(ecuId, request(SID.readDataByIdentifier, signal.did), 3000);
+        const response = await this.send(
+          ecuId,
+          request(SID.readDataByIdentifier, signal.did),
+          this.timing.p2Star,
+        );
         const raw = response.slice(3, 3 + (signal.length ?? response.length - 3));
         const value = decodeSignal(signal, raw);
         signals.push({
@@ -211,7 +278,13 @@ export class VehicleSession {
 
   async securityAccess(ecuId: string, level: number) {
     const config = ecuConfig(ecuId);
-    const rule = config.security?.[String(level)] ?? { algorithm: "invert" as const };
+    const levels = config.security?.levels;
+    if (levels && levels.length > 0 && !levels.includes(level)) {
+      throw new Error(
+        `${ecuId} does not support security level ${level} (supported: ${levels.join(", ")})`,
+      );
+    }
+    const rule = config.security?.algorithms?.[String(level)] ?? { algorithm: "invert" as const };
     const subFunction = level === 0 ? 0x01 : level * 2 - 1;
 
     await this.enterSession(ecuId, level >= 17 ? 0x02 : 0x03);
@@ -235,7 +308,9 @@ export class VehicleSession {
   async runRoutine(ecuId: string, routine: string, action: "start" | "stop" | "status") {
     const rid = ecuConfig(ecuId).routines?.[routine];
     if (!rid) {
-      throw new Error(`No routine identifier mapped for "${routine}" on ${ecuId} (agent/config.json)`);
+      throw new Error(
+        `No routine identifier mapped for "${routine}" on ${ecuId} (agent/config.json)`,
+      );
     }
     const subFunction = action === "start" ? 0x01 : action === "stop" ? 0x02 : 0x03;
     const response = await this.send(
@@ -278,7 +353,11 @@ export class VehicleSession {
     let counter = 1;
     for (let offset = 0; offset < data.length; offset += chunkSize) {
       const chunk = data.subarray(offset, offset + chunkSize);
-      await this.send(ecuId, request(SID.transferData, counter & 0xff, new Uint8Array(chunk)), 20_000);
+      await this.send(
+        ecuId,
+        request(SID.transferData, counter & 0xff, new Uint8Array(chunk)),
+        20_000,
+      );
       counter += 1;
       onProgress(
         Math.round(((offset + chunk.length) / data.length) * 100),
@@ -293,7 +372,11 @@ export class VehicleSession {
     if (!status) return { batteryVoltage: 0, ignitionOn: false };
     const read = async (signal?: SignalConfig) => {
       if (!signal) return undefined;
-      const response = await this.send(status.ecu, request(SID.readDataByIdentifier, signal.did), 2500);
+      const response = await this.send(
+        status.ecu,
+        request(SID.readDataByIdentifier, signal.did),
+        this.timing.p2Star,
+      );
       const raw = response.slice(3, 3 + (signal.length ?? response.length - 3));
       const value = decodeSignal(signal, raw);
       return typeof value === "number" ? value : Number(value);

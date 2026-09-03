@@ -27,12 +27,7 @@ export type ScanReportDialogProps = {
 };
 
 /** Collects technician notes and exports the health-scan PDF report. */
-export function ScanReportDialog({
-  open,
-  onOpenChange,
-  dtcs,
-  completedAt,
-}: ScanReportDialogProps) {
+export function ScanReportDialog({ open, onOpenChange, dtcs, completedAt }: ScanReportDialogProps) {
   const vin = useAppStore((s) => s.vin);
   const user = useAppStore((s) => s.user);
   const scan = useAppStore((s) => s.scan);

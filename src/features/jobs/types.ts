@@ -1,12 +1,7 @@
 import type { TraceLine } from "@/features/bridge/types";
 
 export type JobKind =
-  | "health-scan"
-  | "clear-dtc"
-  | "service"
-  | "programming"
-  | "live-data"
-  | "manual";
+  "health-scan" | "clear-dtc" | "service" | "programming" | "live-data" | "manual";
 
 export type JobStatus = "in-progress" | "completed" | "failed";
 

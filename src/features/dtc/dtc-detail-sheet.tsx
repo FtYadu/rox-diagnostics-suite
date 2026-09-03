@@ -182,7 +182,11 @@ export function DtcDetailSheet({
 
             <div className="glass-chrome sticky bottom-0 flex flex-wrap gap-2 border-t p-4">
               {onClear && (
-                <Button className="h-11 rounded-full" onClick={() => void clear()} disabled={clearing}>
+                <Button
+                  className="h-11 rounded-full"
+                  onClick={() => void clear()}
+                  disabled={clearing}
+                >
                   <Eraser className="size-4" />
                   Clear this DTC
                 </Button>

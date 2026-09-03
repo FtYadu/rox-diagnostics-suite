@@ -42,9 +42,7 @@ export function TraceConsole({
         <Terminal className="size-4" />
         Trace
         <span className="numerals">({trace.length})</span>
-        <ChevronDown
-          className={cn("ml-auto size-4 transition-transform", open && "rotate-180")}
-        />
+        <ChevronDown className={cn("ml-auto size-4 transition-transform", open && "rotate-180")} />
       </button>
       {open && (
         <div className="max-h-52 overflow-y-auto bg-background/60 px-4 pb-4">

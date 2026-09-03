@@ -3,7 +3,13 @@ import { WebSocketServer, type WebSocket } from "ws";
 import { DoipClient, discoverVehicle } from "./doip.ts";
 import { VehicleSession } from "./session.ts";
 import { UdsNegativeResponse, hex } from "./uds.ts";
-import { loadConfig, parseHex } from "./config.ts";
+import {
+  type AgentConfig,
+  AgentConfigError,
+  assertStartupSafe,
+  loadConfig,
+  parseHex,
+} from "./config.ts";
 
 const PORT = Number(process.env["ROX_AGENT_PORT"] ?? 9097);
 
@@ -18,7 +24,21 @@ type VehicleLink = {
 
 let link: VehicleLink | null = null;
 
-const config = loadConfig();
+const config: AgentConfig = (() => {
+  try {
+    const loaded = loadConfig();
+    const problems = assertStartupSafe(loaded);
+    for (const problem of problems) {
+      process.stderr.write(`[rox-agent] WARNING (override): ${problem.message}\n`);
+    }
+    return loaded;
+  } catch (error) {
+    process.stderr.write(
+      `[rox-agent] ${error instanceof AgentConfigError ? error.message : (error as Error).message}\n`,
+    );
+    return process.exit(1);
+  }
+})();
 
 const log = (message: string) => {
   process.stdout.write(`[rox-agent] ${message}\n`);
@@ -30,11 +50,17 @@ const ensureLink = async (): Promise<VehicleLink> => {
   const announcement = host
     ? { host, vin: "", logicalAddress: 0, eid: "" }
     : await discoverVehicle();
-  const client = new DoipClient(announcement.host, parseHex(config.tester.sourceAddress));
+  const client = new DoipClient(
+    announcement.host,
+    parseHex(config.tester.sourceAddress),
+    config.timing,
+  );
   await client.connect();
   const session = new VehicleSession(client);
   link = { client, session, vin: announcement.vin, host: announcement.host };
-  log(`connected to gateway ${announcement.host}${announcement.vin ? ` (VIN ${announcement.vin})` : ""}`);
+  log(
+    `connected to gateway ${announcement.host}${announcement.vin ? ` (VIN ${announcement.vin})` : ""}`,
+  );
   return link;
 };
 
@@ -166,7 +192,7 @@ const handlers: Record<string, Handler> = {
     const { session } = await ensureLink();
     const ecu = asString(params["ecu"]);
     const routine = asString(params["routine"]);
-    const action = (asString(params["action"], "start") as "start" | "stop" | "status");
+    const action = asString(params["action"], "start") as "start" | "stop" | "status";
     try {
       await session.enterSession(ecu);
       const result = await session.runRoutine(ecu, routine, action);
@@ -195,7 +221,14 @@ const handlers: Record<string, Handler> = {
     const ecu = asString(params["ecu"], flow.split(" ")[0] ?? "CCU");
     const phases = ["Preconditions", "Security access", "Transfer", "Verify"];
     const report = (phaseIndex: number, percent: number, message: string, state: string) =>
-      emit({ phaseIndex, phaseCount: phases.length, phase: phases[phaseIndex], percent, message, state });
+      emit({
+        phaseIndex,
+        phaseCount: phases.length,
+        phase: phases[phaseIndex],
+        percent,
+        message,
+        state,
+      });
 
     try {
       report(0, 5, "Entering programming session", "running");
@@ -253,15 +286,24 @@ server.on("connection", (socket: WebSocket) => {
       socket.send(JSON.stringify({ id, type: "error", message: text }));
     }
   });
-  socket.on("close", () => log("app disconnected"));
+  socket.on("close", () => {
+    // Stop the 3E 80 keep-alive: the technician is gone, the ECU may return to default.
+    link?.session.dispose();
+    log("app disconnected");
+  });
 });
 
 server.on("listening", () => {
   log(`listening on ws://127.0.0.1:${PORT}`);
-  log(`tester address ${config.tester.sourceAddress}, ${Object.keys(config.ecus).length} ECUs mapped`);
+  log(
+    `tester ${config.tester.sourceAddress}, functional ${config.tester.functionalAddress}, ` +
+      `${Object.keys(config.ecus).length} ECUs mapped, ` +
+      `P2 ${config.timing.p2} ms / P2* ${config.timing.p2Star} ms / S3 ${config.timing.s3} ms`,
+  );
 });
 
 const shutdown = () => {
+  link?.session.dispose();
   link?.client.close();
   server.close(() => process.exit(0));
 };

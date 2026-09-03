@@ -41,9 +41,7 @@ export function ActuatorPanel({ ecu }: { ecu: Ecu }) {
       ...prev,
       [routine]: {
         running: action === "start" && result.ok,
-        line: result.error
-          ? describeNrcWithHint(result.error.nrc)
-          : result.message,
+        line: result.error ? describeNrcWithHint(result.error.nrc) : result.message,
         ok: result.ok,
       },
     }));

@@ -1,7 +1,7 @@
 import { createSocket } from "node:dgram";
 import { Socket } from "node:net";
 
-import { UdsNegativeResponse, bytesToHex } from "./uds.ts";
+import { UdsNegativeResponse, bytesToHex, hex } from "./uds.ts";
 
 const PROTOCOL_VERSION = 0x02;
 const DOIP_PORT = 13400;
@@ -12,10 +12,61 @@ const PAYLOAD = {
   routingActivationRequest: 0x0005,
   routingActivationResponse: 0x0006,
   aliveCheckRequest: 0x0007,
+  aliveCheckResponse: 0x0008,
   diagnosticMessage: 0x8001,
   diagnosticPositiveAck: 0x8002,
   diagnosticNegativeAck: 0x8003,
 } as const;
+
+/** ISO 13400-2 routing activation response codes. */
+export const ROUTING_ACTIVATION_CODES: Record<number, string> = {
+  0x00: "unknown source address — the gateway does not know this tester address",
+  0x01: "all concurrent sockets are registered and active",
+  0x02: "source address already registered on a different socket",
+  0x03: "socket already registered for a different source address",
+  0x04: "missing authentication",
+  0x05: "rejected confirmation",
+  0x06: "unsupported routing activation type",
+  0x10: "routing activation successful",
+  0x11: "routing activation successful, confirmation required",
+};
+
+/** ISO 13400-2 diagnostic message negative acknowledge codes. */
+export const DIAGNOSTIC_NACK_CODES: Record<number, string> = {
+  0x00: "invalid source address",
+  0x01: "unknown target address",
+  0x02: "diagnostic message too large",
+  0x03: "out of memory in the gateway",
+  0x04: "target unreachable",
+  0x05: "unknown network",
+  0x06: "transport protocol error",
+  0x07: "invalid payload length",
+  0x08: "invalid payload type",
+};
+
+export class DoipRoutingActivationError extends Error {
+  readonly code: number;
+
+  constructor(code: number) {
+    super(
+      `DoIP routing activation refused (0x${hex(code)} — ${ROUTING_ACTIVATION_CODES[code] ?? "unknown code"})`,
+    );
+    this.name = "DoipRoutingActivationError";
+    this.code = code;
+  }
+}
+
+export class DoipNegativeAckError extends Error {
+  readonly code: number;
+
+  constructor(code: number) {
+    super(
+      `DoIP gateway rejected the message (0x${hex(code)} — ${DIAGNOSTIC_NACK_CODES[code] ?? "unknown code"})`,
+    );
+    this.name = "DoipNegativeAckError";
+    this.code = code;
+  }
+}
 
 export type VehicleAnnouncement = {
   vin: string;
@@ -24,7 +75,11 @@ export type VehicleAnnouncement = {
   host: string;
 };
 
-const header = (payloadType: number, payload: Uint8Array): Buffer => {
+export type DoipTiming = { p2: number; p2Star: number; s3: number };
+
+export const DEFAULT_TIMING: DoipTiming = { p2: 100, p2Star: 5000, s3: 5000 };
+
+export const doipHeader = (payloadType: number, payload: Uint8Array): Buffer => {
   const frame = Buffer.alloc(8 + payload.length);
   frame[0] = PROTOCOL_VERSION;
   frame[1] = PROTOCOL_VERSION ^ 0xff;
@@ -33,6 +88,28 @@ const header = (payloadType: number, payload: Uint8Array): Buffer => {
   frame.set(payload, 8);
   return frame;
 };
+
+export type DoipFrame = { payloadType: number; payload: Buffer<ArrayBufferLike> };
+
+/** Splits a byte stream into complete DoIP frames; returns the unconsumed remainder. */
+export const parseDoipFrames = (
+  buffer: Buffer<ArrayBufferLike>,
+): { frames: DoipFrame[]; rest: Buffer<ArrayBufferLike> } => {
+  const frames: DoipFrame[] = [];
+  let rest = buffer;
+  while (rest.length >= 8) {
+    const length = rest.readUInt32BE(4);
+    if (rest.length < 8 + length) break;
+    frames.push({
+      payloadType: rest.readUInt16BE(2),
+      payload: Buffer.from(rest.subarray(8, 8 + length)),
+    });
+    rest = rest.subarray(8 + length);
+  }
+  return { frames, rest: Buffer.from(rest) };
+};
+
+const header = doipHeader;
 
 /** Broadcasts a DoIP vehicle identification request and waits for the first announcement. */
 export const discoverVehicle = (timeoutMs = 2000): Promise<VehicleAnnouncement> =>
@@ -78,12 +155,13 @@ type Waiter = {
 
 /**
  * DoIP TCP client: routing activation plus diagnostic message exchange with an
- * ECU logical address. Handles 0x78 responsePending and negative acknowledgements.
+ * ECU logical address. Applies P2 / P2* timing and handles NRC 0x78 (response
+ * pending) plus DoIP acknowledge codes.
  */
 export class DoipClient {
   private socket: Socket | null = null;
 
-  private buffer = Buffer.alloc(0);
+  private buffer: Buffer<ArrayBufferLike> = Buffer.alloc(0);
 
   private waiters: Waiter[] = [];
 
@@ -93,13 +171,20 @@ export class DoipClient {
 
   private readonly sourceAddress: number;
 
-  constructor(host: string, sourceAddress: number) {
+  readonly timing: DoipTiming;
+
+  constructor(host: string, sourceAddress: number, timing: DoipTiming = DEFAULT_TIMING) {
     this.host = host;
     this.sourceAddress = sourceAddress;
+    this.timing = timing;
   }
 
   get connected(): boolean {
     return this.socket !== null && !this.socket.destroyed;
+  }
+
+  get testerPresentActive(): boolean {
+    return this.testerPresent !== null;
   }
 
   async connect(timeoutMs = 3000): Promise<void> {
@@ -131,8 +216,7 @@ export class DoipClient {
 
   private onClose() {
     this.socket = null;
-    if (this.testerPresent) clearInterval(this.testerPresent);
-    this.testerPresent = null;
+    this.stopTesterPresent();
     const error = new Error("DoIP connection closed");
     for (const waiter of this.waiters.splice(0)) {
       clearTimeout(waiter.timer);
@@ -141,22 +225,16 @@ export class DoipClient {
   }
 
   private onData(chunk: Buffer) {
-    this.buffer = Buffer.concat([this.buffer, chunk]);
-    while (this.buffer.length >= 8) {
-      const length = this.buffer.readUInt32BE(4);
-      if (this.buffer.length < 8 + length) return;
-      const payloadType = this.buffer.readUInt16BE(2);
-      const payload = this.buffer.subarray(8, 8 + length);
-      this.buffer = this.buffer.subarray(8 + length);
-      this.dispatch(payloadType, Buffer.from(payload));
-    }
+    const { frames, rest } = parseDoipFrames(Buffer.concat([this.buffer, chunk]));
+    this.buffer = rest;
+    for (const frame of frames) this.dispatch(frame.payloadType, frame.payload);
   }
 
   private dispatch(payloadType: number, payload: Buffer) {
     if (payloadType === PAYLOAD.aliveCheckRequest) {
       const body = Buffer.alloc(2);
       body.writeUInt16BE(this.sourceAddress, 0);
-      this.socket?.write(header(0x0008, body));
+      this.socket?.write(header(PAYLOAD.aliveCheckResponse, body));
       return;
     }
     const index = this.waiters.findIndex((waiter) => waiter.match(payloadType, payload));
@@ -193,13 +271,21 @@ export class DoipClient {
     this.socket?.write(header(PAYLOAD.routingActivationRequest, body));
     const response = await pending;
     const code = response[4] ?? 0xff;
-    if (code !== 0x10 && code !== 0x11) {
-      throw new Error(`DoIP routing activation refused (code 0x${code.toString(16)})`);
-    }
+    if (code !== 0x10 && code !== 0x11) throw new DoipRoutingActivationError(code);
+  }
+
+  /**
+   * True when a diagnostic frame belongs to this exchange: the ECU is the source and
+   * this tester is the target. Without the target check, a frame addressed to another
+   * tester on the same gateway would be accepted as our answer.
+   */
+  private isOurs(payload: Buffer, ecuAddress: number): boolean {
+    if (payload.length < 4) return false;
+    return payload.readUInt16BE(0) === ecuAddress && payload.readUInt16BE(2) === this.sourceAddress;
   }
 
   /** Sends a UDS request to a logical address and returns the positive response bytes. */
-  async sendUds(target: number, data: Uint8Array, timeoutMs = 5000): Promise<Uint8Array> {
+  async sendUds(target: number, data: Uint8Array, timeoutMs?: number): Promise<Uint8Array> {
     if (!this.socket) throw new Error("DoIP client is not connected");
     const body = Buffer.alloc(4 + data.length);
     body.writeUInt16BE(this.sourceAddress, 0);
@@ -207,44 +293,45 @@ export class DoipClient {
     body.set(data, 4);
 
     const service = data[0] ?? 0;
-    const ackOrResponse = this.wait(
-      (type, payload) =>
-        (type === PAYLOAD.diagnosticMessage && payload.readUInt16BE(0) === target) ||
-        type === PAYLOAD.diagnosticNegativeAck,
-      timeoutMs,
-      `response to service 0x${service.toString(16)}`,
-    );
+    const p2 = timeoutMs ?? this.timing.p2;
+    const p2Star = Math.max(this.timing.p2Star, p2);
+
+    const matchResponse = (type: number, payload: Buffer) =>
+      (type === PAYLOAD.diagnosticMessage && this.isOurs(payload, target)) ||
+      (type === PAYLOAD.diagnosticNegativeAck && this.isOurs(payload, target));
+
+    const first = this.wait(matchResponse, p2, `response to service 0x${hex(service)}`);
     this.socket.write(header(PAYLOAD.diagnosticMessage, body));
 
-    let payload = await ackOrResponse;
+    let payload = await first;
     for (;;) {
+      if (payload.length >= 5 && payload.readUInt16BE(0) === target && this.isNack(payload)) {
+        throw new DoipNegativeAckError(payload[4] ?? 0xff);
+      }
       const uds = payload.subarray(4);
       if (uds[0] === 0x7f && uds[2] === 0x78) {
-        // responsePending: keep waiting for the real answer.
-        payload = await this.wait(
-          (type, next) => type === PAYLOAD.diagnosticMessage && next.readUInt16BE(0) === target,
-          Math.max(timeoutMs, 10_000),
-          "pending response",
-        );
+        // responsePending: the ECU asked for more time — extend to P2*.
+        payload = await this.wait(matchResponse, p2Star, "pending response (P2*)");
         continue;
       }
       if (uds[0] === 0x7f) throw new UdsNegativeResponse(uds[1] ?? service, uds[2] ?? 0x10);
       if (uds[0] !== service + 0x40) {
-        // Positive-response acknowledgement frames are skipped.
-        payload = await this.wait(
-          (type, next) => type === PAYLOAD.diagnosticMessage && next.readUInt16BE(0) === target,
-          timeoutMs,
-          "diagnostic response",
-        );
+        // Not our service id yet (e.g. an unrelated positive frame) — keep waiting.
+        payload = await this.wait(matchResponse, p2Star, "diagnostic response");
         continue;
       }
       return new Uint8Array(uds);
     }
   }
 
-  /** Keeps every session alive with 3E 80 while the technician works. */
-  startTesterPresent(target: number, intervalMs = 2000) {
-    if (this.testerPresent) clearInterval(this.testerPresent);
+  private isNack(payload: Buffer): boolean {
+    // A NACK payload is exactly source(2) + target(2) + code(1).
+    return payload.length === 5;
+  }
+
+  /** Keeps a non-default session alive with 3E 80 at S3/2. */
+  startTesterPresent(target: number, intervalMs = Math.floor(this.timing.s3 / 2)) {
+    this.stopTesterPresent();
     this.testerPresent = setInterval(() => {
       if (!this.socket) return;
       const body = Buffer.alloc(6);
@@ -254,11 +341,16 @@ export class DoipClient {
       body[5] = 0x80;
       this.socket.write(header(PAYLOAD.diagnosticMessage, body));
     }, intervalMs);
+    this.testerPresent.unref?.();
+  }
+
+  stopTesterPresent() {
+    if (this.testerPresent) clearInterval(this.testerPresent);
+    this.testerPresent = null;
   }
 
   close() {
-    if (this.testerPresent) clearInterval(this.testerPresent);
-    this.testerPresent = null;
+    this.stopTesterPresent();
     this.socket?.destroy();
     this.socket = null;
   }

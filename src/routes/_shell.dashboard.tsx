@@ -406,7 +406,9 @@ function Metric({
         {label}
       </p>
       <p className={`mt-2 truncate text-lg font-semibold tracking-tight ${toneClass}`}>{value}</p>
-      {hint && <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && (
+        <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">{hint}</p>
+      )}
     </div>
   );
 }

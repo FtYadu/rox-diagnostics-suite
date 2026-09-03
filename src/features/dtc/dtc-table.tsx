@@ -126,9 +126,7 @@ export function DtcTable({
         <label className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
           <Checkbox
             checked={allSelected}
-            onCheckedChange={(checked) =>
-              setSelected(checked === true ? filtered.map(keyOf) : [])
-            }
+            onCheckedChange={(checked) => setSelected(checked === true ? filtered.map(keyOf) : [])}
             aria-label="Select all listed codes"
           />
           Select all {filtered.length} listed

@@ -48,20 +48,18 @@ function SettingsPage() {
             <CardTitle className="text-base">Diagnostic bridge</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {(
-              [
-                {
-                  mode: "simulator" as const,
-                  title: "Simulator",
-                  description: "In-browser simulation of the full R11_Oversea bus. No hardware.",
-                },
-                {
-                  mode: "local" as const,
-                  title: "Local VCI bridge",
-                  description: "Connects to the local agent on ws://127.0.0.1:9097.",
-                },
-              ]
-            ).map((option) => (
+            {[
+              {
+                mode: "simulator" as const,
+                title: "Simulator",
+                description: "In-browser simulation of the full R11_Oversea bus. No hardware.",
+              },
+              {
+                mode: "local" as const,
+                title: "Local VCI bridge",
+                description: "Connects to the local agent on ws://127.0.0.1:9097.",
+              },
+            ].map((option) => (
               <button
                 key={option.mode}
                 type="button"
@@ -81,7 +79,11 @@ function SettingsPage() {
                 </span>
               </button>
             ))}
-            <Button variant="secondary" className="w-full rounded-full" onClick={() => void reconnect()}>
+            <Button
+              variant="secondary"
+              className="w-full rounded-full"
+              onClick={() => void reconnect()}
+            >
               <RefreshCw className="size-4" />
               Reconnect bridge
             </Button>

@@ -16,9 +16,7 @@ export default defineTool({
     const term = search?.toLowerCase();
     const rows = ecus
       .filter((ecu) => (domain ? ecu.domain.toLowerCase() === domain.toLowerCase() : true))
-      .filter((ecu) =>
-        term ? `${ecu.id} ${ecu.fullName}`.toLowerCase().includes(term) : true,
-      )
+      .filter((ecu) => (term ? `${ecu.id} ${ecu.fullName}`.toLowerCase().includes(term) : true))
       .map((ecu) => ({
         id: ecu.id,
         fullName: ecu.fullName,

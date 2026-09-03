@@ -24,7 +24,8 @@ export default defineTool({
       .eq("id", jobId)
       .maybeSingle();
     if (jobError) return { content: [{ type: "text", text: jobError.message }], isError: true };
-    if (!job) return { content: [{ type: "text", text: `Job ${jobId} not found.` }], isError: true };
+    if (!job)
+      return { content: [{ type: "text", text: `Job ${jobId} not found.` }], isError: true };
 
     const clientEventId = `EVT-MCP-${Date.now().toString(36)}`;
     const { error } = await supabase.from("job_events").insert({

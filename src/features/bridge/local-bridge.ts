@@ -19,8 +19,7 @@ const CALL_TIMEOUT_MS = 15_000;
 const KEEPALIVE_MS = 4000;
 
 export type LocalBridgeEvent =
-  | { type: "status"; info: ConnectionInfo }
-  | { type: "disconnected"; reason: string };
+  { type: "status"; info: ConnectionInfo } | { type: "disconnected"; reason: string };
 
 type PendingEntry = {
   resolve: (value: unknown) => void;
@@ -52,7 +51,6 @@ const normalizeInfo = (payload: unknown): ConnectionInfo => {
     ignitionOn: Boolean(raw["ignitionOn"] ?? raw["ignition"]),
   };
 };
-
 
 /**
  * WebSocket client for the local hardware agent. The agent exposes a small
@@ -233,7 +231,6 @@ export class LocalBridge implements DiagnosticBridge {
     this.startKeepAlive();
     return info;
   }
-
 
   readIdentification(ecu: Ecu): Promise<IdentificationEntry[]> {
     return this.call<IdentificationEntry[]>("readIdentification", { ecu: ecu.id });

@@ -18,8 +18,7 @@ type OAuthNamespace = {
   denyAuthorization: (id: string) => Promise<{ data: OAuthResult | null; error: unknown }>;
 };
 
-const oauth = (): OAuthNamespace =>
-  (supabase.auth as unknown as { oauth: OAuthNamespace }).oauth;
+const oauth = (): OAuthNamespace => (supabase.auth as unknown as { oauth: OAuthNamespace }).oauth;
 
 const errorMessage = (error: unknown): string =>
   error && typeof error === "object" && "message" in error
@@ -29,7 +28,8 @@ const errorMessage = (error: unknown): string =>
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>) => ({
-    authorization_id: typeof search['authorization_id'] === "string" ? search['authorization_id'] : "",
+    authorization_id:
+      typeof search["authorization_id"] === "string" ? search["authorization_id"] : "",
   }),
   loader: async ({ location }) => {
     const authorizationId = new URLSearchParams(location.search).get("authorization_id");

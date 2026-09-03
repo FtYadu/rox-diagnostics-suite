@@ -9,7 +9,7 @@ import addJobNoteTool from "./tools/add-job-note";
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the only
 // value that survives publish unchanged.
-const projectRef = import.meta.env['VITE_SUPABASE_PROJECT_ID'] ?? "project-ref-unset";
+const projectRef = import.meta.env["VITE_SUPABASE_PROJECT_ID"] ?? "project-ref-unset";
 
 export default defineMcp({
   name: "rox-diagnostics-suite",
@@ -29,6 +29,6 @@ export default defineMcp({
     getJobTool,
     addJobNoteTool,
     // Tools omit `outputSchema`; the SDK's optional-property typing needs the cast
-  // under exactOptionalPropertyTypes.
+    // under exactOptionalPropertyTypes.
   ] as unknown as McpDefinitionInput["tools"],
 });
