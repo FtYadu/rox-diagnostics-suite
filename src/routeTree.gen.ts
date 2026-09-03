@@ -25,6 +25,9 @@ import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
+import { Route as ShellEcusEcuIdIndexRouteImport } from './routes/_shell.ecus.$ecuId.index'
+import { Route as ShellEcusEcuIdConfigurationRouteImport } from './routes/_shell.ecus.$ecuId.configuration'
+import { Route as ShellEcusEcuIdIoControlRouteImport } from './routes/_shell.ecus.$ecuId.io-control'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +109,22 @@ const ShellEcusEcuIdRoute = ShellEcusEcuIdRouteImport.update({
   path: '/ecus/$ecuId',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellEcusEcuIdIndexRoute = ShellEcusEcuIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShellEcusEcuIdRoute,
+} as any)
+const ShellEcusEcuIdConfigurationRoute =
+  ShellEcusEcuIdConfigurationRouteImport.update({
+    id: '/configuration',
+    path: '/configuration',
+    getParentRoute: () => ShellEcusEcuIdRoute,
+  } as any)
+const ShellEcusEcuIdIoControlRoute = ShellEcusEcuIdIoControlRouteImport.update({
+  id: '/io-control',
+  path: '/io-control',
+  getParentRoute: () => ShellEcusEcuIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -121,8 +140,11 @@ export interface FileRoutesByFullPath {
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
+  '/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/ecus/': typeof ShellEcusIndexRoute
+  '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,8 +160,10 @@ export interface FileRoutesByTo {
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/ecus/$ecuId': typeof ShellEcusEcuIdRoute
   '/ecus': typeof ShellEcusIndexRoute
+  '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/ecus/$ecuId': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,8 +181,11 @@ export interface FileRoutesById {
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRoute
+  '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/_shell/ecus/': typeof ShellEcusIndexRoute
+  '/_shell/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/_shell/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/_shell/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -178,6 +205,9 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus/'
+    | '/ecus/$ecuId/configuration'
+    | '/ecus/$ecuId/io-control'
+    | '/ecus/$ecuId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -193,8 +223,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/vehicle'
     | '/.lovable/oauth/consent'
-    | '/ecus/$ecuId'
     | '/ecus'
+    | '/ecus/$ecuId/configuration'
+    | '/ecus/$ecuId/io-control'
+    | '/ecus/$ecuId'
   id:
     | '__root__'
     | '/'
@@ -213,6 +245,9 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
+    | '/_shell/ecus/$ecuId/configuration'
+    | '/_shell/ecus/$ecuId/io-control'
+    | '/_shell/ecus/$ecuId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -337,8 +372,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellEcusEcuIdRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/ecus/$ecuId/': {
+      id: '/_shell/ecus/$ecuId/'
+      path: '/'
+      fullPath: '/ecus/$ecuId/'
+      preLoaderRoute: typeof ShellEcusEcuIdIndexRouteImport
+      parentRoute: typeof ShellEcusEcuIdRoute
+    }
+    '/_shell/ecus/$ecuId/configuration': {
+      id: '/_shell/ecus/$ecuId/configuration'
+      path: '/configuration'
+      fullPath: '/ecus/$ecuId/configuration'
+      preLoaderRoute: typeof ShellEcusEcuIdConfigurationRouteImport
+      parentRoute: typeof ShellEcusEcuIdRoute
+    }
+    '/_shell/ecus/$ecuId/io-control': {
+      id: '/_shell/ecus/$ecuId/io-control'
+      path: '/io-control'
+      fullPath: '/ecus/$ecuId/io-control'
+      preLoaderRoute: typeof ShellEcusEcuIdIoControlRouteImport
+      parentRoute: typeof ShellEcusEcuIdRoute
+    }
   }
 }
+
+interface ShellEcusEcuIdRouteChildren {
+  ShellEcusEcuIdConfigurationRoute: typeof ShellEcusEcuIdConfigurationRoute
+  ShellEcusEcuIdIoControlRoute: typeof ShellEcusEcuIdIoControlRoute
+  ShellEcusEcuIdIndexRoute: typeof ShellEcusEcuIdIndexRoute
+}
+
+const ShellEcusEcuIdRouteChildren: ShellEcusEcuIdRouteChildren = {
+  ShellEcusEcuIdConfigurationRoute: ShellEcusEcuIdConfigurationRoute,
+  ShellEcusEcuIdIoControlRoute: ShellEcusEcuIdIoControlRoute,
+  ShellEcusEcuIdIndexRoute: ShellEcusEcuIdIndexRoute,
+}
+
+const ShellEcusEcuIdRouteWithChildren = ShellEcusEcuIdRoute._addFileChildren(
+  ShellEcusEcuIdRouteChildren,
+)
 
 interface ShellRouteChildren {
   ShellDashboardRoute: typeof ShellDashboardRoute
@@ -350,7 +422,7 @@ interface ShellRouteChildren {
   ShellServiceFunctionsRoute: typeof ShellServiceFunctionsRoute
   ShellSettingsRoute: typeof ShellSettingsRoute
   ShellVehicleRoute: typeof ShellVehicleRoute
-  ShellEcusEcuIdRoute: typeof ShellEcusEcuIdRoute
+  ShellEcusEcuIdRoute: typeof ShellEcusEcuIdRouteWithChildren
   ShellEcusIndexRoute: typeof ShellEcusIndexRoute
 }
 
@@ -364,7 +436,7 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellServiceFunctionsRoute: ShellServiceFunctionsRoute,
   ShellSettingsRoute: ShellSettingsRoute,
   ShellVehicleRoute: ShellVehicleRoute,
-  ShellEcusEcuIdRoute: ShellEcusEcuIdRoute,
+  ShellEcusEcuIdRoute: ShellEcusEcuIdRouteWithChildren,
   ShellEcusIndexRoute: ShellEcusIndexRoute,
 }
 

@@ -11,6 +11,8 @@ export type JobEventKind =
   | "dtc-clear"
   | "process"
   | "routine"
+  | "io-control"
+  | "config-write"
   | "programming"
   | "recording"
   | "report"

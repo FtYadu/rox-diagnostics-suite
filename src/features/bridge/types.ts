@@ -1,4 +1,7 @@
 import type { Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
+import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
+
+export type { ProcessRunEvent, ProcessRunHandle, RunProcessOptions } from "./process-run";
 
 export type BridgeMode = "simulator" | "local";
 
@@ -28,6 +31,8 @@ export type IdentificationEntry = {
   did: string;
   label: string;
   value: string;
+  /** Expected value from the canonical DID definition, when known. */
+  expected?: string;
 };
 
 /** UDS DTC status bits exposed to the technician (subset of ISO 14229 statusOfDTC). */
@@ -120,6 +125,44 @@ export type ProgrammingProgressEvent = {
   state: "running" | "done" | "failed";
 };
 
+export type IoControlOptionName = "returnControl" | "resetToDefault" | "freeze" | "shortTermAdjust";
+
+export type IoControlRequest = {
+  ecu: Ecu;
+  did: number;
+  option: IoControlOptionName;
+  params?: Record<string, number>;
+};
+
+export type IoControlResult = {
+  ok: boolean;
+  message: string;
+  trace: TraceLine[];
+  error?: NegativeResponse;
+  /** Decoded control-state record returned by the ECU (6F response). */
+  readback?: Array<{ label: string; value: string; unit?: string }>;
+};
+
+export type WriteDidRequest = { ecu: Ecu; did: number; value: string };
+
+export type WriteDidResult = {
+  ok: boolean;
+  message: string;
+  trace: TraceLine[];
+  error?: NegativeResponse;
+  /** Bytes read back with 22 <did> right after the write. */
+  readback?: string;
+  previous?: string;
+};
+
+export type RoutineRequest = {
+  ecu: Ecu;
+  rid: number;
+  name: string;
+  subFunction: "start" | "stop" | "status";
+  params?: Record<string, number>;
+};
+
 export type DiagnosticBridge = {
   readonly mode: BridgeMode;
   connect(): Promise<ConnectionInfo>;
@@ -130,18 +173,21 @@ export type DiagnosticBridge = {
   readFreezeFrame(ecu: Ecu, code: string): Promise<FreezeFrame>;
   readLiveData(ecu: Ecu, dids: string[]): Promise<LiveDataSignal[]>;
   requestSecurityAccess(ecu: Ecu, level: number): Promise<SecurityAccessResult>;
-  /** Executes a single guided-process step, optionally with technician input. */
-  executeStep(
-    process: ServiceProcess,
-    stepIndex: number,
-    label: string,
-    input?: string,
-  ): Promise<StepExecution>;
+  /** Starts a guided process; progress arrives through the event stream. */
+  runProcess(process: ServiceProcess, options: RunProcessOptions): Promise<ProcessRunHandle>;
+  provideInput(runId: string, value: string): Promise<{ accepted: boolean }>;
+  abortProcess(runId: string): Promise<{ aborted: boolean }>;
   runRoutine(
     ecu: Ecu,
     routine: string,
     action: "start" | "stop" | "status",
   ): Promise<RoutineExecution>;
+  /** Routine by canonical identifier with typed parameters (31 01/02/03). */
+  runRoutineById(request: RoutineRequest): Promise<RoutineExecution>;
+  /** InputOutputControlByIdentifier (0x2F). */
+  ioControl(request: IoControlRequest): Promise<IoControlResult>;
+  /** WriteDataByIdentifier (0x2E) — v2 feature, gated behind a flag in the UI. */
+  writeDid(request: WriteDidRequest): Promise<WriteDidResult>;
   startProgramming(
     flow: ProgrammingFlow,
     pkg: string,

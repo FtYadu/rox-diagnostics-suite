@@ -1,4 +1,4 @@
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, Table2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ecus } from "@/data/vehicle-data";
 import type { DtcRecord } from "@/features/bridge/types";
 import { downloadScanReport } from "@/features/reports/scan-report";
+import { downloadScanWorkbook } from "@/features/reports/scan-workbook";
 import { useAppStore } from "@/store/app-store";
 
 const NOTES_LIMIT = 1200;
@@ -34,30 +35,37 @@ export function ScanReportDialog({ open, onOpenChange, dtcs, completedAt }: Scan
   const bridgeMode = useAppStore((s) => s.bridgeMode);
   const activeJobId = useAppStore((s) => s.activeJobId);
   const appendEvent = useAppStore((s) => s.appendEvent);
+  const workstation = useAppStore((s) => s.workstation);
   const [notes, setNotes] = useState("");
 
   const scanned = Object.values(scan).filter((state) => state.status !== "not-scanned").length;
   const critical = dtcs.filter((dtc) => dtc.severity === 3).length;
 
-  const generate = () => {
-    const technician = user?.name ?? "Unknown technician";
-    downloadScanReport({
-      vin,
-      technician,
-      scan,
-      dtcs,
-      notes,
-      completedAt: completedAt ?? null,
-      jobId: activeJobId,
-      bridgeMode,
-    });
+  const reportInput = () => ({
+    vin,
+    technician: user?.name ?? "Unknown technician",
+    scan,
+    dtcs,
+    notes,
+    completedAt: completedAt ?? null,
+    jobId: activeJobId,
+    bridgeMode,
+    dealerName: workstation.dealerName,
+    dealerLogo: workstation.dealerLogo,
+    variant: workstation.variant,
+  });
+
+  const generate = (format: "pdf" | "xlsx") => {
+    const input = reportInput();
+    if (format === "pdf") downloadScanReport(input);
+    else downloadScanWorkbook(input);
     appendEvent({
       kind: "report",
-      title: "Health scan PDF report generated",
+      title: `Health scan ${format.toUpperCase()} report generated`,
       detail: `${scanned} ECUs · ${dtcs.length} DTCs · ${critical} critical${notes.trim() ? " · notes attached" : ""}`,
       status: "ok",
     });
-    toast.success("Report downloaded");
+    toast.success(`${format.toUpperCase()} report downloaded`);
     onOpenChange(false);
   };
 
@@ -70,8 +78,8 @@ export function ScanReportDialog({ open, onOpenChange, dtcs, completedAt }: Scan
             Health scan report
           </DialogTitle>
           <DialogDescription>
-            A PDF service record for {vin || "this vehicle"} with every ECU scanned, the DTC summary
-            and your notes.
+            A PDF or XLSX service record for {vin || "this vehicle"} with every ECU scanned, the DTC
+            summary and your notes.
           </DialogDescription>
         </DialogHeader>
 
@@ -102,7 +110,11 @@ export function ScanReportDialog({ open, onOpenChange, dtcs, completedAt }: Scan
           <Button variant="ghost" className="h-11 rounded-xl" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button className="h-11 rounded-xl" onClick={generate}>
+          <Button variant="secondary" className="h-11 rounded-xl" onClick={() => generate("xlsx")}>
+            <Table2 className="size-4" />
+            Download XLSX
+          </Button>
+          <Button className="h-11 rounded-xl" onClick={() => generate("pdf")}>
             <Download className="size-4" />
             Download PDF
           </Button>

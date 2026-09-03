@@ -36,6 +36,8 @@ export type Did = {
   max?: number;
   session?: 1 | 3;
   saLevel?: number;
+  /** Expected value (e.g. released part number) used for the compare column. */
+  expected?: string;
 };
 
 export type RoutineSubFunction = "start" | "stop" | "status";

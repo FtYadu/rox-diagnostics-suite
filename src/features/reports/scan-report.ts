@@ -14,6 +14,10 @@ export type ScanReportInput = {
   completedAt?: string | null;
   jobId?: string | null;
   bridgeMode: "simulator" | "local";
+  /** Dealer header, taken from Settings. */
+  dealerName?: string;
+  dealerLogo?: string;
+  variant?: string;
 };
 
 const INK = { r: 17, g: 17, b: 21 };
@@ -69,7 +73,11 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(170, 172, 180);
-  doc.text(`ROX Diagnostics · ${vehicle.name}`, MARGIN, 68);
+  doc.text(
+    `${input.dealerName ?? "ROX Diagnostics"} · ${vehicle.name}${input.variant ? ` (${input.variant})` : ""}`,
+    MARGIN,
+    68,
+  );
   doc.text(`Generated ${formatDateTime(generatedAt)}`, MARGIN, 84);
 
   doc.setTextColor(ACCENT.r, ACCENT.g, ACCENT.b);

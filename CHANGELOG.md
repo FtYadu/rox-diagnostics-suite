@@ -6,6 +6,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-09-03
+
+### Milestone M4 — App feature parity (read + safe writes)
+
+#### Added
+
+- **Unified guided-process event stream.** `SimulatorBridge` now speaks the same
+  `runProcess` / `provideInput` / `abortProcess` protocol as the agent interpreter and
+  emits `step-start`, `step-done`, `output`, `input-required`, `negative-response`,
+  `trace`, `finished`, `aborted` and `error` events. `guided-runner.tsx` consumes that
+  stream for both bridges with inline input forms, abort and a trace console; the old
+  `executeStep` path is gone from `DiagnosticBridge`.
+- **IO control screen** (`/ecus/$ecuId/io-control`): UDS `0x2F` with return control,
+  reset to default, freeze and typed short-term adjust, gated by security access and the
+  senior-technician role.
+- **Configuration write screen** (`/ecus/$ecuId/configuration`): UDS `0x2E` behind the
+  `features.configurationWrite` flag (default OFF, admin only) with old-vs-new byte
+  review, double confirmation and automatic read-back diff.
+- **Typed routine panel**: `31 01/02/03` by canonical RID with typed parameters and NRC
+  meanings on failure.
+- **Identification compare column** with expected-value match/mismatch badges and
+  per-row copy.
+- **Reports**: dealer header from Settings plus an XLSX workbook export (Summary,
+  Control units, Fault codes) alongside the existing PDF.
+- **Settings**: agent URL, dealer name/logo, vehicle variant, language (EN/ZH), access
+  role and feature flags.
+- **i18n** scaffolding with `react-i18next` and EN/ZH resources, persisted language.
+- **Offline**: IndexedDB-backed write queue with a pure reducer and an offline pill in
+  the top bar.
+- **Access roles** (technician / senior / admin) enforced across clear-DTC, IO control,
+  routines and configuration writes.
+- **Tests**: DID decode/encode, CSV export, XLSX report, offline queue and role guards
+  (97 unit tests total) plus a Playwright E2E scan → DTC → clear → report → history flow
+  at 1440×900 and 1180×820.
+
+#### Notes
+
+- PDF generation stays on `jsPDF` + `jspdf-autotable` rather than
+  `@react-pdf/renderer`; the existing generator already produces the required layout and
+  swapping engines would have rewritten a working report for no user-visible gain.
+
 ## [0.3.0] — 2026-09-03
 
 ### Milestone M3 — Harden the hardware agent

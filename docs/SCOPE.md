@@ -19,10 +19,16 @@ even when the canonical data would allow it.
 9. **Reports** — PDF health-scan report (VIN, ECUs scanned, DTC summary, technician notes).
 10. **Job history** — one job per vehicle action, with events, trace and downloads.
 
+### v1 status (M4)
+
+All ten v1 items are implemented against the Simulator and share one code path with
+`LocalBridge`. IO control and routines are additionally gated by the senior-technician
+role; clear-DTC needs the same role.
+
 ## v2 — deferred
 
-- **Configuration writes (WDBI, `2E`)** — the 81 write DIDs are extracted and typed, but
-  writing is not exposed in v1.
+- **Configuration writes (WDBI, `2E`)** — implemented behind the `features.configurationWrite`
+  flag (default OFF, admin only) so it can be validated on a bench vehicle before release.
 - **Programming / reprogramming** — `34/36/37` flash flows beyond the current reference
   implementation.
 - **CAN viewer** — raw bus monitoring and frame capture.

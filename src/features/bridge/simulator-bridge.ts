@@ -1,7 +1,9 @@
 import type { Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
-import { DID_LABELS, identDidsFor } from "@/data/vehicle-data";
+import { DID_LABELS, getEcu, identDidsFor } from "@/data/vehicle-data";
+import { buildRunnerSteps } from "@/features/processes/step-model";
 import { liveDataCatalog } from "./live-data";
 import { nrcMeaning } from "./types";
+import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
 import type {
   ConnectionInfo,
   DiagnosticBridge,
@@ -10,13 +12,22 @@ import type {
   EcuDtcResult,
   FreezeFrame,
   IdentificationEntry,
+  IoControlOptionName,
+  IoControlRequest,
+  IoControlResult,
   LiveDataSignal,
   ProgrammingProgressEvent,
   RoutineExecution,
+  RoutineRequest,
   SecurityAccessResult,
-  StepExecution,
   TraceLine,
+  WriteDidRequest,
+  WriteDidResult,
 } from "./types";
+
+type SimulatorRun = { aborted: boolean; pending: ((value: string) => void) | null };
+
+let runCounter = 0;
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -111,6 +122,8 @@ export class SimulatorBridge implements DiagnosticBridge {
   private runningRoutines = new Set<string>();
 
   private stepAttempts = new Map<string, number>();
+
+  private runs = new Map<string, SimulatorRun>();
 
   private battery = round(randomBetween(12.4, 14.2), 1);
 
@@ -249,48 +262,293 @@ export class SimulatorBridge implements DiagnosticBridge {
     return { ok: true, level, trace };
   }
 
-  async executeStep(
-    process: ServiceProcess,
-    stepIndex: number,
-    label: string,
-    input?: string,
-  ): Promise<StepExecution> {
-    const sid = process.udsServices[stepIndex % Math.max(1, process.udsServices.length)] ?? "22";
-    const trace: TraceLine[] = [];
+  async runProcess(process: ServiceProcess, options: RunProcessOptions): Promise<ProcessRunHandle> {
+    runCounter += 1;
+    const runId = `sim-run-${runCounter}`;
+    const run: SimulatorRun = { aborted: false, pending: null };
+    this.runs.set(runId, run);
+    void this.driveProcess(runId, run, process, options);
+    return { runId };
+  }
 
-    if (stepIndex === 0) {
-      trace.push(line("tx", "10 03"));
-      await wait(160);
-      trace.push(line("rx", "50 03 00 32 01 F4"));
+  async provideInput(runId: string, value: string): Promise<{ accepted: boolean }> {
+    const run = this.runs.get(runId);
+    if (!run?.pending) return { accepted: false };
+    const resolve = run.pending;
+    run.pending = null;
+    resolve(value);
+    return { accepted: true };
+  }
+
+  async abortProcess(runId: string): Promise<{ aborted: boolean }> {
+    const run = this.runs.get(runId);
+    if (!run) return { aborted: false };
+    run.aborted = true;
+    if (run.pending) {
+      const resolve = run.pending;
+      run.pending = null;
+      resolve("");
     }
+    return { aborted: true };
+  }
 
-    const payload = input ? `${input.slice(0, 17)}` : randomBytes(3);
-    trace.push(line("tx", `${sid} ${input ? "F1 90" : randomBytes(2)}`));
-    await wait(220 + Math.random() * 320);
+  private async driveProcess(
+    runId: string,
+    run: SimulatorRun,
+    process: ServiceProcess,
+    options: RunProcessOptions,
+  ): Promise<void> {
+    const emit = options.onEvent;
+    const steps = buildRunnerSteps(process);
+    const ecu = getEcu(process.ecu);
+    const variables: Record<string, string> = { ...(options.variables ?? {}) };
+    const startedAt = Date.now();
 
-    // ~3% of first attempts return a plausible NRC; the retry of the same step
-    // always passes so guided processes stay completable.
-    const stepKey = `${process.ecu}:${process.name}:${stepIndex}`;
-    const stepAttempts = (this.stepAttempts.get(stepKey) ?? 0) + 1;
-    this.stepAttempts.set(stepKey, stepAttempts);
-    if (stepAttempts === 1 && Math.random() < 0.03) {
-      const roll = Math.random();
-      const nrc = roll < 0.5 ? "0x22" : roll < 0.8 ? "0x31" : "0x7E";
-      trace.push(line("rx", `7F ${sid} ${nrc.slice(2)}`));
+    const traceOut = (direction: TraceLine["direction"], text: string) =>
+      emit({ type: "trace", line: line(direction, text) });
+
+    try {
+      traceOut("info", `Run ${runId} · ${process.name} · ${process.ecu}`);
+      traceOut("tx", "10 03");
+      await wait(160);
+      traceOut("rx", "50 03 00 32 01 F4");
+
+      for (let index = 0; index < steps.length; index += 1) {
+        const step = steps[index]!;
+        if (run.aborted) {
+          emit({ type: "aborted", message: `Aborted at step ${index + 1} of ${steps.length}.` });
+          return;
+        }
+
+        emit({
+          type: "step-start",
+          stepId: step.id,
+          index,
+          total: steps.length,
+          title: step.title,
+        });
+
+        if (step.kind === "message") {
+          emit({ type: "output", level: step.level, text: step.text });
+          await wait(220);
+          emit({ type: "step-done", stepId: step.id, ok: true });
+          continue;
+        }
+
+        if (step.kind === "input" || step.kind === "choice") {
+          emit({
+            type: "input-required",
+            variable: step.id,
+            prompt: step.text,
+            inputType:
+              step.kind === "choice" ? "choice" : step.field === "vin" ? "vin" : ("text" as const),
+            ...(step.kind === "choice"
+              ? { options: step.options.map((option) => `${option.value}: ${option.label}`) }
+              : {}),
+          });
+          const value = await new Promise<string>((resolve) => {
+            run.pending = resolve;
+          });
+          if (run.aborted) {
+            emit({ type: "aborted", message: "Aborted while waiting for technician input." });
+            return;
+          }
+          variables[step.id] = value;
+          traceOut("tx", `2E F1 90 ${value.slice(0, 17)}`);
+          await wait(260);
+          traceOut("rx", "6E F1 90");
+          emit({ type: "step-done", stepId: step.id, ok: true, message: `Accepted “${value}”` });
+          continue;
+        }
+
+        // security step
+        if (!ecu) {
+          emit({ type: "error", message: `Unknown control unit ${process.ecu}.` });
+          return;
+        }
+        const result = await this.requestSecurityAccess(ecu, step.level);
+        result.trace.forEach((traceLine) => emit({ type: "trace", line: traceLine }));
+        if (!result.ok) {
+          const error = result.error ?? { nrc: "0x33", meaning: nrcMeaning("0x33") };
+          emit({ type: "negative-response", ...error, ecuId: ecu.id });
+          emit({ type: "step-done", stepId: step.id, ok: false, message: error.meaning });
+          emit({
+            type: "finished",
+            ok: false,
+            message: `Security access L${step.level} rejected — ${error.nrc} ${error.meaning}`,
+          });
+          return;
+        }
+        emit({
+          type: "step-done",
+          stepId: step.id,
+          ok: true,
+          message: `Security access L${step.level} granted`,
+        });
+
+        // Each UDS-backed step exercises the process' declared services.
+        const sid = process.udsServices[index % Math.max(1, process.udsServices.length)] ?? "22";
+        traceOut("tx", `${sid} ${randomBytes(2)}`);
+        await wait(220);
+        const stepKey = `${process.ecu}:${process.name}:${index}`;
+        const attempts = (this.stepAttempts.get(stepKey) ?? 0) + 1;
+        this.stepAttempts.set(stepKey, attempts);
+        if (attempts === 1 && Math.random() < 0.03) {
+          const roll = Math.random();
+          const nrc = roll < 0.5 ? "0x22" : roll < 0.8 ? "0x31" : "0x7E";
+          traceOut("rx", `7F ${sid} ${nrc.slice(2)}`);
+          emit({ type: "negative-response", nrc, meaning: nrcMeaning(nrc), ecuId: process.ecu });
+          emit({ type: "finished", ok: false, message: `${step.title} failed — ${nrc}` });
+          return;
+        }
+        traceOut("rx", `${hex(parseInt(sid, 16) + 0x40)} ${randomBytes(2)}`);
+      }
+
+      emit({
+        type: "finished",
+        ok: true,
+        message: `Completed ${steps.length} step${steps.length === 1 ? "" : "s"} in ${Math.round(
+          (Date.now() - startedAt) / 1000,
+        )} s.`,
+      });
+    } catch (error) {
+      emit({ type: "error", message: error instanceof Error ? error.message : String(error) });
+    } finally {
+      this.runs.delete(runId);
+    }
+  }
+
+  async runRoutineById(request: RoutineRequest): Promise<RoutineExecution> {
+    const { ecu, rid, name, subFunction, params } = request;
+    const sub = subFunction === "start" ? "01" : subFunction === "stop" ? "02" : "03";
+    const paramBytes = Object.values(params ?? {})
+      .map((value) => hex(value))
+      .join(" ");
+    const trace: TraceLine[] = [
+      line(
+        "tx",
+        `31 ${sub} ${hex(rid >> 8)} ${hex(rid & 0xff)}${paramBytes ? ` ${paramBytes}` : ""}`,
+      ),
+    ];
+    await wait(280 + Math.random() * 240);
+
+    const key = `${ecu.id}:${rid}`;
+    if (subFunction === "start" && Math.random() < 0.025) {
+      const nrc = Math.random() < 0.7 ? "0x22" : "0x31";
+      trace.push(line("rx", `7F 31 ${nrc.slice(2)}`));
       return {
         ok: false,
-        message: `${label} failed — negative response ${nrc} ${nrcMeaning(nrc)}`,
+        message: `${name} rejected — ${nrc} ${nrcMeaning(nrc)}`,
         trace,
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
 
-    trace.push(line("rx", `${hex(parseInt(sid, 16) + 0x40)} ${randomBytes(2)}`));
+    trace.push(line("rx", `71 ${sub} ${hex(rid >> 8)} ${hex(rid & 0xff)} ${randomBytes(2)}`));
+    if (subFunction === "start") this.runningRoutines.add(key);
+    if (subFunction === "stop") this.runningRoutines.delete(key);
+
+    const message =
+      subFunction === "start"
+        ? `${name} started (RID 0x${hex(rid, 2)}) — observe the component`
+        : subFunction === "stop"
+          ? `${name} stopped and returned to idle`
+          : this.runningRoutines.has(key)
+            ? `${name} active`
+            : `${name} idle`;
+    return { ok: true, message, trace };
+  }
+
+  async ioControl(request: IoControlRequest): Promise<IoControlResult> {
+    const { did, option, params } = request;
+    const parameterByte =
+      option === "returnControl"
+        ? "00"
+        : option === "resetToDefault"
+          ? "01"
+          : option === "freeze"
+            ? "02"
+            : "03";
+    const values = Object.values(params ?? {});
+    const trace: TraceLine[] = [
+      line(
+        "tx",
+        `2F ${hex(did >> 8)} ${hex(did & 0xff)} ${parameterByte}${
+          values.length > 0 ? ` ${values.map((value) => hex(value)).join(" ")}` : ""
+        }`,
+      ),
+    ];
+    await wait(240 + Math.random() * 220);
+
+    if (Math.random() < 0.03) {
+      const nrc = Math.random() < 0.5 ? "0x22" : "0x33";
+      trace.push(line("rx", `7F 2F ${nrc.slice(2)}`));
+      return {
+        ok: false,
+        message: `IO control rejected — ${nrc} ${nrcMeaning(nrc)}`,
+        trace,
+        error: { nrc, meaning: nrcMeaning(nrc) },
+      };
+    }
+
+    trace.push(
+      line("rx", `6F ${hex(did >> 8)} ${hex(did & 0xff)} ${parameterByte} ${randomBytes(2)}`),
+    );
+    const labels: Record<IoControlOptionName, string> = {
+      returnControl: "Control returned to the ECU",
+      resetToDefault: "Output reset to its default state",
+      freeze: "Output frozen at the current state",
+      shortTermAdjust: "Output driven with the requested value",
+    };
     return {
       ok: true,
-      message: label,
+      message: labels[option],
       trace,
-      ...(input ? { readback: payload } : {}),
+      readback: (request.params ? Object.entries(request.params) : []).map(([label, value]) => ({
+        label,
+        value: String(value),
+      })),
+    };
+  }
+
+  async writeDid(request: WriteDidRequest): Promise<WriteDidResult> {
+    const { did, value } = request;
+    const didHex = `${hex(did >> 8)} ${hex(did & 0xff)}`;
+    const bytes = [...value]
+      .map((char) => hex(char.charCodeAt(0)))
+      .join(" ")
+      .trim();
+    const previous = randomBytes(Math.max(2, Math.min(8, value.length || 4)));
+    const trace: TraceLine[] = [
+      line("info", "Reading current value before the write"),
+      line("tx", `22 ${didHex}`),
+      line("rx", `62 ${didHex} ${previous}`),
+      line("tx", `2E ${didHex} ${bytes}`),
+    ];
+    await wait(320);
+
+    if (Math.random() < 0.05) {
+      const nrc = Math.random() < 0.5 ? "0x33" : "0x31";
+      trace.push(line("rx", `7F 2E ${nrc.slice(2)}`));
+      return {
+        ok: false,
+        message: `Write rejected — ${nrc} ${nrcMeaning(nrc)}`,
+        trace,
+        previous,
+        error: { nrc, meaning: nrcMeaning(nrc) },
+      };
+    }
+
+    trace.push(line("rx", `6E ${didHex}`));
+    trace.push(line("tx", `22 ${didHex}`));
+    await wait(200);
+    trace.push(line("rx", `62 ${didHex} ${bytes}`));
+    return {
+      ok: true,
+      message: `DID 0x${hex(did, 2)} written and verified`,
+      trace,
+      previous,
+      readback: bytes,
     };
   }
 
