@@ -133,7 +133,8 @@ const choiceSpecFor = (process: ServiceProcess): ChoiceSpec | null => {
  * technician input steps are inserted where the process requires them.
  */
 export const buildRunnerSteps = (process: ServiceProcess): RunnerStep[] => {
-  const source = process.steps.length > 0 ? process.steps : [{ type: "output", text: process.name }];
+  const source =
+    process.steps.length > 0 ? process.steps : [{ type: "output", text: process.name }];
   const messages = source.filter((step) => {
     const text = step.text ?? step.label ?? "";
     return text.trim().length > 0 && !OUTCOME_BRANCH.test(text);

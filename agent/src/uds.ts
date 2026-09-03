@@ -63,7 +63,10 @@ export class UdsNegativeResponse extends Error {
 }
 
 export const hex = (value: number, bytes = 1): string =>
-  value.toString(16).toUpperCase().padStart(bytes * 2, "0");
+  value
+    .toString(16)
+    .toUpperCase()
+    .padStart(bytes * 2, "0");
 
 export const bytesToHex = (data: Uint8Array): string =>
   Array.from(data, (byte) => hex(byte)).join(" ");
@@ -71,7 +74,8 @@ export const bytesToHex = (data: Uint8Array): string =>
 export const hexToBytes = (text: string): Uint8Array => {
   const clean = text.replace(/0x/gi, "").replace(/[^0-9a-f]/gi, "");
   const out = new Uint8Array(Math.floor(clean.length / 2));
-  for (let i = 0; i < out.length; i += 1) out[i] = Number.parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+  for (let i = 0; i < out.length; i += 1)
+    out[i] = Number.parseInt(clean.slice(i * 2, i * 2 + 2), 16);
   return out;
 };
 
@@ -127,6 +131,15 @@ export const decodeStatusByte = (statusByte: number): DtcStatusFlags => ({
   pending: (statusByte & 0x04) !== 0,
   confirmed: (statusByte & 0x08) !== 0,
 });
+
+/** Real classification from the status bits — never simulated. */
+export type DtcState = "current" | "pending" | "history";
+
+export const classifyDtc = (statusByte: number): DtcState => {
+  if ((statusByte & 0x01) !== 0) return "current"; // testFailed
+  if ((statusByte & 0x04) !== 0) return "pending"; // pendingDTC
+  return "history"; // confirmed / stored only
+};
 
 export type RawDtc = { code: string; statusByte: number };
 

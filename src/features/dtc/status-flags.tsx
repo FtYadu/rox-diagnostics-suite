@@ -12,13 +12,7 @@ const FLAGS: Array<{ key: keyof DtcStatusFlags; label: string; tone: string }> =
   },
 ];
 
-export function StatusFlags({
-  status,
-  className,
-}: {
-  status: DtcStatusFlags;
-  className?: string;
-}) {
+export function StatusFlags({ status, className }: { status: DtcStatusFlags; className?: string }) {
   const active = FLAGS.filter((flag) => status[flag.key]);
   return (
     <div className={cn("flex flex-wrap gap-1.5", className)}>

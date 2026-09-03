@@ -83,11 +83,7 @@ export function VinDialog({
           <Button variant="ghost" className="h-11 rounded-xl" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            className="h-11 rounded-xl"
-            disabled={!checkVin(draft).ok}
-            onClick={confirm}
-          >
+          <Button className="h-11 rounded-xl" disabled={!checkVin(draft).ok} onClick={confirm}>
             {confirmLabel}
           </Button>
         </DialogFooter>

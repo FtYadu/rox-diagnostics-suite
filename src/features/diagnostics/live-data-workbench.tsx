@@ -1,4 +1,11 @@
-import { Circle, Download, LayoutGrid, LineChart as LineChartIcon, Pause, Play } from "lucide-react";
+import {
+  Circle,
+  Download,
+  LayoutGrid,
+  LineChart as LineChartIcon,
+  Pause,
+  Play,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CartesianGrid,
@@ -102,7 +109,9 @@ export function LiveDataWorkbench({ ecu }: { ecu: Ecu }) {
 
   const toggleRecording = () => {
     if (!recording) {
-      recordRef.current = [["timestamp", ...signals.map((s) => `${s.label} (${s.unit})`)].join(",")];
+      recordRef.current = [
+        ["timestamp", ...signals.map((s) => `${s.label} (${s.unit})`)].join(","),
+      ];
       setRecording(true);
       toast.success("Recording started");
       return;

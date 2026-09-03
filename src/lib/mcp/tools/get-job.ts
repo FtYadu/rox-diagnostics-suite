@@ -24,7 +24,8 @@ export default defineTool({
       .eq("id", jobId)
       .maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    if (!job) return { content: [{ type: "text", text: `Job ${jobId} not found.` }], isError: true };
+    if (!job)
+      return { content: [{ type: "text", text: `Job ${jobId} not found.` }], isError: true };
 
     const { data: events, error: eventsError } = await supabase
       .from("job_events")

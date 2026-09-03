@@ -38,7 +38,11 @@ function VehiclePage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric icon={<Cpu className="size-4" />} label="Control units" value={vehicle.ecuCount} />
         <Metric icon={<Network className="size-4" />} label="Bus" value={vehicle.bus} />
-        <Metric icon={<Wrench className="size-4" />} label="Service processes" value={processes.length} />
+        <Metric
+          icon={<Wrench className="size-4" />}
+          label="Service processes"
+          value={processes.length}
+        />
         <Metric
           icon={<Gauge className="size-4" />}
           label="Programming flows"

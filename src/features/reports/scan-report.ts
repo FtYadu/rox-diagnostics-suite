@@ -112,12 +112,7 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
         "Scan completed",
         input.completedAt ? formatDateTime(input.completedAt) : "Not completed",
       ],
-      [
-        "Bus / protocol",
-        vehicle.bus,
-        "Job reference",
-        input.jobId ?? "Not linked",
-      ],
+      ["Bus / protocol", vehicle.bus, "Job reference", input.jobId ?? "Not linked"],
     ],
     margin: { left: MARGIN, right: MARGIN },
   });
@@ -176,7 +171,8 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
   doc.text(`Diagnostic trouble codes (${input.dtcs.length})`, MARGIN, cursor);
 
   const sorted = [...input.dtcs].sort(
-    (a, b) => b.severity - a.severity || a.ecuId.localeCompare(b.ecuId) || a.code.localeCompare(b.code),
+    (a, b) =>
+      b.severity - a.severity || a.ecuId.localeCompare(b.ecuId) || a.code.localeCompare(b.code),
   );
 
   autoTable(doc, {
@@ -193,7 +189,12 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
             `${record.occurrences}`,
           ])
         : [["—", "—", "No stored fault codes found during this scan", "—", "—", "0"]],
-    styles: { fontSize: 8.5, cellPadding: 5, overflow: "linebreak", textColor: [INK.r, INK.g, INK.b] },
+    styles: {
+      fontSize: 8.5,
+      cellPadding: 5,
+      overflow: "linebreak",
+      textColor: [INK.r, INK.g, INK.b],
+    },
     headStyles: { fillColor: [INK.r, INK.g, INK.b], textColor: 255, fontSize: 8.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
@@ -235,7 +236,12 @@ export function buildScanReportDocument(input: ScanReportInput): jsPDF {
       `${state.dtcCount}`,
       state.scannedAt ? formatDateTime(state.scannedAt) : "—",
     ]),
-    styles: { fontSize: 8.5, cellPadding: 5, overflow: "linebreak", textColor: [INK.r, INK.g, INK.b] },
+    styles: {
+      fontSize: 8.5,
+      cellPadding: 5,
+      overflow: "linebreak",
+      textColor: [INK.r, INK.g, INK.b],
+    },
     headStyles: { fillColor: [INK.r, INK.g, INK.b], textColor: 255, fontSize: 8.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {

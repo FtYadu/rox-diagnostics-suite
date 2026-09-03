@@ -112,7 +112,6 @@ export class SimulatorBridge implements DiagnosticBridge {
 
   private stepAttempts = new Map<string, number>();
 
-
   private battery = round(randomBetween(12.4, 14.2), 1);
 
   async connect(): Promise<ConnectionInfo> {
@@ -187,7 +186,11 @@ export class SimulatorBridge implements DiagnosticBridge {
       recordNumber: `0x${hex((seed % 8) + 1)}`,
       recordedAt: recordedAt.toISOString(),
       entries: [
-        { label: "Battery voltage", value: round(11.4 + (seed % 30) / 10, 1).toFixed(1), unit: "V" },
+        {
+          label: "Battery voltage",
+          value: round(11.4 + (seed % 30) / 10, 1).toFixed(1),
+          unit: "V",
+        },
         { label: "Vehicle speed", value: String(seed % 132), unit: "km/h" },
         { label: "Odometer", value: String(14200 + (seed % 48000)), unit: "km" },
         { label: "Ignition state", value: seed % 3 === 0 ? "Accessory" : "Run", unit: "" },
@@ -237,7 +240,6 @@ export class SimulatorBridge implements DiagnosticBridge {
       return { ok: false, level, trace, error: { nrc, meaning: nrcMeaning(nrc) } };
     }
 
-
     const seedBytes = randomBytes(4);
     trace.push(line("rx", `67 ${sub} ${seedBytes}`));
     trace.push(line("tx", `27 ${hex(parseInt(sub, 16) + 1)} ${randomBytes(4)}`));
@@ -283,7 +285,6 @@ export class SimulatorBridge implements DiagnosticBridge {
       };
     }
 
-
     trace.push(line("rx", `${hex(parseInt(sid, 16) + 0x40)} ${randomBytes(2)}`));
     return {
       ok: true,
@@ -316,7 +317,6 @@ export class SimulatorBridge implements DiagnosticBridge {
         error: { nrc, meaning: nrcMeaning(nrc) },
       };
     }
-
 
     trace.push(line("rx", `71 ${sub} ${rid.slice(0, 2)} ${rid.slice(2)} ${randomBytes(1)}`));
     if (action === "start") this.runningRoutines.add(key);

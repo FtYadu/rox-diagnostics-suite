@@ -88,8 +88,7 @@ export const useAppStore = create<AppState>()(
       jobs: seedJobs,
       activeJobId: null,
 
-      signIn: (email, cloud = false) =>
-        set({ user: { email, name: nameFromEmail(email), cloud } }),
+      signIn: (email, cloud = false) => set({ user: { email, name: nameFromEmail(email), cloud } }),
       signOut: () => set({ user: null, activeJobId: null }),
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
@@ -161,9 +160,7 @@ export const useAppStore = create<AppState>()(
       appendEvent: ({ jobId, ...event }) => {
         const state = get();
         const targetId =
-          jobId ??
-          state.activeJobId ??
-          get().ensureJob({ title: event.title, kind: "manual" });
+          jobId ?? state.activeJobId ?? get().ensureJob({ title: event.title, kind: "manual" });
         const record: JobEvent = { ...event, id: jobEventId(), at: new Date().toISOString() };
 
         set({

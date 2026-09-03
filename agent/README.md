@@ -26,18 +26,18 @@ Environment overrides: `ROX_AGENT_PORT` (default 9097), `ROX_AGENT_CONFIG`
 
 ## What it implements
 
-| App call | UDS |
-| --- | --- |
-| `connect` / `status` | DoIP vehicle identification (UDP 13400), routing activation, battery/ignition DIDs |
-| `readIdentification` | `10 03`, then `22 <DID>` per configured identification DID |
-| `readDtcs` | `19 02 FF`, decoded to `B111716`-style codes + status bits |
-| `clearDtcs` | `14 FF FF FF`, or `14 <DTC>` per selected code |
-| `readFreezeFrame` | `19 06 <DTC> FF` snapshot record |
-| `readLiveData` | `22 <DID>` per selected parameter, scaled with factor/offset |
-| `requestSecurityAccess` | `27 <odd>` seed → `27 <even>` key |
-| `runRoutine` | `31 01/02/03 <RID>` |
-| `executeStep` | raw request mapped per guided-process step |
-| `startProgramming` | `10 02`, `27` L17, `34/36/37` transfer, `11 01` reset |
+| App call                | UDS                                                                                |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| `connect` / `status`    | DoIP vehicle identification (UDP 13400), routing activation, battery/ignition DIDs |
+| `readIdentification`    | `10 03`, then `22 <DID>` per configured identification DID                         |
+| `readDtcs`              | `19 02 FF`, decoded to `B111716`-style codes + status bits                         |
+| `clearDtcs`             | `14 FF FF FF`, or `14 <DTC>` per selected code                                     |
+| `readFreezeFrame`       | `19 06 <DTC> FF` snapshot record                                                   |
+| `readLiveData`          | `22 <DID>` per selected parameter, scaled with factor/offset                       |
+| `requestSecurityAccess` | `27 <odd>` seed → `27 <even>` key                                                  |
+| `runRoutine`            | `31 01/02/03 <RID>`                                                                |
+| `executeStep`           | raw request mapped per guided-process step                                         |
+| `startProgramming`      | `10 02`, `27` L17, `34/36/37` transfer, `11 01` reset                              |
 
 Negative responses are returned with the real NRC (`0x33 securityAccessDenied`,
 `0x35 invalidKey`, …) and every frame is streamed to the app's Trace console.
@@ -45,7 +45,7 @@ Negative responses are returned with the real NRC (`0x33 securityAccessDenied`,
 ## Configure the vehicle (`agent/config.json`)
 
 Fault-code names and severities are read from `src/data/r11-oversea-data.json`, so
-only the *addressing* lives here. Per ECU:
+only the _addressing_ lives here. Per ECU:
 
 - `address` — DoIP logical address (required; unmapped ECUs return a clear error
   instead of guessing).

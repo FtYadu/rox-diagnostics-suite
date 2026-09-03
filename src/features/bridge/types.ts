@@ -215,7 +215,11 @@ export const NRC_HINTS: Record<string, string> = {
 
 /** Normalises `31`, `0X31`, `0x31` and `#31` to the canonical `0x31` form. */
 export const normalizeNrc = (nrc: string): string => {
-  const digits = nrc.trim().replace(/^#/, "").replace(/^0[xX]/, "").toUpperCase();
+  const digits = nrc
+    .trim()
+    .replace(/^#/, "")
+    .replace(/^0[xX]/, "")
+    .toUpperCase();
   return digits ? `0x${digits.padStart(2, "0")}` : nrc;
 };
 
@@ -226,7 +230,6 @@ export const nrcHint = (nrc: string): string | undefined => NRC_HINTS[normalizeN
 
 /** `0x33 securityAccessDenied` for traces and toasts. */
 export const describeNrc = (nrc: string): string => `${normalizeNrc(nrc)} ${nrcMeaning(nrc)}`;
-
 
 /** `0x33 securityAccessDenied — Security access required. Unlock the ECU…` */
 export const describeNrcWithHint = (nrc: string): string => {

@@ -1,19 +1,71 @@
 import raw from "./r11-oversea-data.json";
 
-export type EcuDomain =
-  | "Body"
-  | "Chassis"
-  | "Powertrain"
-  | "ADAS"
-  | "Infotainment"
-  | "Comfort"
-  | "Connectivity"
-  | "Safety";
+import { DOMAIN_ORDER, SUBSYSTEM_DOMAIN, domainForSubSystem, type EcuDomain } from "./domain-map";
+
+export { DOMAIN_ORDER, SUBSYSTEM_DOMAIN, domainForSubSystem };
+export type { EcuDomain };
+
+export type Bus = "DoIP" | "CAN" | "CANFD";
+
+export type ValueType = "uint" | "int" | "ascii" | "hex" | "bitfield" | "enum" | "float";
+
+export type SignalLayout = {
+  name: string;
+  byteStart: number;
+  bitStart?: number;
+  length: number;
+  type: ValueType;
+  unit?: string;
+  factor?: number;
+  offset?: number;
+  signed?: boolean;
+  enum?: Record<string, string>;
+};
+
+export type Did = {
+  did: number;
+  label: string;
+  unit?: string;
+  length: number;
+  type: ValueType;
+  factor?: number;
+  offset?: number;
+  signed?: boolean;
+  enum?: Record<string, string>;
+  min?: number;
+  max?: number;
+  session?: 1 | 3;
+  saLevel?: number;
+};
+
+export type RoutineSubFunction = "start" | "stop" | "status";
+
+export type RoutineDefinition = {
+  rid: number;
+  name: string;
+  subFunctions: RoutineSubFunction[];
+  params?: SignalLayout[];
+  session?: 1 | 3;
+  saLevel?: number;
+};
+
+export type IoControlOption = "returnControl" | "resetToDefault" | "freeze" | "shortTermAdjust";
+
+export type IoControl = {
+  did: number;
+  label: string;
+  options: IoControlOption[];
+  params?: SignalLayout[];
+  saLevel?: number;
+};
 
 export type Dtc = {
   code: string;
   name: string;
   severity: number;
+  /** 3-byte numeric form, present once the canonical pipeline generated the seed. */
+  codeValue?: number;
+  statusMask?: number;
 };
 
 export type Ecu = {
@@ -25,14 +77,37 @@ export type Ecu = {
   routines: string[];
   identificationDids: string[];
   dtcs: Dtc[];
+  /** Fields below arrive with the canonical pipeline; older seeds omit them. */
+  subSystem?: string;
+  bus?: Bus;
+  address?: number;
+  secondaryAddresses?: number[];
+  saLevels?: number[];
+  identDids?: Did[];
+  liveDids?: Did[];
+  writeDids?: Did[];
+  ioControls?: IoControl[];
+  routineDefinitions?: RoutineDefinition[];
+  snapshotLayout?: SignalLayout[];
+  dtcStatusMask?: number;
 };
 
 export type ProcessStep = {
-  type: string;
+  /** Canonical steps are a discriminated union on `kind`; legacy steps only have `type`. */
+  kind?: "ecuService" | "output" | "input" | "if" | "delay" | "setVar";
+  type?: string;
   level?: string;
   text?: string;
   label?: string;
   unit?: string;
+  prompt?: string;
+  inputType?: string;
+  variable?: string;
+  options?: string[];
+  ms?: number;
+  ecuId?: string;
+  sid?: number;
+  negativeExit?: string;
 };
 
 export type ServiceProcess = {
@@ -42,6 +117,8 @@ export type ServiceProcess = {
   udsServices: string[];
   securityLevel: number;
   steps: ProcessStep[];
+  id?: string;
+  requiresVin?: boolean;
 };
 
 export type ProgrammingFlow = {
@@ -49,6 +126,7 @@ export type ProgrammingFlow = {
   type: string;
   ecus: string[];
   phases: string[];
+  id?: string;
 };
 
 export type VehicleInfo = {
@@ -59,11 +137,23 @@ export type VehicleInfo = {
   ecuCount: number;
 };
 
+export type MenuNode = {
+  id: string;
+  label: string;
+  ecuId?: string;
+  processId?: string;
+  children?: MenuNode[];
+};
+
 export type VehicleDataset = {
   vehicle: VehicleInfo;
   ecus: Ecu[];
   processes: ServiceProcess[];
   programmingFlows: ProgrammingFlow[];
+  /** sha256 of the canonical set the seed was generated from. */
+  dataChecksum?: string;
+  generatedAt?: string;
+  menu?: MenuNode[];
 };
 
 const dataset = raw as unknown as VehicleDataset;
@@ -72,17 +162,7 @@ export const vehicle = dataset.vehicle;
 export const ecus = dataset.ecus;
 export const processes = dataset.processes;
 export const programmingFlows = dataset.programmingFlows;
-
-export const DOMAIN_ORDER: EcuDomain[] = [
-  "Body",
-  "Chassis",
-  "Powertrain",
-  "ADAS",
-  "Infotainment",
-  "Comfort",
-  "Connectivity",
-  "Safety",
-];
+export const dataChecksum = dataset.dataChecksum ?? null;
 
 export const getEcu = (id: string): Ecu | undefined => ecus.find((e) => e.id === id);
 
@@ -118,5 +198,6 @@ export const severityLabel = (severity: number): "Low" | "Medium" | "High" =>
 
 export const processCategories = Array.from(new Set(processes.map((p) => p.category))).sort();
 
-/** Stable identity for a process (the seed data has no id field). */
-export const processKey = (process: ServiceProcess): string => `${process.ecu}:${process.name}`;
+/** Stable identity for a process (legacy seed data has no id field). */
+export const processKey = (process: ServiceProcess): string =>
+  process.id ?? `${process.ecu}:${process.name}`;

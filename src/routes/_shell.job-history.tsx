@@ -69,10 +69,7 @@ function JobHistoryPage() {
     if (cloud.data && cloud.data.length > 0) mergeJobs(cloud.data);
   }, [cloud.data, mergeJobs]);
 
-  const vins = useMemo(
-    () => [...new Set(jobs.map((job) => job.vin).filter(Boolean))],
-    [jobs],
-  );
+  const vins = useMemo(() => [...new Set(jobs.map((job) => job.vin).filter(Boolean))], [jobs]);
 
   const filtered = useMemo(
     () =>

@@ -162,9 +162,7 @@ export function GuidedRunner({
         setTrace(nextTrace);
         if (!result.ok) {
           setState(index, "failed");
-          const reason = result.error
-            ? describeNrcWithHint(result.error.nrc)
-            : result.message;
+          const reason = result.error ? describeNrcWithHint(result.error.nrc) : result.message;
           setFailure(reason);
           finish(false, `Step "${step.title}" failed — ${reason}`, nextTrace);
           setBusy(false);
@@ -210,9 +208,7 @@ export function GuidedRunner({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="grid h-[100dvh] w-screen max-w-none grid-rows-[auto_1fr_auto] gap-0 rounded-none border-0 p-0 sm:max-w-none"
-      >
+      <DialogContent className="grid h-[100dvh] w-screen max-w-none grid-rows-[auto_1fr_auto] gap-0 rounded-none border-0 p-0 sm:max-w-none">
         <DialogTitle className="sr-only">{process.name}</DialogTitle>
         <header className="glass-chrome flex flex-wrap items-center gap-3 border-b px-5 py-4">
           <div className="min-w-0 flex-1">
@@ -313,7 +309,11 @@ export function GuidedRunner({
                       finished === "ok" ? "text-success" : "text-destructive",
                     )}
                   >
-                    {finished === "ok" ? <Check className="size-5" /> : <AlertTriangle className="size-5" />}
+                    {finished === "ok" ? (
+                      <Check className="size-5" />
+                    ) : (
+                      <AlertTriangle className="size-5" />
+                    )}
                     {finished === "ok" ? "Process completed" : "Process failed"}
                   </h2>
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -386,7 +386,10 @@ export function GuidedRunner({
                             }))
                           }
                           placeholder={step.placeholder}
-                          className={cn("mt-2 h-11 rounded-xl", step.field === "vin" && "font-mono")}
+                          className={cn(
+                            "mt-2 h-11 rounded-xl",
+                            step.field === "vin" && "font-mono",
+                          )}
                         />
                       </div>
                     )}

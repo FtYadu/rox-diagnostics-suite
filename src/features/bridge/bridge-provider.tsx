@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 import { useAppStore } from "@/store/app-store";
 import { LocalBridge } from "./local-bridge";
@@ -116,7 +124,6 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;
 }
-
 
 export function useBridge(): BridgeContextValue {
   const context = useContext(BridgeContext);
