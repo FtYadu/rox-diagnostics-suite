@@ -22,7 +22,57 @@ npm start          # Node 22+ (type stripping)
 ```
 
 Environment overrides: `ROX_AGENT_PORT` (default 9097), `ROX_AGENT_CONFIG`
-(path to a different config file).
+(path to a different config file), `ROX_AGENT_ALLOW_OVERRIDE=1` (start with an
+incomplete config — bench use only), `ROX_AGENT_LOG_DIR`, `ROX_AGENT_LOG_FULL_VIN=1`.
+
+## Transport
+
+`config.json` selects how the agent reaches the car:
+
+```json
+{ "transport": { "kind": "doip" } }
+{ "transport": { "kind": "j2534", "j2534": { "dllPath": "C:/vendor/PassThru.dll", "protocol": "ISO15765" } } }
+```
+
+`doip` is the default. `j2534` loads a vendor PassThru DLL through the optional
+`koffi` dependency and is Windows-only: on any other platform, or with no
+`dllPath`, `open()` fails with "J2534 not available on this platform" — it never
+crashes at import time. Install it with `npm install koffi` on the workshop PC.
+
+## Security access (seed & key)
+
+The real algorithm ships as a licensed native `ROX_SeedKey.dll` that is **not** in this
+repository. Point the agent at your copy:
+
+```json
+{
+  "security": {
+    "seedKey": { "backend": "dll", "dllPath": "C:/ROX/ROX_SeedKey.dll", "exportName": "ComputeKey" }
+  }
+}
+```
+
+Or run it out of process (any language, keeps the DLL out of the agent):
+
+```json
+{ "security": { "seedKey": { "backend": "sidecar", "command": "python", "args": ["seedkey.py"] } } }
+```
+
+The sidecar reads `level seedHex alg` on stdin and writes `keyHex` to stdout.
+Level → sub-function pairs are fixed: 1→(01,02), 3→(03,04), 11→(0B,0C), 13→(0D,0E),
+programming→(11,12); algorithm 0/1 for extended levels, 9 for programming.
+
+## Job logs
+
+Each job appends JSONL to `~/.rox-agent/logs/<jobId>.jsonl` and is readable with the
+`getJobLog` method. VINs are redacted to the last six characters unless
+`ROX_AGENT_LOG_FULL_VIN=1` is set.
+
+## Legal
+
+The ROX 01 vehicle data and the `ROX_SeedKey` library are ROX / Cihon intellectual
+property. Never commit either — no DLL, no extracted dealer database — to this
+repository or any public mirror.
 
 ## What it implements
 
@@ -54,7 +104,8 @@ only the _addressing_ lives here. Per ECU:
   `offset`, `signed`, `min`, `max`.
 - `snapshot` — layout of the 19 06 record.
 - `routines` — routine name from the vehicle data → routine identifier.
-- `security` — per level: `xor` / `add` / `invert` and a `mask`.
+- `security` — the levels this ECU supports. Keys are computed by the seed-key backend
+  below, never by an in-repo algorithm.
 
 `processes` maps a guided process step to a raw request, e.g.
 

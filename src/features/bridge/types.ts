@@ -11,6 +11,17 @@ export type ConnectionInfo = {
   protocol: string;
   batteryVoltage: number;
   ignitionOn: boolean;
+  /** Agent handshake (protocol v2); absent for the simulator and older agents. */
+  agentVersion?: string;
+  protocolVersion?: number;
+  dataChecksum?: string | null;
+  transport?: string;
+};
+
+/** Non-blocking warning shown in the top bar when app and agent disagree. */
+export type BridgeCompatibility = {
+  ok: boolean;
+  warnings: string[];
 };
 
 export type IdentificationEntry = {

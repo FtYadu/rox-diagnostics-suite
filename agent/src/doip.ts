@@ -165,7 +165,7 @@ export class DoipClient {
 
   private waiters: Waiter[] = [];
 
-  private testerPresent: NodeJS.Timeout | null = null;
+  private testerPresentByTarget = new Map<number, NodeJS.Timeout>();
 
   private readonly host: string;
 
@@ -184,7 +184,12 @@ export class DoipClient {
   }
 
   get testerPresentActive(): boolean {
-    return this.testerPresent !== null;
+    return this.testerPresentByTarget.size > 0;
+  }
+
+  /** Targets currently kept alive with 3E 80. */
+  get testerPresentTargets(): number[] {
+    return [...this.testerPresentByTarget.keys()];
   }
 
   async connect(timeoutMs = 3000): Promise<void> {
@@ -329,24 +334,33 @@ export class DoipClient {
     return payload.length === 5;
   }
 
-  /** Keeps a non-default session alive with 3E 80 at S3/2. */
-  startTesterPresent(target: number, intervalMs = Math.floor(this.timing.s3 / 2)) {
-    this.stopTesterPresent();
-    this.testerPresent = setInterval(() => {
-      if (!this.socket) return;
-      const body = Buffer.alloc(6);
-      body.writeUInt16BE(this.sourceAddress, 0);
-      body.writeUInt16BE(target, 2);
-      body[4] = 0x3e;
-      body[5] = 0x80;
-      this.socket.write(header(PAYLOAD.diagnosticMessage, body));
-    }, intervalMs);
-    this.testerPresent.unref?.();
+  /** Fire-and-forget diagnostic write (no response expected, e.g. 3E 80). */
+  writeUds(target: number, data: Uint8Array) {
+    if (!this.socket) return;
+    const body = Buffer.alloc(4 + data.length);
+    body.writeUInt16BE(this.sourceAddress, 0);
+    body.writeUInt16BE(target, 2);
+    body.set(data, 4);
+    this.socket.write(header(PAYLOAD.diagnosticMessage, body));
   }
 
-  stopTesterPresent() {
-    if (this.testerPresent) clearInterval(this.testerPresent);
-    this.testerPresent = null;
+  /** Keeps each non-default session alive with 3E 80 every 2 s (S3 = 5 s). */
+  startTesterPresent(target: number, intervalMs = 2000) {
+    this.stopTesterPresent(target);
+    const timer = setInterval(() => this.writeUds(target, Uint8Array.of(0x3e, 0x80)), intervalMs);
+    timer.unref?.();
+    this.testerPresentByTarget.set(target, timer);
+  }
+
+  stopTesterPresent(target?: number) {
+    if (target === undefined) {
+      for (const timer of this.testerPresentByTarget.values()) clearInterval(timer);
+      this.testerPresentByTarget.clear();
+      return;
+    }
+    const timer = this.testerPresentByTarget.get(target);
+    if (timer) clearInterval(timer);
+    this.testerPresentByTarget.delete(target);
   }
 
   close() {

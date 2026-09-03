@@ -1,5 +1,11 @@
 {
-  "include": ["tools/**/*.ts", "packages/**/*.ts", "agent/src/**/*.ts", "tests/**/*.ts"],
+  "include": [
+    "tools/**/*.ts",
+    "packages/**/*.ts",
+    "agent/src/**/*.ts",
+    "agent/types/**/*.d.ts",
+    "tests/**/*.ts"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",

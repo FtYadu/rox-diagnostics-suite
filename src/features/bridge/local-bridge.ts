@@ -1,5 +1,7 @@
+import { dataChecksum as appDataChecksum } from "@/data/vehicle-data";
 import type { Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
 import type {
+  BridgeCompatibility,
   ConnectionInfo,
   DiagnosticBridge,
   EcuDtcResult,
@@ -20,6 +22,32 @@ const KEEPALIVE_MS = 4000;
 
 export type LocalBridgeEvent =
   { type: "status"; info: ConnectionInfo } | { type: "disconnected"; reason: string };
+
+/** Protocol version this app build speaks; the agent reports its own in `connect`. */
+export const APP_PROTOCOL_VERSION = 2;
+
+/**
+ * A version or data mismatch is a warning, never a block: the technician still needs to
+ * read fault codes on the car in front of them.
+ */
+export const compareHandshake = (info: ConnectionInfo): BridgeCompatibility => {
+  const warnings: string[] = [];
+  const agentProtocol = info.protocolVersion;
+  if (agentProtocol === undefined) {
+    warnings.push("The VCI agent did not report a protocol version — update the agent.");
+  } else if (agentProtocol !== APP_PROTOCOL_VERSION) {
+    warnings.push(
+      `Agent speaks protocol v${agentProtocol}, this app speaks v${APP_PROTOCOL_VERSION}. ` +
+        "Some functions may be unavailable until the agent is updated.",
+    );
+  }
+  if (info.dataChecksum && appDataChecksum && info.dataChecksum !== appDataChecksum) {
+    warnings.push(
+      "Vehicle data differs between app and agent — regenerate the agent config from the same data set.",
+    );
+  }
+  return { ok: warnings.length === 0, warnings };
+};
 
 type PendingEntry = {
   resolve: (value: unknown) => void;
@@ -49,6 +77,14 @@ const normalizeInfo = (payload: unknown): ConnectionInfo => {
     protocol: asString(raw["protocol"], "DoIP / CAN FD"),
     batteryVoltage: Number.isFinite(voltage) ? voltage : 0,
     ignitionOn: Boolean(raw["ignitionOn"] ?? raw["ignition"]),
+    ...(typeof raw["agentVersion"] === "string" ? { agentVersion: raw["agentVersion"] } : {}),
+    ...(typeof raw["protocolVersion"] === "number"
+      ? { protocolVersion: raw["protocolVersion"] }
+      : {}),
+    ...(typeof raw["dataChecksum"] === "string" || raw["dataChecksum"] === null
+      ? { dataChecksum: raw["dataChecksum"] as string | null }
+      : {}),
+    ...(typeof raw["transport"] === "string" ? { transport: raw["transport"] } : {}),
   };
 };
 
@@ -277,6 +313,43 @@ export class LocalBridge implements DiagnosticBridge {
     action: "start" | "stop" | "status",
   ): Promise<RoutineExecution> {
     return this.call<RoutineExecution>("runRoutine", { ecu: ecu.id, routine, action });
+  }
+
+  /** Runs a canonical guided process on the agent, streaming its events. */
+  runProcess(
+    processId: string,
+    options: {
+      variables?: Record<string, string | number | boolean>;
+      dryRun?: boolean;
+      jobId?: string;
+      onEvent: (event: unknown) => void;
+    },
+  ): Promise<{
+    runId: string;
+    ok: boolean;
+    message: string;
+    executed: number;
+    prompts: number;
+  }> {
+    return this.call(
+      "runProcess",
+      {
+        processId,
+        variables: options.variables ?? {},
+        dryRun: options.dryRun ?? false,
+        jobId: options.jobId ?? null,
+      },
+      (payload) => options.onEvent(payload),
+      600_000,
+    );
+  }
+
+  provideInput(runId: string, value: string): Promise<{ accepted: boolean }> {
+    return this.call<{ accepted: boolean }>("provideInput", { runId, value });
+  }
+
+  abortProcess(runId: string): Promise<{ aborted: boolean }> {
+    return this.call<{ aborted: boolean }>("abortProcess", { runId });
   }
 
   startProgramming(

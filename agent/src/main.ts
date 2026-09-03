@@ -1,26 +1,37 @@
 import { WebSocketServer, type WebSocket } from "ws";
 
-import { DoipClient, discoverVehicle } from "./doip.ts";
+import { PROTOCOL_VERSION } from "../../packages/protocol/src/index.ts";
+import { JobLogger, readJobLog } from "./job-log.ts";
+import { ProcessInterpreter } from "./process-interpreter.ts";
+import { canonicalSteps, findProcess } from "./process-catalog.ts";
+import { scanVehicle } from "./scan.ts";
 import { VehicleSession } from "./session.ts";
+import { createTransport, type Transport } from "./transport/index.ts";
 import { UdsNegativeResponse, hex } from "./uds.ts";
 import {
   type AgentConfig,
   AgentConfigError,
   assertStartupSafe,
+  loadCatalog,
   loadConfig,
-  parseHex,
 } from "./config.ts";
+
+const AGENT_VERSION = "0.3.0";
 
 const PORT = Number(process.env["ROX_AGENT_PORT"] ?? 9097);
 
 type Request = { id?: string; method?: string; params?: Record<string, unknown> };
 
 type VehicleLink = {
-  client: DoipClient;
+  transport: Transport;
   session: VehicleSession;
   vin: string;
-  host: string;
 };
+
+type ProcessRun = { interpreter: ProcessInterpreter; promise: Promise<unknown> };
+
+const runs = new Map<string, ProcessRun>();
+let runCounter = 0;
 
 let link: VehicleLink | null = null;
 
@@ -45,33 +56,31 @@ const log = (message: string) => {
 };
 
 const ensureLink = async (): Promise<VehicleLink> => {
-  if (link?.client.connected) return link;
-  const host = config.tester.gatewayHost;
-  const announcement = host
-    ? { host, vin: "", logicalAddress: 0, eid: "" }
-    : await discoverVehicle();
-  const client = new DoipClient(
-    announcement.host,
-    parseHex(config.tester.sourceAddress),
-    config.timing,
-  );
-  await client.connect();
-  const session = new VehicleSession(client);
-  link = { client, session, vin: announcement.vin, host: announcement.host };
-  log(
-    `connected to gateway ${announcement.host}${announcement.vin ? ` (VIN ${announcement.vin})` : ""}`,
-  );
+  if (link?.transport.connected) return link;
+  const transport = createTransport(config);
+  await transport.open();
+  const session = new VehicleSession(transport);
+  const vin = (transport as { vin?: string }).vin ?? "";
+  link = { transport, session, vin };
+  log(`connected over ${config.transport.kind}${vin ? ` (VIN ${vin})` : ""}`);
   return link;
 };
 
+/** Protocol v2 handshake: version, data checksum, VCI metadata and transport kind. */
 const connectionInfo = async () => {
   const active = await ensureLink();
   const status = await active.session.readVehicleStatus();
+  const vci = active.transport.info;
   return {
-    mode: "local",
-    vciName: config.vci.name,
-    vciSerial: config.vci.serial,
-    protocol: config.vci.protocol,
+    mode: "local" as const,
+    agentVersion: AGENT_VERSION,
+    protocolVersion: PROTOCOL_VERSION,
+    dataChecksum: config.dataChecksum ?? loadCatalog().dataChecksum ?? null,
+    vci,
+    transport: config.transport.kind,
+    vciName: vci.vciName,
+    vciSerial: vci.vciSerial,
+    protocol: vci.protocolList.join(" / "),
     vin: active.vin,
     batteryVoltage: status.batteryVoltage,
     ignitionOn: status.ignitionOn,
@@ -186,6 +195,68 @@ const handlers: Record<string, Handler> = {
             : { nrc: "0x00", meaning: (error as Error).message },
       };
     }
+  },
+
+  runProcess: async (params, emit) => {
+    const dryRun = Boolean(params["dryRun"]);
+    const processId = asString(params["processId"] ?? params["process"]);
+    const process = findProcess(processId);
+    if (!process) throw new Error(`Unknown process "${processId}"`);
+
+    const jobId = asString(params["jobId"]);
+    const logger = jobId ? new JobLogger(jobId, asString(params["vin"])) : null;
+    const session = dryRun ? null : (await ensureLink()).session;
+    runCounter += 1;
+    const runId = `run-${runCounter}`;
+
+    const interpreter = new ProcessInterpreter(session, {
+      dryRun,
+      variables: (params["variables"] as Record<string, string | number | boolean>) ?? {},
+      onEvent: (event) => {
+        logger?.write("process", JSON.stringify(event));
+        emit({ type: "processEvent", runId, event });
+      },
+    });
+
+    const promise = interpreter.run(canonicalSteps(process));
+    runs.set(runId, { interpreter, promise });
+    const result = await promise;
+    runs.delete(runId);
+    return { runId, ...result };
+  },
+
+  provideInput: async (params) => {
+    const run = runs.get(asString(params["runId"]));
+    if (!run) throw new Error("No process is waiting for input");
+    return { accepted: run.interpreter.provideInput(asString(params["value"])) };
+  },
+
+  abortProcess: async (params) => {
+    const run = runs.get(asString(params["runId"]));
+    if (!run) return { aborted: false };
+    run.interpreter.abort();
+    return { aborted: true };
+  },
+
+  scanVehicle: async (params, emit) => {
+    const { session } = await ensureLink();
+    const jobId = asString(params["jobId"]);
+    const logger = jobId ? new JobLogger(jobId, asString(params["vin"])) : null;
+    const startedAt = new Date().toISOString();
+    const results = await scanVehicle(session, {
+      ...(Array.isArray(params["ecus"]) ? { ecuIds: params["ecus"] as string[] } : {}),
+      ...(params["concurrency"] ? { concurrency: Number(params["concurrency"]) } : {}),
+      onEvent: (event) => {
+        logger?.write("info", JSON.stringify(event));
+        emit(event);
+      },
+    });
+    return { results, startedAt, finishedAt: new Date().toISOString() };
+  },
+
+  getJobLog: async (params) => {
+    const jobId = asString(params["jobId"]);
+    return { jobId, path: new JobLogger(jobId).path, entries: readJobLog(jobId) };
   },
 
   runRoutine: async (params) => {
@@ -304,7 +375,7 @@ server.on("listening", () => {
 
 const shutdown = () => {
   link?.session.dispose();
-  link?.client.close();
+  void link?.transport.close();
   server.close(() => process.exit(0));
 };
 

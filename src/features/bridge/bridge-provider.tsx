@@ -9,15 +9,17 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import { useAppStore } from "@/store/app-store";
-import { LocalBridge } from "./local-bridge";
+import { LocalBridge, compareHandshake } from "./local-bridge";
 import { SimulatorBridge } from "./simulator-bridge";
-import type { BridgeStatus, ConnectionInfo, DiagnosticBridge } from "./types";
+import type { BridgeCompatibility, BridgeStatus, ConnectionInfo, DiagnosticBridge } from "./types";
 
 type BridgeContextValue = {
   bridge: DiagnosticBridge;
   status: BridgeStatus;
   connection: ConnectionInfo | null;
   usingFallback: boolean;
+  /** Amber, non-blocking warnings when the agent handshake disagrees with this build. */
+  compatibility: BridgeCompatibility;
   error: string | null;
   reconnect: () => void;
 };
@@ -32,6 +34,10 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [connection, setConnection] = useState<ConnectionInfo | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [compatibility, setCompatibility] = useState<BridgeCompatibility>({
+    ok: true,
+    warnings: [],
+  });
   const [attempt, setAttempt] = useState(0);
   const [activeBridge, setActiveBridge] = useState<DiagnosticBridge>(simulator.current);
 
@@ -52,6 +58,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
       setActiveBridge(simulator.current);
       setConnection({ ...info, vciName: "Simulator fallback" });
+      setCompatibility({ ok: true, warnings: [] });
       setStatus("offline");
       // Keep probing for the hardware agent so plugging in the VCI recovers on its own.
       retry = setTimeout(() => {
@@ -74,12 +81,14 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
           if (cancelled) return;
           if (event.type === "status") {
             setConnection(event.info);
+            setCompatibility(compareHandshake(event.info));
             return;
           }
           void fallbackToSimulator(event.reason);
         });
         setActiveBridge(local);
         setConnection(info);
+        setCompatibility(compareHandshake(info));
         setUsingFallback(false);
         setError(null);
         setStatus("connected");
@@ -103,6 +112,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
       setActiveBridge(simulator.current);
       setConnection(info);
+      setCompatibility({ ok: true, warnings: [] });
       setUsingFallback(false);
       setStatus("connected");
     };
@@ -118,8 +128,16 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   }, [bridgeMode, attempt]);
 
   const value = useMemo<BridgeContextValue>(
-    () => ({ bridge: activeBridge, status, connection, usingFallback, error, reconnect }),
-    [activeBridge, status, connection, usingFallback, error, reconnect],
+    () => ({
+      bridge: activeBridge,
+      status,
+      connection,
+      usingFallback,
+      compatibility,
+      error,
+      reconnect,
+    }),
+    [activeBridge, status, connection, usingFallback, compatibility, error, reconnect],
   );
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;
