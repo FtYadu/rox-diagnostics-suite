@@ -1,0 +1,7 @@
+# CCU (0x1001) — extended session, identification DIDs, DTC read, clear.
+{"target":4097,"request":"10 03","response":"50 03 00 32 01 F4","comment":"extendedDiagnosticSession"}
+{"target":4097,"request":"22 F1 90","response":"62 F1 90 48 4A 34 41 42 42 48 4B 34 52 4E 30 30 30 31 32 33","comment":"VIN"}
+{"target":4097,"request":"22 F1 87","response":"62 F1 87 33 36 35 30 30 31 30 31","comment":"spare part number"}
+{"target":4097,"request":"22 F1 89","response":"62 F1 89 56 31 2E 31 34","comment":"software version V1.14"}
+{"target":4097,"request":"19 02 FF","response":"59 02 FF C1 07 08 2F C0 24 00 08 24","comment":"two DTCs"}
+{"target":4097,"request":"14 FF FF FF","response":"54","comment":"clear all"}

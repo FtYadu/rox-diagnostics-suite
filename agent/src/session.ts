@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 
-import { DoipClient } from "./doip.ts";
+import { PROGRAMMING_LEVEL, computeKey, saLevel } from "./seedkey.ts";
+import type { Transport } from "./transport/types.ts";
 import {
   type SignalConfig,
   dtcMeta,
@@ -24,6 +25,9 @@ import {
   parseDtcResponse,
   request,
 } from "./uds.ts";
+
+/** 3E 80 cadence: S3 is 5 s, so refresh every 2 s. */
+export const TESTER_PRESENT_MS = 2000;
 
 export type TraceLine = { id: string; direction: "tx" | "rx" | "info"; text: string; at: string };
 
@@ -49,14 +53,17 @@ const decodeSignal = (signal: SignalConfig, raw: Uint8Array): number | string =>
 export class VehicleSession {
   readonly trace: TraceLine[] = [];
 
-  private readonly client: DoipClient;
+  private readonly client: Transport;
+
+  /** level unlocked per ECU for the current session; cleared on session change. */
+  private readonly unlocked = new Map<string, Set<number>>();
 
   /** ECU ids currently held in a non-default session (tester-present is running). */
   private readonly keptAlive = new Set<string>();
 
   private idleTimer: NodeJS.Timeout | null = null;
 
-  constructor(client: DoipClient) {
+  constructor(client: Transport) {
     this.client = client;
   }
 
@@ -75,7 +82,10 @@ export class VehicleSession {
     this.push(traceLine("tx", `${ecuId} ${bytesToHex(data)}`));
     this.touch();
     try {
-      const response = await this.client.sendUds(address, data, timeoutMs);
+      const response = await this.client.send(address, data, {
+        p2: timeoutMs ?? this.timing.p2,
+        p2Star: Math.max(this.timing.p2Star, timeoutMs ?? 0),
+      });
       this.push(traceLine("rx", `${ecuId} ${bytesToHex(response)}`));
       return response;
     } catch (error) {
@@ -105,6 +115,7 @@ export class VehicleSession {
 
   private stopKeepAlive() {
     this.keptAlive.clear();
+    this.unlocked.clear();
     this.client.stopTesterPresent();
     if (this.idleTimer) clearTimeout(this.idleTimer);
     this.idleTimer = null;
@@ -121,10 +132,7 @@ export class VehicleSession {
       return;
     }
     this.keptAlive.add(ecuId);
-    this.client.startTesterPresent(
-      parseHex(ecuConfig(ecuId).address),
-      Math.max(Math.floor(this.timing.s3 / 2), 200),
-    );
+    this.client.startTesterPresent(parseHex(ecuConfig(ecuId).address), TESTER_PRESENT_MS);
     this.push(traceLine("info", `${ecuId} session 0x${hex(level)} held with 3E 80`));
     this.touch();
   }
@@ -276,6 +284,10 @@ export class VehicleSession {
     return signals;
   }
 
+  /**
+   * 27 <requestSeed> / 27 <sendKey> with the canonical ROX level table. The key comes from
+   * the licensed seed/key backend — there is no guessed algorithm any more.
+   */
   async securityAccess(ecuId: string, level: number) {
     const config = ecuConfig(ecuId);
     const levels = config.security?.levels;
@@ -284,25 +296,40 @@ export class VehicleSession {
         `${ecuId} does not support security level ${level} (supported: ${levels.join(", ")})`,
       );
     }
-    const rule = config.security?.algorithms?.[String(level)] ?? { algorithm: "invert" as const };
-    const subFunction = level === 0 ? 0x01 : level * 2 - 1;
-
-    await this.enterSession(ecuId, level >= 17 ? 0x02 : 0x03);
-    const seedResponse = await this.send(ecuId, request(SID.securityAccess, subFunction));
-    const seed = seedResponse.slice(2);
-    if (seed.every((byte) => byte === 0)) {
-      this.push(traceLine("info", `${ecuId} already unlocked at level ${level}`));
+    if (this.unlocked.get(ecuId)?.has(level)) {
+      this.push(traceLine("info", `${ecuId} already unlocked at level ${level} in this session`));
       return { ok: true, level };
     }
-    const mask = rule.mask ? hexToBytes(rule.mask) : new Uint8Array(seed.length).fill(0xff);
-    const key = seed.map((byte, index) => {
-      const maskByte = mask[index % Math.max(mask.length, 1)] ?? 0xff;
-      if (rule.algorithm === "xor") return (byte ^ maskByte) & 0xff;
-      if (rule.algorithm === "add") return (byte + maskByte) & 0xff;
-      return ~byte & 0xff;
-    });
-    await this.send(ecuId, request(SID.securityAccess, subFunction + 1, Uint8Array.from(key)));
+
+    const rule = saLevel(level);
+    const seedKey = loadConfig().security?.seedKey;
+    if (!seedKey) {
+      throw new Error(
+        "No seed/key backend configured. Set security.seedKey in agent/config.json " +
+          "(dll or sidecar) — see agent/README.md.",
+      );
+    }
+
+    await this.enterSession(ecuId, level === PROGRAMMING_LEVEL ? 0x02 : 0x03);
+    const seedResponse = await this.send(ecuId, request(SID.securityAccess, rule.requestSeed));
+    const seed = seedResponse.slice(2);
+    if (seed.length > 0 && seed.every((byte) => byte === 0)) {
+      this.push(traceLine("info", `${ecuId} already unlocked at level ${level}`));
+      this.markUnlocked(ecuId, level);
+      return { ok: true, level };
+    }
+
+    const key = await computeKey(level, seed, rule.alg, seedKey);
+    this.push(traceLine("info", `${ecuId} key computed for level ${level} (alg ${rule.alg})`));
+    await this.send(ecuId, request(SID.securityAccess, rule.sendKey, key));
+    this.markUnlocked(ecuId, level);
     return { ok: true, level };
+  }
+
+  private markUnlocked(ecuId: string, level: number) {
+    const set = this.unlocked.get(ecuId) ?? new Set<number>();
+    set.add(level);
+    this.unlocked.set(ecuId, set);
   }
 
   async runRoutine(ecuId: string, routine: string, action: "start" | "stop" | "status") {

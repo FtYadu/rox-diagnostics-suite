@@ -1,0 +1,6 @@
+# IBCM (0x1726) — extended session, tester present, seed/key L1, live data.
+{"target":5926,"request":"10 03","response":"50 03 00 32 01 F4"}
+{"target":5926,"request":"27 01","response":"67 01 11 22 33 44","comment":"seed"}
+{"target":5926,"request":"27 02 AA BB CC DD","response":"67 02","comment":"key accepted"}
+{"target":5926,"request":"22 20 05","response":"62 20 05 03 20","comment":"battery voltage raw 800"}
+{"target":5926,"request":"22 20 06","response":"7F 22 31","comment":"requestOutOfRange"}

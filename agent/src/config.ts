@@ -49,16 +49,10 @@ export const ecuConfigSchema = z.object({
   routines: z.record(z.string(), z.string()).optional(),
   /** IO control label -> data identifier. */
   ioControls: z.record(z.string(), z.string()).optional(),
-  /** Security levels supported, plus optional seed/key rules per level. */
+  /** Security levels supported by this ECU (1, 3, 11, 13, 17). */
   security: z
     .object({
       levels: z.array(z.number().int().nonnegative()).optional(),
-      algorithms: z
-        .record(
-          z.string(),
-          z.object({ algorithm: z.enum(["xor", "add", "invert"]), mask: z.string().optional() }),
-        )
-        .optional(),
     })
     .optional(),
 });
@@ -73,6 +67,32 @@ export const timingSchema = z.object({
   s3: z.number().int().positive().default(5000),
 });
 export type Timing = z.infer<typeof timingSchema>;
+
+export const transportConfigSchema = z.object({
+  kind: z.enum(["doip", "j2534"]).default("doip"),
+  j2534: z
+    .object({
+      dllPath: z.string().min(1),
+      protocol: z.enum(["ISO15765", "DoIP"]).default("ISO15765"),
+    })
+    .optional(),
+});
+export type TransportConfig = z.infer<typeof transportConfigSchema>;
+
+export const seedKeyConfigSchema = z.discriminatedUnion("backend", [
+  z.object({
+    backend: z.literal("dll"),
+    dllPath: z.string().min(1),
+    exportName: z.string().optional(),
+  }),
+  z.object({
+    backend: z.literal("sidecar"),
+    command: z.string().min(1),
+    args: z.array(z.string()).optional(),
+  }),
+  z.object({ backend: z.literal("test"), table: z.record(z.string(), z.string()) }),
+]);
+export type SeedKeyConfig = z.infer<typeof seedKeyConfigSchema>;
 
 export const agentConfigSchema = z.object({
   comment: z.string().optional(),
@@ -92,6 +112,13 @@ export const agentConfigSchema = z.object({
     })
     .default({ sourceAddress: "0x0E80", functionalAddress: "0xE400" }),
   timing: timingSchema.default({ p2: 100, p2Star: 5000, s3: 5000 }),
+  transport: transportConfigSchema.default({ kind: "doip" }),
+  security: z
+    .object({
+      /** Seed/key backend. The real algorithm is a licensed native library. */
+      seedKey: seedKeyConfigSchema.optional(),
+    })
+    .optional(),
   vehicleStatus: z
     .object({
       ecu: z.string().min(1),

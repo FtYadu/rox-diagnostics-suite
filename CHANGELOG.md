@@ -6,6 +6,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-09-03
+
+### Milestone M3 — Harden the hardware agent
+
+#### Added
+
+- **Transport abstraction** (`agent/src/transport/`). `Transport` exposes
+  `open/close/send/onEvent/info` plus per-ECU tester-present control.
+  `DoipTransport` wraps the existing `DoipClient` (routing activation, P2/P2\*,
+  NRC `0x78`, source+target matching, typed NACKs). `J2534Transport` loads a vendor
+  PassThru DLL through the optional `koffi` dependency and fails at `open()` with
+  "J2534 not available on this platform" off Windows — never at import time.
+  `ReplayTransport` replays JSONL recordings for tests and reports both hex strings
+  on mismatch. `transport: { kind, j2534 }` selects one at startup, and `connect`
+  now reports `vciName`, `vciSerial` and `protocolList`.
+- **Recordings** — `tests/fixtures/recordings/` holds a CCU identification + DTC read
+  session and an IBCM security/live-data session (`10 03`, `22 F1xx`, `19 02 FF`,
+  `27 01/02`, `3E 80`).
+- **Seed-key sidecar** (`agent/src/seedkey.ts`) with `dll`, `sidecar` and `test`
+  backends and the canonical level → sub-function table (1→01/02, 3→03/04, 11→0B/0C,
+  13→0D/0E, programming→11/12). The placeholder xor/add/invert algorithms are gone.
+  Unlocked state is cached per ECU per session.
+- **Guided-process interpreter** (`agent/src/process-interpreter.ts`) executing the
+  canonical step tree — `ecuService`, `output`, `input`, `if`, `delay`, `setVar` —
+  with `$variable` request fields, response layout decoding, `storeAs`, negative exits,
+  comparators over variables and `$lastResponse.status` / `.nrc`, dry-run mode, and
+  `runProcess` / `provideInput` / `abortProcess` streaming over the WebSocket.
+- **Scan manager** (`agent/src/scan.ts`) — bounded concurrency, per-ECU
+  `responded` / `silent` / `unmapped` classification and progress events.
+- **Job logs** (`agent/src/job-log.ts`) — append-only JSONL under
+  `~/.rox-agent/logs/<jobId>.jsonl`, VIN redacted unless `ROX_AGENT_LOG_FULL_VIN=1`,
+  readable via `getJobLog`.
+- **Protocol contract** — `packages/protocol` shares request/response/event types
+  between agent and `LocalBridge`; `protocolVersion: 2` and `dataChecksum` travel in the
+  `connect` handshake, and the app shows a non-blocking amber top-bar banner on
+  mismatch. Documented in `agent/PROTOCOL.md`.
+- **Docs** — `docs/ARCHITECTURE.md` (app ↔ bridge ↔ agent ↔ transport ↔ vehicle) and
+  agent README sections for transport, seed-key backends, job logs and the ROX / Cihon
+  IP note.
+- **Tests** — ReplayTransport, DoipTransport against a fake in-process DoIP gateway,
+  seed-key backends and SA table, interpreter behaviour, dry-run of all 131 seed
+  processes, scan classification, JSONL logging and VIN redaction, protocol types.
+
+#### Changed
+
+- `VehicleSession` depends on `Transport` instead of `DoipClient`, keeps one session
+  per ECU, and drives tester-present per target.
+
 ## [0.2.0] — 2026-09-03
 
 ### Milestone M2 — Fix the foundations
