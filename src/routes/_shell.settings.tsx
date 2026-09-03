@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plug, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ROLE_LABEL, ROLE_ORDER } from "@/lib/roles";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,15 @@ function SettingsPage() {
   const user = useAppStore((s) => s.user);
   const signOut = useAppStore((s) => s.signOut);
   const { connection, status, reconnect } = useBridge();
+  const role = useAppStore((s) => s.role);
+  const setRole = useAppStore((s) => s.setRole);
+  const language = useAppStore((s) => s.language);
+  const setLanguage = useAppStore((s) => s.setLanguage);
+  const workstation = useAppStore((s) => s.workstation);
+  const setWorkstation = useAppStore((s) => s.setWorkstation);
+  const features = useAppStore((s) => s.features);
+  const setFeature = useAppStore((s) => s.setFeature);
+  const isAdmin = role === "admin";
 
   return (
     <div className="space-y-6">
@@ -117,6 +128,122 @@ function SettingsPage() {
                 Dark appearance
               </Label>
               <Switch id="dark-mode" checked={theme === "dark"} onCheckedChange={toggleTheme} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-hairline shadow-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Local agent &amp; vehicle</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <Label htmlFor="agent-url" className="text-xs">
+                Agent URL
+              </Label>
+              <Input
+                id="agent-url"
+                value={workstation.agentUrl}
+                onChange={(event) => setWorkstation({ agentUrl: event.target.value })}
+                className="mt-1 h-11 rounded-xl font-mono"
+              />
+            </div>
+            <div>
+              <Label htmlFor="dealer-name" className="text-xs">
+                Dealer name (report header)
+              </Label>
+              <Input
+                id="dealer-name"
+                value={workstation.dealerName}
+                onChange={(event) => setWorkstation({ dealerName: event.target.value })}
+                className="mt-1 h-11 rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="dealer-logo" className="text-xs">
+                Dealer logo URL
+              </Label>
+              <Input
+                id="dealer-logo"
+                value={workstation.dealerLogo}
+                onChange={(event) => setWorkstation({ dealerLogo: event.target.value })}
+                placeholder="https://…"
+                className="mt-1 h-11 rounded-xl"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(["R11", "R11EN", "R11h"] as const).map((variant) => (
+                <Button
+                  key={variant}
+                  variant={workstation.variant === variant ? "default" : "secondary"}
+                  className="h-11 rounded-full"
+                  onClick={() => setWorkstation({ variant })}
+                >
+                  {variant}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-hairline shadow-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Language &amp; access</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {(["en", "zh"] as const).map((code) => (
+                <Button
+                  key={code}
+                  variant={language === code ? "default" : "secondary"}
+                  className="h-11 rounded-full"
+                  onClick={() => setLanguage(code)}
+                >
+                  {code === "en" ? "English" : "中文"}
+                </Button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {ROLE_ORDER.map((option) => (
+                <Button
+                  key={option}
+                  variant={role === option ? "default" : "secondary"}
+                  className="h-11 rounded-full"
+                  onClick={() => setRole(option)}
+                >
+                  {ROLE_LABEL[option]}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Clearing faults, IO control and routines need Senior technician. Configuration writes
+              and programming need Workshop admin.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-hairline shadow-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Feature flags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-secondary/40 px-4 py-3 hairline">
+              <div>
+                <Label htmlFor="config-write" className="text-sm">
+                  Configuration write (v2)
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {isAdmin
+                    ? "Enables UDS 0x2E writes with double confirmation."
+                    : "Only a Workshop admin can enable this."}
+                </p>
+              </div>
+              <Switch
+                id="config-write"
+                disabled={!isAdmin}
+                checked={features.configurationWrite}
+                onCheckedChange={(checked) => setFeature("configurationWrite", checked)}
+              />
             </div>
           </CardContent>
         </Card>

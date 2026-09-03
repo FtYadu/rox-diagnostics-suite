@@ -5,6 +5,7 @@ import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { TopBar } from "@/components/layout/top-bar";
 import { BridgeProvider } from "@/features/bridge/bridge-provider";
 import { useAppStore } from "@/store/app-store";
+import { setLanguage } from "@/i18n";
 
 export const Route = createFileRoute("/_shell")({
   component: ShellLayout,
@@ -16,6 +17,7 @@ function ShellLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const user = useAppStore((s) => s.user);
   const theme = useAppStore((s) => s.theme);
+  const language = useAppStore((s) => s.language);
 
   useEffect(() => {
     void useAppStore.persist.rehydrate();
@@ -26,6 +28,10 @@ function ShellLayout() {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
   }, [theme]);
+
+  useEffect(() => {
+    setLanguage(language);
+  }, [language]);
 
   useEffect(() => {
     if (hydrated && !user) void navigate({ to: "/" });

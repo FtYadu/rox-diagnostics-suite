@@ -1,5 +1,7 @@
 import { dataChecksum as appDataChecksum } from "@/data/vehicle-data";
 import type { Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
+import { fromAgentProcessEvent } from "./process-run";
+import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
 import type {
   BridgeCompatibility,
   ConnectionInfo,
@@ -7,11 +9,15 @@ import type {
   EcuDtcResult,
   FreezeFrame,
   IdentificationEntry,
+  IoControlRequest,
+  IoControlResult,
   LiveDataSignal,
   ProgrammingProgressEvent,
   RoutineExecution,
+  RoutineRequest,
   SecurityAccessResult,
-  StepExecution,
+  WriteDidRequest,
+  WriteDidResult,
 } from "./types";
 
 export const LOCAL_BRIDGE_URL = "ws://127.0.0.1:9097";
@@ -292,21 +298,6 @@ export class LocalBridge implements DiagnosticBridge {
     return this.call<SecurityAccessResult>("requestSecurityAccess", { ecu: ecu.id, level });
   }
 
-  executeStep(
-    process: ServiceProcess,
-    stepIndex: number,
-    label: string,
-    input?: string,
-  ): Promise<StepExecution> {
-    return this.call<StepExecution>("executeStep", {
-      ecu: process.ecu,
-      process: process.name,
-      stepIndex,
-      label,
-      input: input ?? null,
-    });
-  }
-
   runRoutine(
     ecu: Ecu,
     routine: string,
@@ -315,33 +306,87 @@ export class LocalBridge implements DiagnosticBridge {
     return this.call<RoutineExecution>("runRoutine", { ecu: ecu.id, routine, action });
   }
 
-  /** Runs a canonical guided process on the agent, streaming its events. */
-  runProcess(
-    processId: string,
-    options: {
-      variables?: Record<string, string | number | boolean>;
-      dryRun?: boolean;
-      jobId?: string;
-      onEvent: (event: unknown) => void;
-    },
-  ): Promise<{
-    runId: string;
-    ok: boolean;
-    message: string;
-    executed: number;
-    prompts: number;
-  }> {
-    return this.call(
+  runRoutineById(request: RoutineRequest): Promise<RoutineExecution> {
+    return this.call<RoutineExecution>("runRoutine", {
+      ecu: request.ecu.id,
+      rid: request.rid,
+      routine: request.name,
+      action: request.subFunction,
+      params: request.params ?? {},
+    });
+  }
+
+  ioControl(request: IoControlRequest): Promise<IoControlResult> {
+    return this.call<IoControlResult>("ioControl", {
+      ecu: request.ecu.id,
+      did: request.did,
+      option: request.option,
+      params: request.params ?? {},
+    });
+  }
+
+  writeDid(request: WriteDidRequest): Promise<WriteDidResult> {
+    return this.call<WriteDidResult>("writeDid", {
+      ecu: request.ecu.id,
+      did: request.did,
+      value: request.value,
+    });
+  }
+
+  /**
+   * Runs a canonical guided process on the agent, translating its interpreter
+   * events into the shared `ProcessRunEvent` stream the runner consumes.
+   * The handle resolves as soon as the agent reports a runId in its first event.
+   */
+  async runProcess(process: ServiceProcess, options: RunProcessOptions): Promise<ProcessRunHandle> {
+    const processId = process.id ?? `${process.ecu}:${process.name}`;
+    let runId = `agent-${processId}`;
+    let announce: ((handle: ProcessRunHandle) => void) | null = null;
+    const handle = new Promise<ProcessRunHandle>((resolve) => {
+      announce = resolve;
+    });
+
+    const settle = () => {
+      if (announce) {
+        announce({ runId });
+        announce = null;
+      }
+    };
+
+    void this.call<{ runId: string; ok: boolean; message: string }>(
       "runProcess",
       {
         processId,
         variables: options.variables ?? {},
-        dryRun: options.dryRun ?? false,
-        jobId: options.jobId ?? null,
+        dryRun: false,
+        jobId: null,
       },
-      (payload) => options.onEvent(payload),
+      (payload) => {
+        const envelope = payload as { runId?: string; event?: unknown };
+        if (envelope?.runId) {
+          runId = envelope.runId;
+          settle();
+        }
+        const translated = fromAgentProcessEvent(envelope?.event ?? payload);
+        if (translated) options.onEvent(translated);
+      },
       600_000,
-    );
+    )
+      .then((reply) => {
+        if (reply?.runId) runId = reply.runId;
+        settle();
+      })
+      .catch((error: unknown) => {
+        settle();
+        options.onEvent({
+          type: "error",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      });
+
+    // Never block the UI: if the agent is slow to emit, use the provisional id.
+    setTimeout(settle, 1500);
+    return handle;
   }
 
   provideInput(runId: string, value: string): Promise<{ accepted: boolean }> {

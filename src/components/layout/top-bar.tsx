@@ -8,6 +8,7 @@ import {
   Moon,
   Radio,
   Sun,
+  WifiOff,
   TriangleAlert,
   UserRound,
 } from "lucide-react";
@@ -26,6 +27,7 @@ import { vehicle } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
 import { VinDialog } from "@/features/vehicle/vin-dialog";
 import { useAppStore } from "@/store/app-store";
+import { useOnline } from "@/hooks/use-online";
 
 export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { bridge, status, connection, usingFallback, compatibility } = useBridge();
@@ -35,6 +37,7 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const user = useAppStore((s) => s.user);
   const vin = useAppStore((s) => s.vin);
   const [vinOpen, setVinOpen] = useState(false);
+  const online = useOnline();
 
   const bridgeLabel =
     usingFallback || status === "offline"
@@ -83,6 +86,13 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
             )}
           </button>
         </div>
+
+        {!online && (
+          <span className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 text-xs font-medium text-warning">
+            <WifiOff className="size-3.5" />
+            Offline — work is queued
+          </span>
+        )}
 
         <span
           className={cn(

@@ -4,6 +4,7 @@ import type { BridgeMode, DtcRecord, EcuDtcResult } from "@/features/bridge/type
 import { pushJob, pushJobEvent } from "@/features/jobs/job-cloud";
 import { jobEventId, jobId as newJobId } from "@/features/jobs/types";
 import { isVinValid, normalizeVin } from "@/features/vehicle/vin";
+import type { Role } from "@/lib/roles";
 import type { Job, JobEvent, JobKind } from "@/features/jobs/types";
 
 export type { Job, JobEvent, JobKind } from "@/features/jobs/types";
@@ -29,8 +30,28 @@ type NewJobInput = {
   technician?: string;
 };
 
+export type VehicleVariant = "R11" | "R11EN" | "R11h";
+
+export type Language = "en" | "zh";
+
+export type FeatureFlags = {
+  /** WriteDataByIdentifier screen (v2 scope) — OFF by default, admin only. */
+  configurationWrite: boolean;
+};
+
+export type Workstation = {
+  agentUrl: string;
+  dealerName: string;
+  dealerLogo: string;
+  variant: VehicleVariant;
+};
+
 type AppState = {
   user: User | null;
+  role: Role;
+  language: Language;
+  workstation: Workstation;
+  features: FeatureFlags;
   theme: Theme;
   bridgeMode: BridgeMode;
   sidebarCollapsed: boolean;
@@ -43,6 +64,10 @@ type AppState = {
   jobs: Job[];
   activeJobId: string | null;
   signIn: (email: string, cloud?: boolean) => void;
+  setRole: (role: Role) => void;
+  setLanguage: (language: Language) => void;
+  setWorkstation: (patch: Partial<Workstation>) => void;
+  setFeature: (flag: keyof FeatureFlags, enabled: boolean) => void;
   signOut: () => void;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
@@ -78,6 +103,15 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      role: "senior",
+      language: "en",
+      workstation: {
+        agentUrl: "ws://127.0.0.1:9097",
+        dealerName: "ROX Dealer Workshop",
+        dealerLogo: "",
+        variant: "R11",
+      },
+      features: { configurationWrite: false },
       theme: "dark",
       bridgeMode: "simulator",
       sidebarCollapsed: false,
@@ -90,6 +124,10 @@ export const useAppStore = create<AppState>()(
 
       signIn: (email, cloud = false) => set({ user: { email, name: nameFromEmail(email), cloud } }),
       signOut: () => set({ user: null, activeJobId: null }),
+      setRole: (role) => set({ role }),
+      setLanguage: (language) => set({ language }),
+      setWorkstation: (patch) => set({ workstation: { ...get().workstation, ...patch } }),
+      setFeature: (flag, enabled) => set({ features: { ...get().features, [flag]: enabled } }),
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
       setBridgeMode: (bridgeMode) => set({ bridgeMode }),
@@ -217,6 +255,10 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
+        role: state.role,
+        language: state.language,
+        workstation: state.workstation,
+        features: state.features,
         theme: state.theme,
         bridgeMode: state.bridgeMode,
         sidebarCollapsed: state.sidebarCollapsed,
