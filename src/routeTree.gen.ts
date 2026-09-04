@@ -28,6 +28,7 @@ import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 import { Route as ShellEcusEcuIdIndexRouteImport } from './routes/_shell.ecus.$ecuId.index'
 import { Route as ShellEcusEcuIdConfigurationRouteImport } from './routes/_shell.ecus.$ecuId.configuration'
 import { Route as ShellEcusEcuIdIoControlRouteImport } from './routes/_shell.ecus.$ecuId.io-control'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -125,6 +126,12 @@ const ShellEcusEcuIdIoControlRoute = ShellEcusEcuIdIoControlRouteImport.update({
   path: '/io-control',
   getParentRoute: () => ShellEcusEcuIdRoute,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/ecus/': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -163,6 +171,7 @@ export interface FileRoutesByTo {
   '/ecus': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesById {
@@ -185,6 +194,7 @@ export interface FileRoutesById {
   '/_shell/ecus/': typeof ShellEcusIndexRoute
   '/_shell/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/_shell/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/_shell/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/ecus/'
     | '/ecus/$ecuId/configuration'
     | '/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/ecus/$ecuId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/ecus'
     | '/ecus/$ecuId/configuration'
     | '/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/ecus/$ecuId'
   id:
     | '__root__'
@@ -247,6 +259,7 @@ export interface FileRouteTypes {
     | '/_shell/ecus/'
     | '/_shell/ecus/$ecuId/configuration'
     | '/_shell/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/_shell/ecus/$ecuId/'
   fileRoutesById: FileRoutesById
 }
@@ -256,6 +269,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -393,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellEcusEcuIdIoControlRouteImport
       parentRoute: typeof ShellEcusEcuIdRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -449,6 +470,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
