@@ -63,10 +63,10 @@ function SignInPage() {
     if (storedVin) setVinDraft(storedVin);
   }, [storedVin]);
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!email.includes("@") || password.length < 4) {
-      setError("Enter your dealer email and a password of at least 4 characters.");
+    if (!email.includes("@") || password.length < 8) {
+      setError("Enter your dealer email and a password of at least 8 characters.");
       return;
     }
     const parsedVin = checkVin(vin);
@@ -74,9 +74,34 @@ function SignInPage() {
       setError(`Vehicle VIN: ${parsedVin.error}.`);
       return;
     }
+
     setError(null);
+    setNotice(null);
+    setBusy(true);
+
+    const result =
+      mode === "signup"
+        ? await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: `${window.location.origin}/` },
+          })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+    setBusy(false);
+
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+
+    if (!result.data.session) {
+      setNotice("Check your inbox to confirm the account, then sign in.");
+      return;
+    }
+
     setVin(parsedVin.vin);
-    signIn(email, false);
+    signIn(email, true);
     void navigate({ to: "/dashboard" });
   };
 
