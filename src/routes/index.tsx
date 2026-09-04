@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { vehicle } from "@/data/vehicle-data";
 import { VinPicker } from "@/features/vehicle/vin-picker";
 import { checkVin } from "@/features/vehicle/vin";
+import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/")({
@@ -43,6 +44,9 @@ function SignInPage() {
   const [vin, setVinDraft] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     void useAppStore.persist.rehydrate();
@@ -60,10 +64,10 @@ function SignInPage() {
     if (storedVin) setVinDraft(storedVin);
   }, [storedVin]);
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!email.includes("@") || password.length < 4) {
-      setError("Enter your dealer email and a password of at least 4 characters.");
+    if (!email.includes("@") || password.length < 8) {
+      setError("Enter your dealer email and a password of at least 8 characters.");
       return;
     }
     const parsedVin = checkVin(vin);
@@ -71,9 +75,34 @@ function SignInPage() {
       setError(`Vehicle VIN: ${parsedVin.error}.`);
       return;
     }
+
     setError(null);
+    setNotice(null);
+    setBusy(true);
+
+    const result =
+      mode === "signup"
+        ? await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: `${window.location.origin}/` },
+          })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+    setBusy(false);
+
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+
+    if (!result.data.session) {
+      setNotice("Check your inbox to confirm the account, then sign in.");
+      return;
+    }
+
     setVin(parsedVin.vin);
-    signIn(email, false);
+    signIn(email, true);
     void navigate({ to: "/dashboard" });
   };
 
@@ -124,12 +153,16 @@ function SignInPage() {
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-sm"
         >
-          <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {mode === "signup" ? "Create dealer account" : "Sign in"}
+          </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Use your dealer account to open the workstation.
+            {mode === "signup"
+              ? "Register your workshop, then choose a subscription plan."
+              : "Use your dealer account to open the workstation."}
           </p>
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
+          <form onSubmit={(event) => void onSubmit(event)} className="mt-8 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Dealer email</Label>
               <Input
@@ -171,7 +204,7 @@ function SignInPage() {
               </label>
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Lock className="size-3.5" />
-                Local session
+                Secure dealer account
               </span>
             </div>
 
@@ -181,9 +214,29 @@ function SignInPage() {
               </p>
             )}
 
-            <Button type="submit" className="h-11 w-full rounded-xl text-sm font-semibold">
-              Open workstation
+            {notice && <p className="text-sm text-success">{notice}</p>}
+
+            <Button
+              type="submit"
+              disabled={busy}
+              className="h-11 w-full rounded-xl text-sm font-semibold"
+            >
+              {busy ? "Working…" : mode === "signup" ? "Create account" : "Open workstation"}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "signup" ? "signin" : "signup");
+                setError(null);
+                setNotice(null);
+              }}
+              className="w-full text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {mode === "signup"
+                ? "Already registered? Sign in"
+                : "New workshop? Create a dealer account"}
+            </button>
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">

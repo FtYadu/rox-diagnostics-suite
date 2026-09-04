@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as ShellDashboardRouteImport } from './routes/_shell.dashboard'
 import { Route as ShellHealthScanRouteImport } from './routes/_shell.health-scan'
@@ -22,12 +23,14 @@ import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 import { Route as ShellEcusEcuIdIndexRouteImport } from './routes/_shell.ecus.$ecuId.index'
 import { Route as ShellEcusEcuIdConfigurationRouteImport } from './routes/_shell.ecus.$ecuId.configuration'
 import { Route as ShellEcusEcuIdIoControlRouteImport } from './routes/_shell.ecus.$ecuId.io-control'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +44,11 @@ const ShellRoute = ShellRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubscribeRoute = SubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -94,6 +102,11 @@ const ShellVehicleRoute = ShellVehicleRouteImport.update({
   path: '/vehicle',
   getParentRoute: () => ShellRoute,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -125,10 +138,17 @@ const ShellEcusEcuIdIoControlRoute = ShellEcusEcuIdIoControlRouteImport.update({
   path: '/io-control',
   getParentRoute: () => ShellEcusEcuIdRoute,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/subscribe': typeof SubscribeRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
@@ -139,16 +159,19 @@ export interface FileRoutesByFullPath {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/ecus/': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/subscribe': typeof SubscribeRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof ShellDashboardRoute
   '/health-scan': typeof ShellHealthScanRoute
@@ -159,10 +182,12 @@ export interface FileRoutesByTo {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRoutesById {
@@ -170,6 +195,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
   '/mcp': typeof McpRoute
+  '/subscribe': typeof SubscribeRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_shell/dashboard': typeof ShellDashboardRoute
   '/_shell/health-scan': typeof ShellHealthScanRoute
@@ -180,11 +206,13 @@ export interface FileRoutesById {
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/_shell/ecus/': typeof ShellEcusIndexRoute
   '/_shell/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
   '/_shell/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/_shell/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -192,6 +220,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/mcp'
+    | '/subscribe'
     | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/health-scan'
@@ -202,16 +231,19 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus/'
     | '/ecus/$ecuId/configuration'
     | '/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/ecus/$ecuId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/mcp'
+    | '/subscribe'
     | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/health-scan'
@@ -222,16 +254,19 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/ecus'
     | '/ecus/$ecuId/configuration'
     | '/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/ecus/$ecuId'
   id:
     | '__root__'
     | '/'
     | '/_shell'
     | '/mcp'
+    | '/subscribe'
     | '/.well-known/oauth-protected-resource'
     | '/_shell/dashboard'
     | '/_shell/health-scan'
@@ -242,11 +277,13 @@ export interface FileRouteTypes {
     | '/_shell/service-functions'
     | '/_shell/settings'
     | '/_shell/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
     | '/_shell/ecus/$ecuId/configuration'
     | '/_shell/ecus/$ecuId/io-control'
+    | '/api/public/payments/webhook'
     | '/_shell/ecus/$ecuId/'
   fileRoutesById: FileRoutesById
 }
@@ -254,8 +291,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ShellRoute: typeof ShellRouteWithChildren
   McpRoute: typeof McpRoute
+  SubscribeRoute: typeof SubscribeRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -279,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscribe': {
+      id: '/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof SubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -351,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellVehicleRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -392,6 +446,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ecus/$ecuId/io-control'
       preLoaderRoute: typeof ShellEcusEcuIdIoControlRouteImport
       parentRoute: typeof ShellEcusEcuIdRoute
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -446,9 +507,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ShellRoute: ShellRouteWithChildren,
   McpRoute: McpRoute,
+  SubscribeRoute: SubscribeRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

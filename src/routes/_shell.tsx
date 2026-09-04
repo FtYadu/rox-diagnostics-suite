@@ -6,6 +6,8 @@ import { TopBar } from "@/components/layout/top-bar";
 import { BridgeProvider } from "@/features/bridge/bridge-provider";
 import { useAppStore } from "@/store/app-store";
 import { setLanguage } from "@/i18n";
+import { useSubscription } from "@/features/billing/use-subscription";
+import { PaymentTestModeBanner } from "@/features/billing/payment-test-mode-banner";
 
 export const Route = createFileRoute("/_shell")({
   component: ShellLayout,
@@ -18,6 +20,7 @@ function ShellLayout() {
   const user = useAppStore((s) => s.user);
   const theme = useAppStore((s) => s.theme);
   const language = useAppStore((s) => s.language);
+  const { loading: subscriptionLoading, userId, isActive, pastDue } = useSubscription();
 
   useEffect(() => {
     void useAppStore.persist.rehydrate();
@@ -37,7 +40,14 @@ function ShellLayout() {
     if (hydrated && !user) void navigate({ to: "/" });
   }, [hydrated, user, navigate]);
 
-  if (!hydrated || !user) {
+  // Diagnostics stay locked until the workshop has an active subscription.
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (!userId) void navigate({ to: "/" });
+    else if (!isActive) void navigate({ to: "/subscribe" });
+  }, [subscriptionLoading, userId, isActive, navigate]);
+
+  if (!hydrated || !user || subscriptionLoading || !isActive) {
     return (
       <div className="grid min-h-dvh place-items-center bg-background">
         <p className="text-sm text-muted-foreground">Loading workstation…</p>
@@ -60,6 +70,12 @@ function ShellLayout() {
         </Sheet>
 
         <div className="flex min-w-0 flex-1 flex-col">
+          <PaymentTestModeBanner />
+          {pastDue && (
+            <div className="border-b border-warning/30 bg-warning/10 px-4 py-2 text-center text-xs text-warning">
+              Your last payment failed. Update the card in billing to keep workshop access.
+            </div>
+          )}
           <TopBar onOpenMobileNav={() => setMobileNavOpen(true)} />
           <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-6 sm:px-6 sm:py-8">
             <Outlet />

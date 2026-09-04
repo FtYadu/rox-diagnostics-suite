@@ -3,6 +3,7 @@ import {
   BatteryCharging,
   Car,
   Cable,
+  CreditCard,
   LogOut,
   Menu,
   Moon,
@@ -27,6 +28,12 @@ import { vehicle } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
 import { VinDialog } from "@/features/vehicle/vin-dialog";
 import { useAppStore } from "@/store/app-store";
+import { supabase } from "@/integrations/supabase/client";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { createPortalSession } from "@/utils/payments.functions";
+import { planByPriceId } from "@/features/billing/plans";
+import { useSubscription } from "@/features/billing/use-subscription";
+import { toast } from "sonner";
 import { useOnline } from "@/hooks/use-online";
 
 export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
@@ -38,6 +45,24 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const vin = useAppStore((s) => s.vin);
   const [vinOpen, setVinOpen] = useState(false);
   const online = useOnline();
+  const { subscription } = useSubscription();
+  const plan = planByPriceId(subscription?.price_id);
+
+  const openBilling = async () => {
+    const result = await createPortalSession({
+      data: { returnUrl: window.location.href, environment: getStripeEnvironment() },
+    });
+    if ("error" in result) {
+      toast.error(result.error);
+      return;
+    }
+    window.open(result.url, "_blank", "noopener,noreferrer");
+  };
+
+  const onSignOut = async () => {
+    await supabase.auth.signOut();
+    signOut();
+  };
 
   const bridgeLabel =
     usingFallback || status === "offline"
@@ -141,10 +166,19 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
               <p className="truncate text-xs text-muted-foreground">{user?.email ?? "—"}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {plan && (
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                {plan.name} plan · {plan.interval === "month" ? "monthly" : "yearly"}
+              </DropdownMenuLabel>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/settings">Settings</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={signOut}>
+            <DropdownMenuItem onClick={() => void openBilling()}>
+              <CreditCard className="size-4" />
+              Manage billing
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => void onSignOut()}>
               <LogOut className="size-4" />
               Sign out
             </DropdownMenuItem>
