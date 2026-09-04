@@ -221,11 +221,7 @@ function SignInPage() {
               disabled={busy}
               className="h-11 w-full rounded-xl text-sm font-semibold"
             >
-              {busy
-                ? "Working…"
-                : mode === "signup"
-                  ? "Create account"
-                  : "Open workstation"}
+              {busy ? "Working…" : mode === "signup" ? "Create account" : "Open workstation"}
             </Button>
 
             <button

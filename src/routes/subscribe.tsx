@@ -80,7 +80,9 @@ function SubscribePage() {
           <section className="mx-auto max-w-3xl">
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight">Complete your subscription</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Complete your subscription
+                </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Your workstation unlocks as soon as the payment clears.
                 </p>
