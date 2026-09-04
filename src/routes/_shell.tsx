@@ -37,7 +37,14 @@ function ShellLayout() {
     if (hydrated && !user) void navigate({ to: "/" });
   }, [hydrated, user, navigate]);
 
-  if (!hydrated || !user) {
+  // Diagnostics stay locked until the workshop has an active subscription.
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (!userId) void navigate({ to: "/" });
+    else if (!isActive) void navigate({ to: "/subscribe" });
+  }, [subscriptionLoading, userId, isActive, navigate]);
+
+  if (!hydrated || !user || subscriptionLoading || !isActive) {
     return (
       <div className="grid min-h-dvh place-items-center bg-background">
         <p className="text-sm text-muted-foreground">Loading workstation…</p>
