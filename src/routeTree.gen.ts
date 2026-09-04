@@ -23,6 +23,7 @@ import { Route as ShellReportsRouteImport } from './routes/_shell.reports'
 import { Route as ShellServiceFunctionsRouteImport } from './routes/_shell.service-functions'
 import { Route as ShellSettingsRouteImport } from './routes/_shell.settings'
 import { Route as ShellVehicleRouteImport } from './routes/_shell.vehicle'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
@@ -101,6 +102,11 @@ const ShellVehicleRoute = ShellVehicleRouteImport.update({
   path: '/vehicle',
   getParentRoute: () => ShellRoute,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/ecus/': typeof ShellEcusIndexRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/service-functions': typeof ShellServiceFunctionsRoute
   '/settings': typeof ShellSettingsRoute
   '/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/_shell/service-functions': typeof ShellServiceFunctionsRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/vehicle': typeof ShellVehicleRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/_shell/ecus/': typeof ShellEcusIndexRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/ecus/$ecuId'
     | '/ecus/'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/service-functions'
     | '/settings'
     | '/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/ecus'
     | '/ecus/$ecuId/configuration'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/_shell/service-functions'
     | '/_shell/settings'
     | '/_shell/vehicle'
+    | '/checkout/return'
     | '/.lovable/oauth/consent'
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
@@ -281,6 +293,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   SubscribeRoute: typeof SubscribeRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vehicle'
       preLoaderRoute: typeof ShellVehicleRouteImport
       parentRoute: typeof ShellRoute
+    }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
@@ -490,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubscribeRoute: SubscribeRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
