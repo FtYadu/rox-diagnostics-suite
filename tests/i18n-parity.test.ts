@@ -5,9 +5,7 @@ type Tree = { [key: string]: string | Tree };
 
 const flatten = (tree: Tree, prefix = ""): string[] =>
   Object.entries(tree).flatMap(([key, value]) =>
-    typeof value === "string"
-      ? [`${prefix}${key}`]
-      : flatten(value as Tree, `${prefix}${key}.`),
+    typeof value === "string" ? [`${prefix}${key}`] : flatten(value as Tree, `${prefix}${key}.`),
   );
 
 const enKeys = flatten(resources.en.translation as Tree);
