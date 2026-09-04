@@ -61,7 +61,7 @@ function JobHistoryPage() {
 
   const cloud = useQuery({
     queryKey: ["cloud-jobs"],
-    queryFn: fetchCloudJobs,
+    queryFn: () => fetchCloudJobs(),
     retry: false,
   });
 
