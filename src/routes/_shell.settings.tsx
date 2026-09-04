@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { vehicle } from "@/data/vehicle-data";
 import { useBridge } from "@/features/bridge/bridge-provider";
 import { useAppStore } from "@/store/app-store";
+import { useDealerProfile } from "@/features/profile/use-dealer-profile";
 
 export const Route = createFileRoute("/_shell/settings")({
   head: () => ({
@@ -47,7 +48,10 @@ function SettingsPage() {
   const setWorkstation = useAppStore((s) => s.setWorkstation);
   const features = useAppStore((s) => s.features);
   const setFeature = useAppStore((s) => s.setFeature);
-  const isAdmin = role === "admin";
+  const { profile } = useDealerProfile();
+  const isAdmin = (profile?.role ?? role) === "admin";
+  // Role impersonation is a preview-only debugging aid for workshop admins.
+  const canImpersonate = import.meta.env.DEV && profile?.role === "admin";
 
   return (
     <div className="space-y-6">
@@ -203,18 +207,36 @@ function SettingsPage() {
                 </Button>
               ))}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {ROLE_ORDER.map((option) => (
-                <Button
-                  key={option}
-                  variant={role === option ? "default" : "secondary"}
-                  className="h-11 rounded-full"
-                  onClick={() => setRole(option)}
-                >
-                  {ROLE_LABEL[option]}
-                </Button>
-              ))}
+            <div className="rounded-xl bg-secondary/40 px-4 py-3 hairline">
+              <p className="text-sm font-medium">
+                {profile ? ROLE_LABEL[profile.role] : ROLE_LABEL[role]}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {profile
+                  ? `Granted to ${profile.displayName || profile.dealerName} by your workshop admin.`
+                  : "Sign in to load your dealer role."}
+              </p>
             </div>
+            {canImpersonate && (
+              <div className="space-y-2 rounded-xl border border-warning/30 bg-warning/10 p-3">
+                <p className="text-xs font-medium text-warning">
+                  Impersonate a role (preview builds only — the database still enforces your real
+                  role).
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {ROLE_ORDER.map((option) => (
+                    <Button
+                      key={option}
+                      variant={role === option ? "default" : "secondary"}
+                      className="h-11 rounded-full"
+                      onClick={() => setRole(option)}
+                    >
+                      {ROLE_LABEL[option]}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               Clearing faults, IO control and routines need Senior technician. Configuration writes
               and programming need Workshop admin.

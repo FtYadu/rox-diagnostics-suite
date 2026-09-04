@@ -35,6 +35,7 @@ import { planByPriceId } from "@/features/billing/plans";
 import { useSubscription } from "@/features/billing/use-subscription";
 import { toast } from "sonner";
 import { useOnline } from "@/hooks/use-online";
+import { useOfflineSync } from "@/features/jobs/offline-sync";
 
 export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const { bridge, status, connection, usingFallback, compatibility } = useBridge();
@@ -46,6 +47,7 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const [vinOpen, setVinOpen] = useState(false);
   const online = useOnline();
   const { subscription } = useSubscription();
+  const { pending, syncing } = useOfflineSync();
   const plan = planByPriceId(subscription?.price_id);
 
   const openBilling = async () => {
@@ -115,7 +117,13 @@ export function TopBar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
         {!online && (
           <span className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 text-xs font-medium text-warning">
             <WifiOff className="size-3.5" />
-            Offline — work is queued
+            {pending > 0 ? `Offline — ${pending} pending` : "Offline — work is queued"}
+          </span>
+        )}
+
+        {online && pending > 0 && (
+          <span className="flex items-center gap-1.5 rounded-full bg-secondary/70 px-3 py-1.5 text-xs font-medium text-muted-foreground hairline">
+            {syncing ? `Syncing ${pending}…` : `${pending} pending`}
           </span>
         )}
 

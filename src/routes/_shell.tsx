@@ -7,6 +7,7 @@ import { BridgeProvider } from "@/features/bridge/bridge-provider";
 import { useAppStore } from "@/store/app-store";
 import { setLanguage } from "@/i18n";
 import { useSubscription } from "@/features/billing/use-subscription";
+import { useDealerProfile } from "@/features/profile/use-dealer-profile";
 import { PaymentTestModeBanner } from "@/features/billing/payment-test-mode-banner";
 
 export const Route = createFileRoute("/_shell")({
@@ -21,6 +22,8 @@ function ShellLayout() {
   const theme = useAppStore((s) => s.theme);
   const language = useAppStore((s) => s.language);
   const { loading: subscriptionLoading, userId, isActive, pastDue } = useSubscription();
+  const { profile } = useDealerProfile();
+  const setRole = useAppStore((s) => s.setRole);
 
   useEffect(() => {
     void useAppStore.persist.rehydrate();
@@ -39,6 +42,11 @@ function ShellLayout() {
   useEffect(() => {
     if (hydrated && !user) void navigate({ to: "/" });
   }, [hydrated, user, navigate]);
+
+  // profiles.role is authoritative: mirror it into the store the guards read.
+  useEffect(() => {
+    if (profile) setRole(profile.role);
+  }, [profile, setRole]);
 
   // Diagnostics stay locked until the workshop has an active subscription.
   useEffect(() => {
