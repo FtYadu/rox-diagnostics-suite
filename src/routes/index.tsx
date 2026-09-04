@@ -203,7 +203,7 @@ function SignInPage() {
               </label>
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Lock className="size-3.5" />
-                Local session
+                Secure dealer account
               </span>
             </div>
 
@@ -213,9 +213,33 @@ function SignInPage() {
               </p>
             )}
 
-            <Button type="submit" className="h-11 w-full rounded-xl text-sm font-semibold">
-              Open workstation
+            {notice && <p className="text-sm text-success">{notice}</p>}
+
+            <Button
+              type="submit"
+              disabled={busy}
+              className="h-11 w-full rounded-xl text-sm font-semibold"
+            >
+              {busy
+                ? "Working…"
+                : mode === "signup"
+                  ? "Create account"
+                  : "Open workstation"}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "signup" ? "signin" : "signup");
+                setError(null);
+                setNotice(null);
+              }}
+              className="w-full text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {mode === "signup"
+                ? "Already registered? Sign in"
+                : "New workshop? Create a dealer account"}
+            </button>
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
