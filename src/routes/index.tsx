@@ -43,6 +43,9 @@ function SignInPage() {
   const [vin, setVinDraft] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     void useAppStore.persist.rehydrate();
