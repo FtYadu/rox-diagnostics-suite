@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { vehicle } from "@/data/vehicle-data";
 import { VinPicker } from "@/features/vehicle/vin-picker";
 import { checkVin } from "@/features/vehicle/vin";
+import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/store/app-store";
 
 export const Route = createFileRoute("/")({
