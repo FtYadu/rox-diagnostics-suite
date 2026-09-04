@@ -162,7 +162,7 @@ function SignInPage() {
               : "Use your dealer account to open the workstation."}
           </p>
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-4">
+          <form onSubmit={(event) => void onSubmit(event)} className="mt-8 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Dealer email</Label>
               <Input
