@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      dealers: {
+        Row: {
+          created_at: string
+          id: string
+          logo_path: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_path?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_path?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      job_attachments: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          job_id: string
+          kind: string
+          path: string
+          size_bytes: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          job_id: string
+          kind: string
+          path: string
+          size_bytes?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          job_id?: string
+          kind?: string
+          path?: string
+          size_bytes?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_attachments_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_attachments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_events: {
         Row: {
           client_event_id: string
@@ -71,14 +140,17 @@ export type Database = {
         Row: {
           actions_count: number
           created_at: string
+          dealer_id: string | null
           dtc_critical: number
           dtc_total: number
           ended_at: string | null
+          finished_at: string | null
           id: string
           kind: string
           started_at: string
           status: string
           summary: string
+          summary_data: Json
           technician: string
           title: string
           updated_at: string
@@ -88,14 +160,17 @@ export type Database = {
         Insert: {
           actions_count?: number
           created_at?: string
+          dealer_id?: string | null
           dtc_critical?: number
           dtc_total?: number
           ended_at?: string | null
+          finished_at?: string | null
           id: string
           kind: string
           started_at?: string
           status?: string
           summary?: string
+          summary_data?: Json
           technician: string
           title: string
           updated_at?: string
@@ -105,21 +180,64 @@ export type Database = {
         Update: {
           actions_count?: number
           created_at?: string
+          dealer_id?: string | null
           dtc_critical?: number
           dtc_total?: number
           ended_at?: string | null
+          finished_at?: string | null
           id?: string
           kind?: string
           started_at?: string
           status?: string
           summary?: string
+          summary_data?: Json
           technician?: string
           title?: string
           updated_at?: string
           user_id?: string
           vin?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "jobs_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          display_name: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          display_name?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          display_name?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -174,6 +292,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_dealer_id: { Args: never; Returns: string }
+      current_role_name: { Args: never; Returns: string }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
