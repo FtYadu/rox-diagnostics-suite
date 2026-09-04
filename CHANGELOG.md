@@ -6,6 +6,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-09-04
+
+### Batch 3b — cloud persistence, offline replay, translations
+
+#### Added
+
+- **Dealer cloud schema.** `dealers`, `profiles`, `jobs` and `job_attachments` with
+  dealer-scoped row policies, a signup trigger that creates a technician profile, and a
+  private `job-logs` storage bucket keyed by `<dealer_id>/<job_id>/…`.
+- **Job cloud wiring.** `job-cloud.ts` upserts jobs and job events with the signed-in
+  dealer, uploads agent JSONL / PDF / XLSX artefacts as attachments and lists them with
+  one-hour signed URLs. Job history reads filter by VIN, kind and status.
+- **Roles from the database.** `profiles.role` is now authoritative and mirrored into the
+  app store; the Settings role picker survives only as a preview-only admin impersonation
+  control.
+- **Offline queue replay.** `queue-replay.ts` sends queued writes oldest-first with
+  exponential backoff and a retry cap; the top bar shows an "N pending" / "Syncing N" pill.
+- **Offline app shell.** `vite-plugin-pwa` (generateSW) caches the shell, hashed assets and
+  the vehicle seed, registered only from the guarded `register-sw.ts` wrapper.
+- **Translations.** Shared chrome, auth and billing strings added in English and Simplified
+  Chinese, with a Vitest parity test that fails on missing or untranslated keys.
+
+#### Tests
+
+107 unit tests across 19 files, including queue ordering / retry / backoff, role guards and
+i18n parity.
+
+#### Known gaps
+
+- Playwright's downloaded Chromium cannot launch in this environment (missing
+  `libglib-2.0.so.0`), so the E2E suite was not executed here. The CI job is unchanged.
+- String extraction covers app chrome and the shared surfaces; deeper diagnostic panels
+  still hold English literals.
+
 ## [0.4.0] — 2026-09-03
 
 ### Milestone M4 — App feature parity (read + safe writes)

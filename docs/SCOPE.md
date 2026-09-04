@@ -19,6 +19,12 @@ even when the canonical data would allow it.
 9. **Reports** — PDF health-scan report (VIN, ECUs scanned, DTC summary, technician notes).
 10. **Job history** — one job per vehicle action, with events, trace and downloads.
 
+### v1 status (0.4.1)
+
+Cloud persistence, dealer roles, job attachments, offline queue replay and the offline app
+shell are in place. Remaining v1 polish: full i18n extraction of the diagnostic panels and
+an executed E2E run (blocked locally by Playwright's browser sandbox, runs in CI).
+
 ### v1 status (M4)
 
 All ten v1 items are implemented against the Simulator and share one code path with
