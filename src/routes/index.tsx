@@ -152,9 +152,13 @@ function SignInPage() {
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-sm"
         >
-          <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {mode === "signup" ? "Create dealer account" : "Sign in"}
+          </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Use your dealer account to open the workstation.
+            {mode === "signup"
+              ? "Register your workshop, then choose a subscription plan."
+              : "Use your dealer account to open the workstation."}
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
