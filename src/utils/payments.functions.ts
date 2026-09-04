@@ -59,7 +59,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       const isRecurring = stripePrice.type === "recurring";
 
       const customerId = await resolveOrCreateCustomer(stripe, {
-        email: user?.email ?? undefined,
+        ...(user?.email ? { email: user.email } : {}),
         userId,
       });
 

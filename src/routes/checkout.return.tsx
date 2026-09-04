@@ -21,9 +21,8 @@ export const Route = createFileRoute("/checkout/return")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
-    session_id: typeof search["session_id"] === "string" ? search["session_id"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { session_id?: string } =>
+    typeof search["session_id"] === "string" ? { session_id: search["session_id"] } : {},
   component: CheckoutReturnPage,
 });
 
