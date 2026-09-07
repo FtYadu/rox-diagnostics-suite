@@ -1,0 +1,258 @@
+{
+ "testerAddress": 3712,
+ "functionalAddress": 58368,
+ "ecus": [
+  {
+   "id": "CCU",
+   "bus": "DoIP",
+   "address": 26,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "IBCM",
+   "bus": "DoIP",
+   "address": 4104,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "AVAS",
+   "bus": "DoIP",
+   "address": 4105,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "WCM_L",
+   "bus": "DoIP",
+   "address": 4106,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "WCM_R",
+   "bus": "DoIP",
+   "address": 4107,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "LHCM",
+   "bus": "DoIP",
+   "address": 4108,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "RHCM",
+   "bus": "DoIP",
+   "address": 4109,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "TLCM_L",
+   "bus": "DoIP",
+   "address": 4110,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "TLCM_R",
+   "bus": "DoIP",
+   "address": 4111,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SCM_L",
+   "bus": "DoIP",
+   "address": 4113,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SCM_R",
+   "bus": "DoIP",
+   "address": 4114,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ASCM_RL",
+   "bus": "DoIP",
+   "address": 4115,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ASCM_RR",
+   "bus": "DoIP",
+   "address": 4116,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "EPS_FD",
+   "bus": "DoIP",
+   "address": 4373,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "EPS",
+   "bus": "DoIP",
+   "address": 4392,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ESC",
+   "bus": "DoIP",
+   "address": 4374,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "IB",
+   "bus": "DoIP",
+   "address": 4375,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "CDS",
+   "bus": "DoIP",
+   "address": 4376,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "CDS_I",
+   "bus": "DoIP",
+   "address": 4376,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "TCU",
+   "bus": "DoIP",
+   "address": 4851,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ACU",
+   "bus": "DoIP",
+   "address": 4849,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "IDCU",
+   "bus": "DoIP",
+   "address": 5411,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "AMP",
+   "bus": "DoIP",
+   "address": 5666,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "TBOX",
+   "bus": "DoIP",
+   "address": 5929,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "BTM",
+   "bus": "DoIP",
+   "address": 5930,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ADCU_MCU",
+   "bus": "DoIP",
+   "address": 6407,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ADCU_Soc",
+   "bus": "DoIP",
+   "address": 6443,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SRR_FL",
+   "bus": "DoIP",
+   "address": 6145,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SRR_FR",
+   "bus": "DoIP",
+   "address": 6146,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SRR_RL",
+   "bus": "DoIP",
+   "address": 6147,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SRR_RR",
+   "bus": "DoIP",
+   "address": 6148,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "MRR_F",
+   "bus": "DoIP",
+   "address": 6149,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "MDCU",
+   "bus": "DoIP",
+   "address": 5091,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "EMS",
+   "bus": "DoIP",
+   "address": 5344,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "GCU",
+   "bus": "DoIP",
+   "address": 5149,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "RMC",
+   "bus": "DoIP",
+   "address": 5158,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "FMC",
+   "bus": "DoIP",
+   "address": 5159,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "IBS",
+   "bus": "DoIP",
+   "address": 5151,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "ATC",
+   "bus": "DoIP",
+   "address": 5152,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "SCU",
+   "bus": "DoIP",
+   "address": 5157,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "BMS",
+   "bus": "DoIP",
+   "address": 5150,
+   "secondaryAddresses": []
+  },
+  {
+   "id": "PMS",
+   "bus": "DoIP",
+   "address": 5147,
+   "secondaryAddresses": []
+  }
+ ]
+}

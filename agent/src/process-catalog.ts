@@ -1,4 +1,7 @@
-import type { ProcessStep } from "../../packages/canonical-schema/src/index.ts";
+import {
+  processStepSchema,
+  type ProcessStep,
+} from "../../packages/canonical-schema/src/index.ts";
 import { loadCatalog } from "./config.ts";
 
 export type SeedProcess = {
@@ -22,6 +25,12 @@ export const toCanonicalStep = (raw: Record<string, unknown>, index: number): Pr
   const id = asText(raw["id"], `s${index}`);
   const label = asText(raw["label"] ?? raw["text"], id);
   const kind = asText(raw["kind"] ?? raw["type"], "output");
+
+  // Canonical data already speaks the step union — keep every field (session, saAlg, layouts).
+  if (raw["kind"] !== undefined) {
+    const parsed = processStepSchema.safeParse({ id, label, ...raw });
+    if (parsed.success) return parsed.data;
+  }
 
   if (kind === "input") {
     return {

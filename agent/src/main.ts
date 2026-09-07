@@ -16,7 +16,7 @@ import {
   loadConfig,
 } from "./config.ts";
 
-const AGENT_VERSION = "0.3.0";
+const AGENT_VERSION = "0.4.0";
 
 const PORT = Number(process.env["ROX_AGENT_PORT"] ?? 9097);
 
@@ -123,6 +123,100 @@ const handlers: Record<string, Handler> = {
     const ecu = asString(params["ecu"]);
     await session.enterSession(ecu);
     return session.clearDtcs(ecu, (params["codes"] as string[] | null) ?? null);
+  },
+
+  clearDtcsAuthorized: async (params) => {
+    const { session } = await ensureLink();
+    const ecu = asString(params["ecu"]);
+    const result = await session.clearDtcsAuthorized(ecu, {
+      ...(params["session"] ? { session: Number(params["session"]) } : {}),
+      ...(params["level"] ? { level: Number(params["level"]) } : {}),
+    });
+    return { ...result, trace: session.takeTrace() };
+  },
+
+  /** Clear every responding ECU, streaming one clearEcu event per ECU. */
+  clearAllDtcs: async (params, emit) => {
+    const { session } = await ensureLink();
+    const jobId = asString(params["jobId"]);
+    const logger = jobId ? new JobLogger(jobId, asString(params["vin"])) : null;
+    const requested = Array.isArray(params["ecus"]) ? (params["ecus"] as string[]) : null;
+    const ecuIds = requested ?? Object.keys(config.ecus);
+    const results: Array<Awaited<ReturnType<VehicleSession["clearDtcsAuthorized"]>>> = [];
+
+    for (const ecuId of ecuIds) {
+      const result = await session.clearDtcsAuthorized(ecuId);
+      results.push(result);
+      logger?.write("info", JSON.stringify({ type: "clearEcu", ...result }));
+      emit({ type: "clearEcu", ecuId, cleared: result.cleared, ...(result.nrc ? { nrc: result.nrc } : {}) });
+    }
+    return {
+      results,
+      cleared: results.filter((entry) => entry.cleared).length,
+      failed: results.filter((entry) => !entry.cleared).map((entry) => entry.ecuId),
+    };
+  },
+
+  /** Re-scan after a repair and diff against the DTC list captured before it. */
+  verifyRepair: async (params, emit) => {
+    const { session } = await ensureLink();
+    const jobId = asString(params["jobId"]);
+    const logger = jobId ? new JobLogger(jobId, asString(params["vin"])) : null;
+    const before = Array.isArray(params["before"])
+      ? (params["before"] as Array<{ code?: string; ecuId?: string; state?: string }>)
+      : [];
+    const results = await scanVehicle(session, {
+      onEvent: (event) => {
+        logger?.write("info", JSON.stringify(event));
+        emit(event);
+      },
+    });
+
+    const after = results.flatMap((entry) => entry.dtcs);
+    const key = (dtc: { ecuId?: string; code?: string }) => `${dtc.ecuId ?? ""}:${dtc.code ?? ""}`;
+    const afterKeys = new Set(after.map(key));
+    const beforeKeys = new Set(before.map(key));
+    const current = after.filter((dtc) => dtc["state"] !== "history");
+    const historyOnly = after.filter((dtc) => dtc["state"] === "history");
+
+    return {
+      before,
+      after,
+      resolved: before.filter((dtc) => !afterKeys.has(key(dtc))),
+      remaining: current,
+      historyOnly,
+      new: after.filter((dtc) => !beforeKeys.has(key(dtc))),
+      ok: current.length === 0,
+    };
+  },
+
+  /** Discovery → routing activation → VIN + baseline from the CCU gateway. */
+  autoConnect: async (params) => {
+    const wantedVin = asString(params["vin"]);
+    const handshake = await connectionInfo();
+    const { session } = await ensureLink();
+    const gatewayId =
+      Object.keys(config.ecus).find((id) => id === "CCU") ?? Object.keys(config.ecus)[0] ?? "CCU";
+    let vin = handshake.vin;
+    let softwareBaseline = "";
+    try {
+      await session.enterSession(gatewayId);
+      const identification = await session.readIdentification(gatewayId);
+      vin = identification.find((entry) => entry.did === "F190")?.value ?? vin;
+      softwareBaseline =
+        identification.find((entry) => entry.did === "F1A0" || entry.did === "F195")?.value ?? "";
+    } catch (error) {
+      log(`autoConnect identification failed: ${(error as Error).message}`);
+    }
+    if (wantedVin && vin && wantedVin.toUpperCase() !== vin.toUpperCase()) {
+      log(`autoConnect: connected car VIN ${vin} does not match requested ${wantedVin}`);
+    }
+    return {
+      ...handshake,
+      vin,
+      softwareBaseline,
+      ecusMapped: Object.keys(config.ecus).length,
+    };
   },
 
   readFreezeFrame: async (params) => {

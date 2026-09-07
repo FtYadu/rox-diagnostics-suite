@@ -10,10 +10,10 @@ import {
 
 describe("agent protocol contract", () => {
   it("pins the version the app and agent compare at connect time", () => {
-    expect(PROTOCOL_VERSION).toBe(2);
+    expect(PROTOCOL_VERSION).toBe(3);
   });
 
-  it("includes the v2 handshake fields in the connect reply", () => {
+  it("includes the handshake fields in the connect reply", () => {
     const reply: ConnectReply = {
       mode: "local",
       agentVersion: "0.3.0",
@@ -28,7 +28,7 @@ describe("agent protocol contract", () => {
       batteryVoltage: 12.6,
       ignitionOn: true,
     };
-    expect(reply.protocolVersion).toBe(2);
+    expect(reply.protocolVersion).toBe(3);
     expectTypeOf(reply.transport).toEqualTypeOf<"doip" | "j2534" | "replay">();
   });
 
@@ -39,8 +39,12 @@ describe("agent protocol contract", () => {
       "abortProcess",
       "scanVehicle",
       "getJobLog",
+      "autoConnect",
+      "clearDtcsAuthorized",
+      "clearAllDtcs",
+      "verifyRepair",
     ];
-    expect(methods).toHaveLength(5);
+    expect(methods).toHaveLength(9);
   });
 
   it("types process and scan events as discriminated unions", () => {

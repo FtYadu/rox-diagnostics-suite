@@ -1,4 +1,5 @@
 import { createSocket } from "node:dgram";
+import { networkInterfaces } from "node:os";
 import { Socket } from "node:net";
 
 import { UdsNegativeResponse, bytesToHex, hex } from "./uds.ts";
@@ -111,27 +112,99 @@ export const parseDoipFrames = (
 
 const header = doipHeader;
 
-/** Broadcasts a DoIP vehicle identification request and waits for the first announcement. */
-export const discoverVehicle = (timeoutMs = 2000): Promise<VehicleAnnouncement> =>
-  new Promise((resolve, reject) => {
+export class DoipAdapterError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DoipAdapterError";
+  }
+}
+
+export type Ipv4Interface = { address: string; netmask: string; broadcast: string };
+
+const broadcastFor = (address: string, netmask: string): string => {
+  const a = address.split(".").map(Number);
+  const m = netmask.split(".").map(Number);
+  return a.map((byte, i) => (byte & (m[i] ?? 255)) | (~(m[i] ?? 255) & 0xff)).join(".");
+};
+
+/** Every non-loopback IPv4 adapter, with the broadcast address for each. */
+export const ipv4Interfaces = (): Ipv4Interface[] => {
+  const result: Ipv4Interface[] = [];
+  for (const entries of Object.values(networkInterfaces())) {
+    for (const entry of entries ?? []) {
+      if (entry.family !== "IPv4" || entry.internal) continue;
+      result.push({
+        address: entry.address,
+        netmask: entry.netmask,
+        broadcast: broadcastFor(entry.address, entry.netmask),
+      });
+    }
+  }
+  return result;
+};
+
+/** The diagnostic Ethernet adapter must live in the vehicle's /24, or nothing is reachable. */
+export const assertDiagnosticAdapter = (
+  vehicleIp = "192.168.0.100",
+  interfaces: Ipv4Interface[] = ipv4Interfaces(),
+): void => {
+  const prefix = vehicleIp.split(".").slice(0, 3).join(".");
+  if (interfaces.some((entry) => entry.address.startsWith(`${prefix}.`))) return;
+  throw new DoipAdapterError(
+    `No network adapter on ${prefix}.x — set the diagnostic Ethernet adapter to ${prefix}.110/24`,
+  );
+};
+
+const probeTcp = (host: string, port: number, timeoutMs: number): Promise<boolean> =>
+  new Promise((resolve) => {
+    const socket = new Socket();
+    const done = (ok: boolean) => {
+      socket.destroy();
+      resolve(ok);
+    };
+    socket.setTimeout(timeoutMs);
+    socket.once("connect", () => done(true));
+    socket.once("timeout", () => done(false));
+    socket.once("error", () => done(false));
+    socket.connect(port, host);
+  });
+
+/**
+ * ISO 13400 vehicle identification on every IPv4 adapter (a bench PC often has several).
+ * Announcements are collected for the whole window so the VIN of the car under test can be
+ * matched; when nothing answers, the configured gateway IP is probed over TCP.
+ */
+export const discoverVehicle = async (
+  timeoutMs = 2000,
+  options: { vin?: string; vehicleIp?: string; port?: number } = {},
+): Promise<VehicleAnnouncement> => {
+  const vehicleIp = options.vehicleIp ?? "192.168.0.100";
+  const port = options.port ?? DOIP_PORT;
+  const interfaces = ipv4Interfaces();
+  assertDiagnosticAdapter(vehicleIp, interfaces);
+
+  const announcements = await new Promise<VehicleAnnouncement[]>((resolve) => {
+    const found: VehicleAnnouncement[] = [];
     const socket = createSocket({ type: "udp4", reuseAddr: true });
-    const timer = setTimeout(() => {
-      socket.close();
-      reject(new Error("No DoIP vehicle announcement received (check VCI cable and ignition)"));
-    }, timeoutMs);
+    const finish = () => {
+      try {
+        socket.close();
+      } catch {
+        // already closed
+      }
+      resolve(found);
+    };
+    const timer = setTimeout(finish, timeoutMs);
+    timer.unref?.();
 
-    socket.on("error", (error) => {
+    socket.on("error", () => {
       clearTimeout(timer);
-      socket.close();
-      reject(error);
+      finish();
     });
-
     socket.on("message", (message, remote) => {
       if (message.length < 40 || message.readUInt16BE(2) !== PAYLOAD.vehicleAnnouncement) return;
       const body = message.subarray(8);
-      clearTimeout(timer);
-      socket.close();
-      resolve({
+      found.push({
         vin: body.subarray(0, 17).toString("ascii").replace(/\0/g, "").trim(),
         logicalAddress: body.readUInt16BE(17),
         eid: bytesToHex(body.subarray(19, 25)),
@@ -139,12 +212,27 @@ export const discoverVehicle = (timeoutMs = 2000): Promise<VehicleAnnouncement> 
       });
     });
 
-    socket.bind(DOIP_PORT, () => {
+    socket.bind(port, () => {
       socket.setBroadcast(true);
       const frame = header(PAYLOAD.vehicleIdentificationRequest, new Uint8Array());
-      socket.send(frame, DOIP_PORT, "255.255.255.255");
+      const targets = [...new Set([...interfaces.map((i) => i.broadcast), "255.255.255.255"])];
+      for (const target of targets) socket.send(frame, port, target);
     });
   });
+
+  const wanted = options.vin?.toUpperCase();
+  const matched = wanted ? announcements.find((entry) => entry.vin.toUpperCase() === wanted) : null;
+  const picked = matched ?? announcements[0];
+  if (picked) return picked;
+
+  if (await probeTcp(vehicleIp, port, Math.max(timeoutMs, 1500))) {
+    return { vin: "", logicalAddress: 0x001a, eid: "", host: vehicleIp };
+  }
+  throw new Error(
+    `No DoIP vehicle announcement and ${vehicleIp}:${port} did not answer ` +
+      "(check the VCI cable, ignition and the diagnostic Ethernet adapter)",
+  );
+};
 
 type Waiter = {
   match: (payloadType: number, payload: Buffer) => boolean;

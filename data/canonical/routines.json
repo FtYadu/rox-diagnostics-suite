@@ -1,0 +1,1110 @@
+{
+ "ecus": [
+  {
+   "id": "CCU",
+   "routines": [
+    {
+     "rid": 1889,
+     "name": "CCU_通讯密钥申请",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "IBCM",
+   "routines": [
+    {
+     "rid": 1216,
+     "name": "车窗自学习",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1217,
+     "name": "遮阳帘自学习",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1226,
+     "name": "删除钥匙",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1227,
+     "name": "学习钥匙",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 270,
+     "name": "TPMS ECU进入自检",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 271,
+     "name": "RFR 安装",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "AVAS",
+   "routines": []
+  },
+  {
+   "id": "WCM_L",
+   "routines": []
+  },
+  {
+   "id": "WCM_R",
+   "routines": []
+  },
+  {
+   "id": "LHCM",
+   "routines": []
+  },
+  {
+   "id": "RHCM",
+   "routines": []
+  },
+  {
+   "id": "TLCM_L",
+   "routines": []
+  },
+  {
+   "id": "TLCM_R",
+   "routines": []
+  },
+  {
+   "id": "SCM_L",
+   "routines": [
+    {
+     "rid": 64768,
+     "name": "座椅自学习（仅高配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64773,
+     "name": "一排左座椅自学习（仅低配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64774,
+     "name": "二排左座椅自学习（仅低配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "SCM_R",
+   "routines": [
+    {
+     "rid": 64769,
+     "name": "座椅自学习（仅高配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64775,
+     "name": "一排右座椅自学习（仅低配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64776,
+     "name": "二排右座椅自学习（仅低配）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "ASCM_RL",
+   "routines": [
+    {
+     "rid": 64770,
+     "name": "座椅自学习",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64777,
+     "name": "长滑轨自学习（仅高配航空座椅）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "ASCM_RR",
+   "routines": [
+    {
+     "rid": 64772,
+     "name": "座椅自学习",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 64778,
+     "name": "长滑轨自学习（仅高配航空座椅）",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "EPS_FD",
+   "routines": [
+    {
+     "rid": 65280,
+     "name": "启动擦除内存",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "erase address",
+       "byteStart": 1,
+       "length": 4,
+       "type": "uint"
+      },
+      {
+       "name": "erase size",
+       "byteStart": 5,
+       "length": 4,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "EPS",
+   "routines": [
+    {
+     "rid": 65280,
+     "name": "启动擦除内存",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "erase address",
+       "byteStart": 1,
+       "length": 4,
+       "type": "uint"
+      },
+      {
+       "name": "erase size",
+       "byteStart": 5,
+       "length": 4,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "ESC",
+   "routines": [
+    {
+     "rid": 23040,
+     "name": "延迟执行机构控制",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "DriverStates (State 2)",
+       "byteStart": 4,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23041,
+     "name": "抽真空加注",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Time until start of pump motor(2…150s)",
+       "byteStart": 1,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23042,
+     "name": "加液排气",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Counter = 0x03 - 0x05",
+       "byteStart": 1,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23043,
+     "name": "控制器检测",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Byte20..21 Actuator 4 Identifier",
+       "byteStart": 16,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23044,
+     "name": "动态测试",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Byte20..21 Actuator 4 Identifier",
+       "byteStart": 16,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23047,
+     "name": "轮速限制 禁止/启用",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Byte4 Control Option          0x00: Disable Speed Limit          0x01: Enable Speed Limit",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable Speed Limit",
+        "1": "Enable Speed Limit"
+       }
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23048,
+     "name": "阀门继电器关闭禁用",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "Byte4 Control Option          0x00: Disable Valve Relay Shutdown          0x01: Re-enable Valve Relay Shutdown",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable Valve Relay Shutdown",
+        "1": "Reenable Valve Relay Shutdown"
+       }
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "IB",
+   "routines": [
+    {
+     "rid": 23040,
+     "name": "iBooster执行器测试",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23050,
+     "name": "右侧驻车制动器释放",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23053,
+     "name": "右侧驻车制动器释放",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23062,
+     "name": "装配测试",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23063,
+     "name": "进入PBC维修模式",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23064,
+     "name": "退出PBC维修模式",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23065,
+     "name": "数据复位A",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23066,
+     "name": "数据复位B",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 23067,
+     "name": "出厂复位",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "NA",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "CDS",
+   "routines": []
+  },
+  {
+   "id": "CDS_I",
+   "routines": [
+    {
+     "rid": 65280,
+     "name": "启动擦除内存",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "erase address",
+       "byteStart": 1,
+       "length": 4,
+       "type": "uint"
+      },
+      {
+       "name": "erase size",
+       "byteStart": 5,
+       "length": 4,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1025,
+     "name": "高度传感器标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "左前悬架轮心至轮眉高度",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint"
+      },
+      {
+       "name": "右前悬架轮心至轮眉高度",
+       "byteStart": 2,
+       "length": 2,
+       "type": "uint"
+      },
+      {
+       "name": "左后悬架轮心至轮眉高度",
+       "byteStart": 4,
+       "length": 2,
+       "type": "uint"
+      },
+      {
+       "name": "右后悬架轮心至轮眉高度",
+       "byteStart": 6,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1027,
+     "name": "EOL测试_目标电流设置",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "FL CDC目标电流",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "TCU",
+   "routines": []
+  },
+  {
+   "id": "ACU",
+   "routines": [
+    {
+     "rid": 38912,
+     "name": "IMU标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "开始标定",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "IDCU",
+   "routines": [
+    {
+     "rid": 1889,
+     "name": "IDCU_通讯密钥申请",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 532,
+     "name": "车辆俯仰角和侧倾角标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 533,
+     "name": "显示屏幕触摸轨迹和坐标",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "控制选项",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "1": "开启",
+        "2": "关闭"
+       }
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "AMP",
+   "routines": [
+    {
+     "rid": 57346,
+     "name": "单个扬声器发声测试",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "通道选择",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "CLOSE 关闭",
+        "1": "LSURROUND 左后环绕扬声器",
+        "2": "RSURROUND 右后环绕扬声器",
+        "3": "CENTER  中置音响",
+        "4": "RF_WOOFER  右前低频扬声器",
+        "5": "LF_WOOFER 左前低频扬声器",
+        "6": "RS_SUB 低音扬声器",
+        "7": "IS_SUB 重低音扬声器",
+        "8": "LR_WOOFER 左后低频扬声器",
+        "9": "RR_WOOFER 右后低频扬声器",
+        "A": "RF_MIDDLE 右前中频扬声器",
+        "B": "LF_MIDDLE 左前中频扬声器"
+       }
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 57347,
+     "name": "扬声器循环发声测试",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "间隔控制",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "TBOX",
+   "routines": [
+    {
+     "rid": 1889,
+     "name": "TBOX密钥交换",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "BTM",
+   "routines": []
+  },
+  {
+   "id": "ADCU_MCU",
+   "routines": []
+  },
+  {
+   "id": "ADCU_Soc",
+   "routines": [
+    {
+     "rid": 1540,
+     "name": "前视120度摄像头售后标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1541,
+     "name": "前视64度摄像头售后标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1544,
+     "name": "环视摄像头售后标定",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 1889,
+     "name": "ADCU_通讯密钥申请",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "SRR_FL",
+   "routines": [
+    {
+     "rid": 4621,
+     "name": "静态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 4622,
+     "name": "动态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "SRR_FR",
+   "routines": [
+    {
+     "rid": 4621,
+     "name": "静态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 4622,
+     "name": "动态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "SRR_RL",
+   "routines": [
+    {
+     "rid": 4621,
+     "name": "静态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 4622,
+     "name": "动态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "SRR_RR",
+   "routines": [
+    {
+     "rid": 4621,
+     "name": "静态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 4622,
+     "name": "动态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "MRR_F",
+   "routines": [
+    {
+     "rid": 2608,
+     "name": "静态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 2609,
+     "name": "动态校准",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "MDCU",
+   "routines": [
+    {
+     "rid": 65280,
+     "name": "启动擦除内存",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "擦除地址",
+       "byteStart": 1,
+       "length": 4,
+       "type": "uint"
+      },
+      {
+       "name": "擦除大小",
+       "byteStart": 5,
+       "length": 4,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    },
+    {
+     "rid": 27137,
+     "name": "热管理下线检测",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    },
+    {
+     "rid": 27138,
+     "name": "空调风门下线检测",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "EMS",
+   "routines": []
+  },
+  {
+   "id": "GCU",
+   "routines": [
+    {
+     "rid": 2480,
+     "name": "角标自学习",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "RMC",
+   "routines": []
+  },
+  {
+   "id": "FMC",
+   "routines": []
+  },
+  {
+   "id": "IBS",
+   "routines": []
+  },
+  {
+   "id": "ATC",
+   "routines": []
+  },
+  {
+   "id": "SCU",
+   "routines": [
+    {
+     "rid": 65280,
+     "name": "启动擦除内存",
+     "subFunctions": [
+      "start",
+      "stop",
+      "status"
+     ],
+     "params": [
+      {
+       "name": "erase address",
+       "byteStart": 1,
+       "length": 4,
+       "type": "uint"
+      },
+      {
+       "name": "erase size",
+       "byteStart": 5,
+       "length": 4,
+       "type": "uint"
+      }
+     ],
+     "session": 3
+    }
+   ]
+  },
+  {
+   "id": "BMS",
+   "routines": []
+  },
+  {
+   "id": "PMS",
+   "routines": []
+  }
+ ]
+}

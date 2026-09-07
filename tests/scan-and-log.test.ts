@@ -29,13 +29,14 @@ describe("scanVehicle", () => {
   it("classifies responded, silent and unmapped ECUs and reports progress", async () => {
     const events: ScanEvent[] = [];
     const results = await scanVehicle(fakeSession(), {
-      ecuIds: ["CCU", "BMS", "IBCM"],
+      ecuIds: ["CCU", "BMS", "NOT_IN_CONFIG"],
       concurrency: 2,
       onEvent: (event) => events.push(event),
     });
 
     const byId = new Map(results.map((result) => [result.ecuId, result]));
-    expect(byId.get("CCU")?.status).toBe("unmapped");
+    expect(byId.get("NOT_IN_CONFIG")?.status).toBe("unmapped");
+    expect(byId.get("CCU")?.status).toBe("responded");
     expect(results).toHaveLength(3);
     expect(events[0]).toEqual({ type: "scanStart", total: 3 });
     expect(events.at(-1)).toEqual({ type: "scanDone", total: 3 });

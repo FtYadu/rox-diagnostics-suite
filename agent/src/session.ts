@@ -29,6 +29,12 @@ import {
 /** 3E 80 cadence: S3 is 5 s, so refresh every 2 s. */
 export const TESTER_PRESENT_MS = 2000;
 
+/**
+ * NRCs that must never be retried: securityAccessDenied, invalidKey and the two
+ * attempt-limit codes that lock the ECU until a power cycle (or for good).
+ */
+const LOCKING_NRCS = new Set([0x33, 0x35, 0x36, 0x37]);
+
 export type TraceLine = { id: string; direction: "tx" | "rx" | "info"; text: string; at: string };
 
 let traceCounter = 0;
@@ -200,6 +206,12 @@ export class VehicleSession {
   }
 
   async clearDtcs(ecuId: string, codes?: string[] | null) {
+    // The real car refuses 0x14 in the default session on every ECU that has a level-1 entry.
+    const table = loadConfig().security?.accessTable?.[ecuId];
+    if ((!codes || codes.length === 0) && table && Object.keys(table).length > 0) {
+      const result = await this.clearDtcsAuthorized(ecuId);
+      return { ...result, cleared: result.cleared ? -1 : 0 };
+    }
     if (!codes || codes.length === 0) {
       await this.send(ecuId, request(SID.clearDiagnosticInformation, "FF FF FF"), 10_000);
       return { cleared: -1 };
@@ -212,15 +224,85 @@ export class VehicleSession {
     return { cleared };
   }
 
+  /**
+   * Authorized clear: extended session → security access → 14 FF FF FF → 19 02 read-back →
+   * back to default. 0x33/0x35/0x36/0x37 stop immediately and are never retried, because
+   * 0x36/0x37 lock the ECU out for good.
+   */
+  async clearDtcsAuthorized(
+    ecuId: string,
+    options: { session?: number; level?: number } = {},
+  ): Promise<{
+    ecuId: string;
+    cleared: boolean;
+    remaining: Awaited<ReturnType<VehicleSession["readDtcs"]>>["dtcs"];
+    nrc?: string;
+    message?: string;
+  }> {
+    const level = options.level ?? 1;
+    try {
+      await this.enterSession(ecuId, (options.session ?? 0x03) as 0x01 | 0x02 | 0x03);
+      await this.securityAccess(ecuId, level);
+      await this.send(ecuId, request(SID.clearDiagnosticInformation, "FF FF FF"), 10_000);
+      const readBack = await this.readDtcs(ecuId);
+      return { ecuId, cleared: true, remaining: readBack.dtcs };
+    } catch (error) {
+      if (error instanceof UdsNegativeResponse) {
+        if (LOCKING_NRCS.has(error.nrc)) {
+          this.push(
+            traceLine(
+              "info",
+              `${ecuId} clear refused with ${error.nrcHex} — not retrying (would lock the ECU)`,
+            ),
+          );
+        }
+        return {
+          ecuId,
+          cleared: false,
+          remaining: [],
+          nrc: error.nrcHex,
+          message: error.meaning,
+        };
+      }
+      return { ecuId, cleared: false, remaining: [], message: (error as Error).message };
+    } finally {
+      try {
+        await this.enterSession(ecuId, 0x01);
+      } catch {
+        // The ECU may already have fallen back to default — nothing to do.
+      }
+    }
+  }
+
   async readFreezeFrame(ecuId: string, code: string) {
-    const response = await this.send(
+    const layout = ecuConfig(ecuId).snapshot ?? [];
+    const empty = (unsupported: boolean, nrc?: string) => ({
+      code,
       ecuId,
-      request(SID.readDtcInformation, 0x06, encodeDtc(code), 0xff),
-      this.timing.p2Star,
-    );
+      recordNumber: "0xFF",
+      recordedAt: new Date().toISOString(),
+      entries: [] as Array<{ label: string; value: string; unit: string }>,
+      ...(unsupported ? { unsupported: true as const } : {}),
+      ...(nrc ? { nrc } : {}),
+    });
+
+    let response: Uint8Array;
+    try {
+      response = await this.send(
+        ecuId,
+        request(SID.readDtcInformation, 0x06, encodeDtc(code), 0xff),
+        this.timing.p2Star,
+      );
+    } catch (error) {
+      // 0x12 subFunctionNotSupported / 0x31 requestOutOfRange = this ECU stores no snapshot.
+      if (error instanceof UdsNegativeResponse && (error.nrc === 0x12 || error.nrc === 0x31)) {
+        return empty(true, error.nrcHex);
+      }
+      throw error;
+    }
+
     // 59 06 <3 DTC bytes> <status> <recordNumber> <numberOfIdentifiers> [DID(2) value...]
     const recordNumber = response[6] ?? 0xff;
-    const layout = ecuConfig(ecuId).snapshot ?? [];
     const entries: Array<{ label: string; value: string; unit: string }> = [];
     let index = 8;
     while (index + 2 <= response.length) {
@@ -288,20 +370,30 @@ export class VehicleSession {
    * 27 <requestSeed> / 27 <sendKey> with the canonical ROX level table. The key comes from
    * the licensed seed/key backend — there is no guessed algorithm any more.
    */
-  async securityAccess(ecuId: string, level: number) {
+  async securityAccess(ecuId: string, level: number, saAlg?: number) {
     const config = ecuConfig(ecuId);
     const levels = config.security?.levels;
-    if (levels && levels.length > 0 && !levels.includes(level)) {
+    // The canonical security-access table wins: it lists levels (e.g. 17 immobiliser) that the
+    // per-ECU service list does not advertise but the real car accepts.
+    const inAccessTable =
+      loadConfig().security?.accessTable?.[ecuId]?.[String(level)] !== undefined;
+    if (levels && levels.length > 0 && !levels.includes(level) && !inAccessTable) {
       throw new Error(
         `${ecuId} does not support security level ${level} (supported: ${levels.join(", ")})`,
       );
     }
+
     if (this.unlocked.get(ecuId)?.has(level)) {
       this.push(traceLine("info", `${ecuId} already unlocked at level ${level} in this session`));
       return { ok: true, level };
     }
 
-    const rule = saLevel(level);
+    const cfg = loadConfig();
+    const rule = saLevel(level, {
+      ecuId,
+      accessTable: cfg.security?.accessTable,
+      ...(saAlg === undefined ? {} : { saAlg }),
+    });
     const seedKey = loadConfig().security?.seedKey;
     if (!seedKey) {
       throw new Error(

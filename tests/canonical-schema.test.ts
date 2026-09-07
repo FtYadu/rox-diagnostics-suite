@@ -38,7 +38,7 @@ describe("canonical schema", () => {
       drdbiDids: 1056,
       wdbiDids: 81,
       ioControls: 113,
-      routines: 148,
+      routines: 64,
       processes: 131,
     });
   });

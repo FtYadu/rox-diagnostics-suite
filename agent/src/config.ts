@@ -37,6 +37,18 @@ export const ecuConfigSchema = z.object({
   address: hexString,
   secondaryAddresses: z.array(hexString).optional(),
   bus: z.enum(["DoIP", "CAN", "CANFD"]).optional(),
+  ecuType: z.string().optional(),
+  /** Per-ECU UDS timing from the canonical data; falls back to the global timing. */
+  timing: z
+    .object({
+      p2: z.number().int().positive(),
+      p2Star: z.number().int().positive(),
+      s3: z.number().int().positive(),
+    })
+    .optional(),
+  doip: z
+    .object({ ip: z.string().min(1), port: z.number().int().positive(), gatewayAddress: hexString })
+    .optional(),
   /** Status mask used for 19 02 <mask>; defaults to 0xFF. */
   dtcStatusMask: z.string().optional(),
   /** DID -> label for the Identification tab. */
@@ -49,7 +61,7 @@ export const ecuConfigSchema = z.object({
   routines: z.record(z.string(), z.string()).optional(),
   /** IO control label -> data identifier. */
   ioControls: z.record(z.string(), z.string()).optional(),
-  /** Security levels supported by this ECU (1, 3, 11, 13, 17). */
+  /** Security levels supported by this ECU (1, 3, 5, 9, 17, 19, …). */
   security: z
     .object({
       levels: z.array(z.number().int().nonnegative()).optional(),
@@ -117,6 +129,19 @@ export const agentConfigSchema = z.object({
     .object({
       /** Seed/key backend. The real algorithm is a licensed native library. */
       seedKey: seedKeyConfigSchema.optional(),
+      /** ECU id -> security level -> seed/key algorithm, from the canonical extraction. */
+      accessTable: z
+        .record(z.string(), z.record(z.string(), z.number().int().nonnegative()))
+        .optional(),
+    })
+    .optional(),
+  /** Vehicle DoIP entry point used when discovery finds nothing. */
+  vehicle: z
+    .object({
+      ip: z.string().min(1),
+      port: z.number().int().positive().default(13400),
+      gatewayAddress: hexString.optional(),
+      recommendedTesterIp: z.string().optional(),
     })
     .optional(),
   vehicleStatus: z
