@@ -1,4 +1,4 @@
-# ROX agent protocol (v2)
+# ROX agent protocol (v3)
 
 Transport: a single WebSocket on `ws://127.0.0.1:9097`, one JSON object per message.
 Shared TypeScript types live in `packages/protocol` and are imported by both the agent
@@ -27,8 +27,8 @@ Messages **without** an `id` are unsolicited pushes (status/battery/VCI changes)
 ```json
 {
   "mode": "local",
-  "agentVersion": "0.3.0",
-  "protocolVersion": 2,
+  "agentVersion": "0.4.0",
+  "protocolVersion": 3,
   "dataChecksum": "9f0c…",
   "transport": "doip",
   "vci": { "vciName": "ROX VCI", "vciSerial": "RX-0042", "protocolList": ["DoIP", "CANFD"] },
@@ -65,6 +65,26 @@ The flat `vciName` / `vciSerial` / `protocol` fields are kept for v1 agents.
 | `startProgramming`      | `{ flow, pkg }`                             | `{ ok, message }`                             |
 | `executeStep`           | `{ ecu, process, stepIndex, label, input }` | `StepExecution` (legacy; prefer `runProcess`) |
 
+### New in v3
+
+| Method                 | Params                        | Result                                                  |
+| ---------------------- | ----------------------------- | ------------------------------------------------------- |
+| `autoConnect`          | `{ vin? }`                    | handshake plus `{ vin, softwareBaseline, ecusMapped }`   |
+| `clearDtcsAuthorized`  | `{ ecu, session?, level? }`   | `{ ecuId, cleared, remaining[], nrc?, message? }`        |
+| `clearAllDtcs`         | `{ ecus?, jobId? }`           | `{ results[], cleared, failed }`, streams `clearEcu`     |
+| `verifyRepair`         | `{ before[], jobId? }`        | `{ before, after, resolved[], remaining[], new[], ok }`  |
+
+- `autoConnect` runs ISO 13400 vehicle identification on every IPv4 interface, activates
+  routing, then reads VIN (`F190`) and identification from the CCU gateway `0x001A`. With no
+  adapter in the vehicle's `/24` it fails with the adapter hint instead of a socket error.
+- `clearDtcsAuthorized` performs `10 03` → security access (level from the canonical access
+  table, default 1) → `14 FF FF FF` → `19 02 <mask>` read-back → `10 01`. NRC `0x33`, `0x35`,
+  `0x36` and `0x37` stop the sequence immediately and are **never** retried — `0x36`/`0x37`
+  lock the controller. `clearDtcs` routes through this path whenever the ECU has a level-1
+  entry in the access table.
+- `verifyRepair` re-scans the vehicle; history-only codes are listed separately and do not
+  count towards `remaining`, so `ok` means no current faults are left.
+
 ## Streaming examples
 
 `runProcess` emits one `event` per interpreter step, then a single `result`:
@@ -80,6 +100,8 @@ The flat `vciName` / `vciSerial` / `protocol` fields are kept for v1 agents.
 
 While an `input` event is outstanding the run is paused; answer it with
 `provideInput` (same `runId`) or end it with `abortProcess`.
+
+`clearAllDtcs` emits one `clearEcu` event per responding controller before its aggregate result.
 
 `scanVehicle` emits `scanStart`, one `scanEcu` per controller
 (`responded` | `silent` | `unmapped`), `scanProgress`, then `scanDone`.

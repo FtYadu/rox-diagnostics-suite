@@ -23,8 +23,10 @@ describe("dry run over every seed process", () => {
       const result = await new ProcessInterpreter(null, { dryRun: true }).run(
         canonicalSteps(process),
       );
-      if (!result.ok) failures.push(`${process.name}: ${result.message}`);
-      else if (result.executed > 0) executable += 1;
+      // A `quit` step or a legacy native callback is an expected end, not a broken tree.
+      if (!result.ok && result.endedBy === "error") {
+        failures.push(`${process.name}: ${result.message}`);
+      } else if (result.executed > 0) executable += 1;
       else promptOnly += 1;
     }
 

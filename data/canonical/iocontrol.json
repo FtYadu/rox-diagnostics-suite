@@ -1,0 +1,3222 @@
+{
+ "ecus": [
+  {
+   "id": "CCU",
+   "ioControls": []
+  },
+  {
+   "id": "IBCM",
+   "ioControls": [
+    {
+     "did": 53377,
+     "label": "X3_28_IGN2 relay driver",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rearview mirror expands",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53379,
+     "label": "rear windshield heating_left_right exterior rearview mirror heating resistance drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rear view mirror folded",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53380,
+     "label": "X3_38_ front wiper low speed drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "main driver door lock motor",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53381,
+     "label": "X3_38_ front wiper low speed drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "main door lock",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53382,
+     "label": "X3_40_ reading light gated signal",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "(Unlock)Other three door lock motor +",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53400,
+     "label": "X4_1_ left front capacitor switching power supply",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "left BSD indicator",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53385,
+     "label": "X4_2_ right front capacitor switching power supply",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right BSD indicator",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53386,
+     "label": "X4_16_ Rear door lock driver",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right rear child lock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53387,
+     "label": "X4-17_ Rear door lock unlock driver",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Right rear child lock unlock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53388,
+     "label": "X4_21_ left rear door capacitor switch power supply",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Left rear child lock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53389,
+     "label": "X4_22_ right rear door capacitor switch power supply",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Left rear child lock unlock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53390,
+     "label": "X4_25_ rear wiper drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "a row of voice control reading light signals",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53409,
+     "label": "X4_26_ Fuel filler cover lock drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "two row voice control signal",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53410,
+     "label": "X4_27_ Fuel filler cover lock unlock driver",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "three rows of voice control signals",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53391,
+     "label": "X4_28_ front wiper wash drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "left external rearview mirror turn signal",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53392,
+     "label": "X4_29_ rear wiper wash drive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right external rearview mirror turn signal",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53393,
+     "label": "outside trunk Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "horn driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53394,
+     "label": "right door Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "indoor light output power supply",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53395,
+     "label": "left door Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Danger alarm indicator Background light working indicator",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53396,
+     "label": "In car 2 Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Suitcase light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53398,
+     "label": "In car 3 Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "license plate light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53401,
+     "label": "In car 1 Antenna IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "reverse headlights",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53402,
+     "label": "CAN communication IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "rear fog light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53403,
+     "label": "LIN1 IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Five Door Handle Light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53404,
+     "label": "LIN2 IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "vehicle background light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53405,
+     "label": "LIN3 IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "high brake light",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53407,
+     "label": "Switch Supply  IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "IGN1 Relay driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53408,
+     "label": "IGN2继电器驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "IGN2 relay driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53412,
+     "label": "后风挡玻璃加热/左/右外后视镜加热电阻驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "rear windshield heating",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53415,
+     "label": "前雨刮低速驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "front wiper low speed drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53416,
+     "label": "前雨刮高速驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "front wiper low speed drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53417,
+     "label": "阅读灯门控信号",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "reading light gated signal",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53418,
+     "label": "左前电容开关电源",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "left front capacitor switching power supply",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53419,
+     "label": "右前电容开关电源",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right front capacitor switching power supply",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53421,
+     "label": "尾门锁lock驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rear door lock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53422,
+     "label": "X4-17_尾门锁unlock驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rear door lock unlock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53424,
+     "label": "X4_21_左后门电容开关电源",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "left rear door capacitor switch power supply",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53425,
+     "label": "X4_22_右后门电容开关电源",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right rear door capacitor switch power supply",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53426,
+     "label": "X4_25_后雨刮驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "rear wiper drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53427,
+     "label": "X4_26_加油口盖锁lock驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel filler cover lock drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53428,
+     "label": "X4_27_加油口盖锁unlock驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel filler cover lock unlock driver",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53429,
+     "label": "X4_28_前雨刮洗涤驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "front wiper wash drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53430,
+     "label": "X4_29_后雨刮洗涤驱动",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "rear wiper wash drive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53432,
+     "label": "X5-1&X5-2后备箱室外天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "outside trunk Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53433,
+     "label": "x5-3&x5-4副驾驶侧门板室外天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "right door Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53434,
+     "label": "X5-5&X5--6_主驾驶侧门板室外天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "left door Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53435,
+     "label": "X5-21&X5-22_二排座椅室内天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "in car 2 Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53436,
+     "label": "X5-23&5-24_三排座椅室内天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "in car 3 Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53437,
+     "label": "X5-25&X5-26_Console室内天线控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "in car 1 Antenna IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53439,
+     "label": "X4-38&X4-39_CAN通讯 IO Control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "CAN communication IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53441,
+     "label": "X4-20_LIN1 IO Control（LIN ID=0x14  DLC=8）",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "LIN1 IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53442,
+     "label": "X4-40_LIN2 IO Control（LIN ID=0x24  DLC=8）",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "LIN2 IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53443,
+     "label": "X5-37_LIN3 IO Control（LIN ID=0x24  DLC=8）",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "LIN3 IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    },
+    {
+     "did": 53447,
+     "label": "开关电源IO控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Switch Supply  IO Control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "禁能",
+        "1": "使能"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "AVAS",
+   "ioControls": []
+  },
+  {
+   "id": "WCM_L",
+   "ioControls": []
+  },
+  {
+   "id": "WCM_R",
+   "ioControls": []
+  },
+  {
+   "id": "LHCM",
+   "ioControls": [
+    {
+     "did": 57457,
+     "label": "Light switch control and headlamp height control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Light switch control and headlamp height control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "High beam lamp",
+        "2": "Low beam lamp",
+        "4": "Position lamp",
+        "8": "Daytime running lamp",
+        "10": "Turn  lamp"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "RHCM",
+   "ioControls": [
+    {
+     "did": 57473,
+     "label": "Light switch control and headlamp height control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Light switch control and headlamp height control",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "High beam lamp",
+        "2": "Low beam lamp",
+        "4": "Position lamp",
+        "8": "Daytime running lamp",
+        "10": "Turn  lamp"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TLCM_L",
+   "ioControls": []
+  },
+  {
+   "id": "TLCM_R",
+   "ioControls": []
+  },
+  {
+   "id": "SCM_L",
+   "ioControls": [
+    {
+     "did": 61860,
+     "label": "left Seat motor position control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Left front slide motor forward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "Left front slide motor backward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "2": "Enable"
+       }
+      },
+      {
+       "name": "Left front back motor moves forward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "4": "Enable"
+       }
+      },
+      {
+       "name": "Left front back motor moves backward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "8": "Enable"
+       }
+      },
+      {
+       "name": "Left front Cushion angle motor is turned up",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Disable",
+        "16": "Enable"
+       }
+      },
+      {
+       "name": "Left front Cushion angle motor is turned down",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Disable",
+        "32": "Enable"
+       }
+      },
+      {
+       "name": "Left front high motor is turned up",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Disable",
+        "64": "Enable"
+       }
+      },
+      {
+       "name": "Left front high motor is turned down",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Disable",
+        "128": "Enable"
+       }
+      },
+      {
+       "name": "The second row of left slide motor forward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "256": "Enable"
+       }
+      },
+      {
+       "name": "The second row of left slide motor backward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "512": "Enable"
+       }
+      },
+      {
+       "name": "The second row of left back motor forward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "1024": "Enable"
+       }
+      },
+      {
+       "name": "The second row of left back motor backward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "2048": "Enable"
+       }
+      },
+      {
+       "name": "field",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 4
+      },
+      {
+       "name": "field",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 5
+      },
+      {
+       "name": "field",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 6
+      },
+      {
+       "name": "field",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 7
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SCM_R",
+   "ioControls": [
+    {
+     "did": 61861,
+     "label": "right Seat motor position control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Right front Sliding motor forward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "Right front Sliding motor backward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "2": "Enable"
+       }
+      },
+      {
+       "name": "Right front Back motor forward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "4": "Enable"
+       }
+      },
+      {
+       "name": "Right front Back motor backward",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "8": "Enable"
+       }
+      },
+      {
+       "name": "Right front lift motor is turned up",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Disable",
+        "16": "Enable"
+       }
+      },
+      {
+       "name": "Right front lift motor is turned down",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Disable",
+        "32": "Enable"
+       }
+      },
+      {
+       "name": "Right front cushion motor is turned up",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Disable",
+        "64": "Enable"
+       }
+      },
+      {
+       "name": "Right front cushion motor is turned down",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Disable",
+        "128": "Enable"
+       }
+      },
+      {
+       "name": "The second row of right slide motor forward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "256": "Enable"
+       }
+      },
+      {
+       "name": "The second row of right slide motor backward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "512": "Enable"
+       }
+      },
+      {
+       "name": "The second row of right back motor forward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "1024": "Enable"
+       }
+      },
+      {
+       "name": "The second row of right back motor backward",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "2048": "Enable"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ASCM_RL",
+   "ioControls": [
+    {
+     "did": 61862,
+     "label": "Second row left seat motor position percent control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "二排左滑道电机向前",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "二排左滑道电机向后",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "2": "Enable"
+       }
+      },
+      {
+       "name": "二排左靠背电机向前",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "4": "Enable"
+       }
+      },
+      {
+       "name": "二排左靠背电机向后",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "8": "Enable"
+       }
+      },
+      {
+       "name": "二排左腿托电机向上",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Disable",
+        "16": "Enable"
+       }
+      },
+      {
+       "name": "二排左腿托电机向下",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Disable",
+        "32": "Enable"
+       }
+      },
+      {
+       "name": "二排左座椅角度电机向上",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Disable",
+        "64": "Enable"
+       }
+      },
+      {
+       "name": "二排左座椅角度电机向下",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Disable",
+        "128": "Enable"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ASCM_RR",
+   "ioControls": [
+    {
+     "did": 61863,
+     "label": "Second row right seat motor position percent control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "二排右滑道电机向前",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "二排右滑道电机向后",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Disable",
+        "2": "Enable"
+       }
+      },
+      {
+       "name": "二排右靠背电机向前",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Disable",
+        "4": "Enable"
+       }
+      },
+      {
+       "name": "二排右靠背电机向后",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Disable",
+        "8": "Enable"
+       }
+      },
+      {
+       "name": "二排右腿托电机向上",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Disable",
+        "16": "Enable"
+       }
+      },
+      {
+       "name": "二排右腿托电机向下",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Disable",
+        "32": "Enable"
+       }
+      },
+      {
+       "name": "二排右座椅角度电机向上",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Disable",
+        "64": "Enable"
+       }
+      },
+      {
+       "name": "二排右座椅角度电机向下",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Disable",
+        "128": "Enable"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "EPS_FD",
+   "ioControls": []
+  },
+  {
+   "id": "EPS",
+   "ioControls": []
+  },
+  {
+   "id": "ESC",
+   "ioControls": [
+    {
+     "did": 65440,
+     "label": "ShortTermAdjustment",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Outlet rear right",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Inlet rear right",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Outlet rear left",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Inlet rear left",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Outlet front right",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Inleft front right",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Outlet front left",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Inlet front left",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "ABS lamp",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 7,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Valve Relay Shut Down",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 6,
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "Speed Limit",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 5,
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      },
+      {
+       "name": "Pump Motor",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 4,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "HSV2",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 3,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "HSV1",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "USV2",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "USV1",
+       "byteStart": 1,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 2,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 7
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 2,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 6
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 2,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 5
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 2,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 4
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 2,
+       "length": 1,
+       "type": "uint",
+       "bitStart": 3
+      },
+      {
+       "name": "Pala lamp",
+       "byteStart": 2,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 2,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "ESP lamp",
+       "byteStart": 2,
+       "length": 1,
+       "type": "enum",
+       "bitStart": 1,
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "EBD lamp",
+       "byteStart": 2,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Off",
+        "1": "On"
+       }
+      },
+      {
+       "name": "Reserve",
+       "byteStart": 3,
+       "length": 1,
+       "type": "uint"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "IB",
+   "ioControls": []
+  },
+  {
+   "id": "CDS",
+   "ioControls": [
+    {
+     "did": 41952,
+     "label": "电磁阀电流控制",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "前左电磁阀目标电流设定",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "mA"
+      },
+      {
+       "name": "前右电磁阀目标电流设定",
+       "byteStart": 2,
+       "length": 2,
+       "type": "uint",
+       "unit": "mA"
+      },
+      {
+       "name": "后左电磁阀目标电流设定",
+       "byteStart": 4,
+       "length": 2,
+       "type": "uint",
+       "unit": "mA"
+      },
+      {
+       "name": "后右电磁阀目标电流设定",
+       "byteStart": 6,
+       "length": 2,
+       "type": "uint",
+       "unit": "mA"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "CDS_I",
+   "ioControls": []
+  },
+  {
+   "id": "TCU",
+   "ioControls": []
+  },
+  {
+   "id": "ACU",
+   "ioControls": []
+  },
+  {
+   "id": "IDCU",
+   "ioControls": []
+  },
+  {
+   "id": "AMP",
+   "ioControls": []
+  },
+  {
+   "id": "TBOX",
+   "ioControls": []
+  },
+  {
+   "id": "BTM",
+   "ioControls": []
+  },
+  {
+   "id": "ADCU_MCU",
+   "ioControls": []
+  },
+  {
+   "id": "ADCU_Soc",
+   "ioControls": []
+  },
+  {
+   "id": "SRR_FL",
+   "ioControls": []
+  },
+  {
+   "id": "SRR_FR",
+   "ioControls": []
+  },
+  {
+   "id": "SRR_RL",
+   "ioControls": []
+  },
+  {
+   "id": "SRR_RR",
+   "ioControls": []
+  },
+  {
+   "id": "MRR_F",
+   "ioControls": []
+  },
+  {
+   "id": "MDCU",
+   "ioControls": [
+    {
+     "did": 1991,
+     "label": "HVStatusControl",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "HVStatusControl",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "no request HV",
+        "1": "request HV"
+       }
+      }
+     ]
+    },
+    {
+     "did": 54861,
+     "label": "Heater Pump PWM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Heater Pump PWM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54862,
+     "label": "Battery Pump PWM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Battery Pump PWM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54863,
+     "label": "Edrv Pump PWM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Edrv Pump PWM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54869,
+     "label": "Left Fan PWM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Left Fan PWM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54870,
+     "label": "Right Fan PWM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Right Fan PWM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54940,
+     "label": "Battery Valve Request Position",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Battery Valve Request Position",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54941,
+     "label": "Engine Valve Request Position",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Engine Valve Request Position",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54942,
+     "label": "FourWay Valve Request Position",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "FourWay Valve Request Position",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "pct",
+       "factor": 0.1
+      }
+     ]
+    },
+    {
+     "did": 54943,
+     "label": "Battery Valve Control Enable",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Battery Valve Control Enable",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Not enabled",
+        "1": "Enable"
+       }
+      }
+     ]
+    },
+    {
+     "did": 54944,
+     "label": "Engine Valve Control Enable",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Engine Valve Control Enable",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Not enabled",
+        "1": "Enable"
+       }
+      }
+     ]
+    },
+    {
+     "did": 54945,
+     "label": "FourWay Valve Control Enable",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "FourWay Valve Control Enable",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "Not enabled",
+        "1": "Enable"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "EMS",
+   "ioControls": [
+    {
+     "did": 8208,
+     "label": "Malfunction Indicator Lights",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "MIL Lights",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "MIL OFF",
+        "1": "MIL ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8209,
+     "label": "Canister Purge",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Canister Purge Desired Duty Cycle",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8210,
+     "label": "Fuel Pump",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel Pump",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "FPR OFF",
+        "1": "FPR ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8211,
+     "label": "Fan Low",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fan Low",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "FAN OFF",
+        "1": "FAN  ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8212,
+     "label": "Fan High",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fan High",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "FAN OFF",
+        "1": "FAN  ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8213,
+     "label": "AC Compressor",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "AC Compressor",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "AC Relay OFF",
+        "1": "AC Relay ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8219,
+     "label": "Controller ShutDown Logic",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Controller ShutDown Logic",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "40": "Immed Force IGN OFF",
+        "80": "IGN OFF after Key OFF"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8227,
+     "label": "Spark Advance",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Spark Advance_Retard",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "degrees"
+      },
+      {
+       "name": "Spark Advance_Retard",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "degrees"
+      }
+     ]
+    },
+    {
+     "did": 8241,
+     "label": "Canister Vent",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Canister Vent",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "Canister Vent OFF"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8242,
+     "label": "Fuel Injector Disable",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel Injector Disable",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "1": "Cylinder_1 OFF",
+        "2": "Cylinder_2 OFF",
+        "3": "Cylinder_3 OFF",
+        "4": "Cylinder_4 OFF"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8245,
+     "label": "BLM Learn Disable",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "BLM Learn Disable",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "停止学习功能关闭",
+        "1": "停止学习功能激活开启"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8247,
+     "label": "Fuel Open Loop",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel Open Loop",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "Disable Open Loop"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8236,
+     "label": "TEC Learn _Crankshaft Adaptive",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "TEC Learn _Crankshaft Adaptive",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "Disable TEC Learn",
+        "1": "Begin TEC Learn"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8249,
+     "label": "Fuel Gauge",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Fuel Gauge Reading",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8250,
+     "label": "Tachometer",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Tachometer Position",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "rpm",
+       "factor": 30
+      }
+     ]
+    },
+    {
+     "did": 8256,
+     "label": "BLM Reset",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "BLM Reset",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "FF": "Reset Learned BLM‘s"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8258,
+     "label": "Idle Cat Mon",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Idle Cat Mon",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "FF": "Force ICMD",
+        "0": "Disable ICMD"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8261,
+     "label": "EOL Check Enable Command for STT",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "EOL Check Enable Command for STT",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "Disable Command",
+        "1": "Enable Command"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8272,
+     "label": "O2 Response",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "O2 Response",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "255": "Force O2 response diagnostics",
+        "0": "Disable O2 response diagnostics"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8275,
+     "label": "O2 Heater Front",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Duty cycle slew",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8276,
+     "label": "O2 Heater Rear",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Duty cycle slew",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8281,
+     "label": "EVPD EOL",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "EVPD EOL",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "OFF",
+        "1": "ON"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8290,
+     "label": "TPS Min Learn Algorithm Reset",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "TPS Min Learn Algorithm Reset",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "FF": "Enable Learn Algorithm"
+       }
+      }
+     ]
+    },
+    {
+     "did": 8293,
+     "label": "CAM Phaser Intake",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Position slew",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "degrees"
+      }
+     ]
+    },
+    {
+     "did": 8294,
+     "label": "CAM Phaser Intake Oil Control Valve",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Duty Cycle",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8295,
+     "label": "CAM Phaser exhaust",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Position slew",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "degrees",
+       "factor": -1
+      }
+     ]
+    },
+    {
+     "did": 8296,
+     "label": "CAM Phaser Exhaust Oil Control Valve",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Duty Cycle",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "did": 8323,
+     "label": "Desired Idle RPM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Set Desired Idle RPM",
+       "byteStart": 0,
+       "length": 1,
+       "type": "uint",
+       "unit": "rpm",
+       "factor": 12.5
+      }
+     ]
+    },
+    {
+     "did": 8324,
+     "label": "Desired High Idle RPM",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Set Desired Idle RPM",
+       "byteStart": 0,
+       "length": 2,
+       "type": "uint",
+       "unit": "rpm",
+       "factor": 0.15625
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "GCU",
+   "ioControls": []
+  },
+  {
+   "id": "RMC",
+   "ioControls": []
+  },
+  {
+   "id": "FMC",
+   "ioControls": []
+  },
+  {
+   "id": "IBS",
+   "ioControls": []
+  },
+  {
+   "id": "ATC",
+   "ioControls": [
+    {
+     "did": 25431,
+     "label": "CMPR_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "CMPR_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25432,
+     "label": "EXV_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "EXV_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25433,
+     "label": "Front_Blower_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Front_Blower_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25440,
+     "label": "Front_Mode_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Front_Mode_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25441,
+     "label": "Recirc_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Recirc_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25442,
+     "label": "Rear_Blower_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rear_Blower_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25443,
+     "label": "APTC_Check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "APTC_Check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    },
+    {
+     "did": 25444,
+     "label": "Rear_Mode_check",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Rear_Mode_check",
+       "byteStart": 0,
+       "length": 1,
+       "type": "enum",
+       "enum": {
+        "0": "not_request",
+        "1": "request"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SCU",
+   "ioControls": []
+  },
+  {
+   "id": "BMS",
+   "ioControls": [
+    {
+     "did": 61569,
+     "label": "relay control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "relay control",
+       "byteStart": 0,
+       "length": 2,
+       "type": "enum",
+       "unit": "N/A",
+       "enum": {
+        "0": "Disable",
+        "2": "Main positive relay control",
+        "1": "Main negative relay control",
+        "4": "Preloaded relay control",
+        "8": "Fast charge relay control"
+       }
+      }
+     ]
+    },
+    {
+     "did": 61570,
+     "label": "Insulation control",
+     "options": [
+      "freeze",
+      "returnControl",
+      "shortTermAdjust"
+     ],
+     "params": [
+      {
+       "name": "Insulation control",
+       "byteStart": 0,
+       "length": 2,
+       "type": "enum",
+       "unit": "NA",
+       "enum": {
+        "0": "Disable",
+        "1": "Enable"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PMS",
+   "ioControls": []
+  }
+ ]
+}

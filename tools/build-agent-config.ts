@@ -44,7 +44,7 @@ const signalFromDid = (did: Did) => ({
 });
 
 const signalFromLayout = (field: SignalLayout) => ({
-  did: didHex(field.byteStart),
+  did: didHex(field.did ?? field.byteStart),
   label: field.name,
   ...(field.unit ? { unit: field.unit } : {}),
   length: field.length,
@@ -66,6 +66,9 @@ const main = () => {
     );
   }
 
+  const doip = set.ecus.vehicle.doip;
+  const timing = ecus[0]?.timing ?? { p2: 150, p2Star: 5000, s3: 5000 };
+
   const config = {
     comment:
       "GENERATED FILE — do not edit by hand. Produced by tools/build-agent-config.ts from data/canonical. Run `npm run build:agent-config` after re-extracting the legacy data.",
@@ -75,7 +78,27 @@ const main = () => {
       sourceAddress: hexWord(set.addresses.testerAddress),
       functionalAddress: hexWord(set.addresses.functionalAddress || FUNCTIONAL_ADDRESS),
     },
-    timing: { p2: 100, p2Star: 5000, s3: 5000 },
+    ...(doip
+      ? {
+          vehicle: {
+            ip: doip.vehicleIp,
+            port: doip.port,
+            gatewayAddress: hexWord(doip.gatewayAddress),
+            ...(doip.recommendedTesterIp ? { recommendedTesterIp: doip.recommendedTesterIp } : {}),
+          },
+        }
+      : {}),
+    timing,
+    security: {
+      /** ROX_SeedKey.dll is 32-bit, so the key is computed in a 32-bit Python sidecar. */
+      seedKey: {
+        backend: "sidecar",
+        command: "py",
+        args: ["-3-32", "agent/sidecar/rox_seedkey_sidecar.py"],
+      },
+      /** ECU -> level -> seed/key algorithm, straight from the canonical extraction. */
+      accessTable: set.ecus.vehicle.securityAccessTable ?? {},
+    },
     ecus: Object.fromEntries(
       ecus.map((ecu) => [
         ecu.id,
@@ -83,6 +106,17 @@ const main = () => {
           address: hexWord(ecu.address),
           secondaryAddresses: ecu.secondaryAddresses.map(hexWord),
           bus: ecu.bus,
+          ...(ecu.ecuType ? { ecuType: ecu.ecuType } : {}),
+          ...(ecu.timing ? { timing: ecu.timing } : {}),
+          ...(ecu.doip
+            ? {
+                doip: {
+                  ip: ecu.doip.ip,
+                  port: ecu.doip.port,
+                  gatewayAddress: hexWord(ecu.doip.gatewayAddress),
+                },
+              }
+            : {}),
           dtcStatusMask: `0x${(ecu.dtcStatusMask ?? 0xff).toString(16).toUpperCase().padStart(2, "0")}`,
           identification: ecu.identDids.map(signalFromDid),
           liveData: ecu.liveDids.map(signalFromDid),

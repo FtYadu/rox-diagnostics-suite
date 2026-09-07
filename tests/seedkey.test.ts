@@ -9,18 +9,25 @@ describe("security access level table", () => {
     expect(saLevel(3)).toMatchObject({ requestSeed: 0x03, sendKey: 0x04 });
     expect(saLevel(11)).toMatchObject({ requestSeed: 0x0b, sendKey: 0x0c });
     expect(saLevel(13)).toMatchObject({ requestSeed: 0x0d, sendKey: 0x0e });
-    expect(saLevel(17)).toMatchObject({ requestSeed: 0x11, sendKey: 0x12, alg: 9 });
+    expect(saLevel(17)).toMatchObject({ requestSeed: 0x11, sendKey: 0x12, alg: 11 });
+    expect(saLevel(7)).toMatchObject({ requestSeed: 0x07, sendKey: 0x08 });
+    expect(saLevel(19)).toMatchObject({ requestSeed: 0x13, sendKey: 0x14 });
   });
 
-  it("uses algorithm 9 only for the programming level", () => {
-    for (const [level, rule] of Object.entries(SA_LEVELS)) {
-      if (Number(level) === 17) expect(rule.alg).toBe(9);
-      else expect(rule.alg).not.toBe(9);
-    }
+  it("derives requestSeed/sendKey for a level that is not in the table", () => {
+    expect(saLevel(0x21)).toMatchObject({ requestSeed: 0x21, sendKey: 0x22, alg: 1 });
   });
 
-  it("rejects an unsupported level instead of guessing", () => {
-    expect(() => saLevel(5)).toThrow(SeedKeyError);
+  it("takes the algorithm from the canonical access table, then the step, then 1", () => {
+    const accessTable = { IBCM: { "17": 11, "1": 5 } };
+    expect(saLevel(17, { ecuId: "IBCM", accessTable }).alg).toBe(11);
+    expect(saLevel(1, { ecuId: "IBCM", accessTable }).alg).toBe(5);
+    expect(saLevel(1, { ecuId: "CCU", accessTable, saAlg: 7 }).alg).toBe(7);
+    expect(saLevel(3, { ecuId: "CCU", accessTable }).alg).toBe(1);
+  });
+
+  it("rejects an even level instead of guessing", () => {
+    expect(() => saLevel(2)).toThrow(SeedKeyError);
   });
 });
 

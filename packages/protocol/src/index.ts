@@ -6,7 +6,7 @@
  * See agent/PROTOCOL.md for the documented methods and examples.
  */
 
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 export type BusKind = "DoIP" | "CAN" | "CANFD" | "ISO15765";
 
@@ -46,11 +46,16 @@ export type AgentMethod =
   | "provideInput"
   | "abortProcess"
   | "scanVehicle"
-  | "getJobLog";
+  | "getJobLog"
+  /* protocol v3 */
+  | "autoConnect"
+  | "clearDtcsAuthorized"
+  | "clearAllDtcs"
+  | "verifyRepair";
 
 /* ------------------------------------------------------------------ connect */
 
-/** Reply to `connect` / `status`. Protocol v2 adds the version handshake fields. */
+/** Reply to `connect` / `status`. Protocol v2 adds the version handshake fields; v3 adds autoConnect. */
 export type ConnectReply = {
   mode: "local";
   agentVersion: string;

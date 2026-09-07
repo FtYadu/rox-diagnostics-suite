@@ -30,7 +30,7 @@ export type LocalBridgeEvent =
   { type: "status"; info: ConnectionInfo } | { type: "disconnected"; reason: string };
 
 /** Protocol version this app build speaks; the agent reports its own in `connect`. */
-export const APP_PROTOCOL_VERSION = 2;
+export const APP_PROTOCOL_VERSION = 3;
 
 /**
  * A version or data mismatch is a warning, never a block: the technician still needs to

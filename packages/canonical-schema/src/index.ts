@@ -37,6 +37,8 @@ export const signalLayoutSchema = z.object({
   length: z.number().int().positive(),
   type: valueTypeSchema,
   unit: z.string().optional(),
+  /** DID this field belongs to — needed to decode a 19 06 snapshot record. */
+  did: z.number().int().min(0).max(0xffff).optional(),
   ...scaling,
 });
 export type SignalLayout = z.infer<typeof signalLayoutSchema>;
@@ -100,6 +102,22 @@ export type Dtc = z.infer<typeof dtcSchema>;
 
 /* ------------------------------------------------------------------ ecu */
 
+/** Per-ECU UDS timing, taken from the canonical extraction (P2 / P2* / S3, ms). */
+export const ecuTimingSchema = z.object({
+  p2: z.number().int().positive(),
+  p2Star: z.number().int().positive(),
+  s3: z.number().int().positive(),
+});
+export type EcuTiming = z.infer<typeof ecuTimingSchema>;
+
+/** DoIP entry point for an ECU: the vehicle's IP plus the gateway that routes to it. */
+export const ecuDoipSchema = z.object({
+  ip: z.string().min(1),
+  port: z.number().int().positive(),
+  gatewayAddress: z.number().int().min(0).max(0xffff),
+});
+export type EcuDoip = z.infer<typeof ecuDoipSchema>;
+
 export const ecuSchema = z.object({
   id: z.string().min(1),
   fullName: z.string().min(1),
@@ -118,6 +136,10 @@ export const ecuSchema = z.object({
   dtcs: z.array(dtcSchema).default([]),
   snapshotLayout: z.array(signalLayoutSchema).default([]),
   dtcStatusMask: z.number().int().min(0).max(0xff).optional(),
+  timing: ecuTimingSchema.optional(),
+  doip: ecuDoipSchema.optional(),
+  /** Legacy classification, e.g. "Soc", "MCU". */
+  ecuType: z.string().min(1).optional(),
 });
 export type Ecu = z.infer<typeof ecuSchema>;
 
@@ -145,9 +167,22 @@ export const ecuServiceStepSchema = z.object({
   negativeExit: z.string().optional(),
   session: sessionSchema.optional(),
   saLevel: z.number().int().nonnegative().optional(),
+  /** Seed/key algorithm the legacy tool used for `saLevel` on this step. */
+  saAlg: z.number().int().nonnegative().optional(),
   storeAs: z.string().optional(),
 });
 export type EcuServiceStep = z.infer<typeof ecuServiceStepSchema>;
+
+export const securityAccessStepSchema = z.object({
+  kind: z.literal("securityAccess"),
+  ...stepBase,
+  ecuId: z.string().min(1),
+  level: z.number().int().positive(),
+  alg: z.number().int().nonnegative(),
+  session: sessionSchema,
+  negativeExit: z.string().optional(),
+});
+export type SecurityAccessStep = z.infer<typeof securityAccessStepSchema>;
 
 export const outputStepSchema = z.object({
   kind: z.literal("output"),
@@ -164,6 +199,8 @@ export const inputStepSchema = z.object({
   inputType: z.enum(["text", "number", "choice", "vin", "confirm"]),
   variable: z.string().min(1),
   options: z.array(z.string()).optional(),
+  /** Machine values matching `options`, in the same order. */
+  optionValues: z.array(z.string()).optional(),
   unit: z.string().optional(),
   min: z.number().optional(),
   max: z.number().optional(),
@@ -182,13 +219,56 @@ export const setVarStepSchema = z.object({
   ...stepBase,
   variable: z.string().min(1),
   value: z.union([z.string(), z.number(), z.boolean()]),
+  /** When true, `value` is an arithmetic expression over other variables. */
+  expression: z.boolean().optional(),
 });
 export type SetVarStep = z.infer<typeof setVarStepSchema>;
 
+/** Ends the run; `error: true` means the legacy tool treated it as a failure. */
+export const quitStepSchema = z.object({
+  kind: z.literal("quit"),
+  ...stepBase,
+  error: z.boolean(),
+  text: z.string().min(1),
+});
+export type QuitStep = z.infer<typeof quitStepSchema>;
+
+/** Legacy native callback into a Windows DLL — never executed by this agent. */
+export const dllCallbackStepSchema = z.object({
+  kind: z.literal("dllCallback"),
+  ...stepBase,
+  function: z.string().min(1),
+  dll: z.string().optional(),
+  variables: z.array(z.string()).default([]),
+});
+export type DllCallbackStep = z.infer<typeof dllCallbackStepSchema>;
+
+/** Flash/programming operation; gated behind the agent's programming flag. */
+export const programmingStepSchema = z.object({
+  kind: z.literal("programming"),
+  ...stepBase,
+  op: z.string().min(1),
+  attrs: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).default({}),
+});
+export type ProgrammingStep = z.infer<typeof programmingStepSchema>;
+
+export const comparatorSchema = z.enum(["eq", "neq", "lt", "lte", "gt", "gte", "contains"]);
+
 export const conditionSchema = z.object({
   left: z.string().min(1),
-  comparator: z.enum(["eq", "neq", "lt", "lte", "gt", "gte", "contains"]),
+  comparator: comparatorSchema,
   right: z.union([z.string(), z.number(), z.boolean()]),
+  /** AND/OR chain appended to the primary comparison, evaluated left to right. */
+  extra: z
+    .array(
+      z.object({
+        connect: z.enum(["AND", "OR"]),
+        left: z.string().min(1),
+        comparator: comparatorSchema,
+        right: z.union([z.string(), z.number(), z.boolean()]),
+      }),
+    )
+    .optional(),
 });
 export type Condition = z.infer<typeof conditionSchema>;
 
@@ -201,7 +281,28 @@ export type IfStep = {
   else?: ProcessStep[] | undefined;
 };
 
-export type ProcessStep = EcuServiceStep | OutputStep | InputStep | IfStep | DelayStep | SetVarStep;
+export type LoopStep = {
+  kind: "loop";
+  id?: string | undefined;
+  label?: string | undefined;
+  /** Re-evaluated before every iteration; absent means "repeat until maxIterations". */
+  while?: Condition | undefined;
+  maxIterations: number;
+  steps: ProcessStep[];
+};
+
+export type ProcessStep =
+  | EcuServiceStep
+  | SecurityAccessStep
+  | OutputStep
+  | InputStep
+  | IfStep
+  | LoopStep
+  | DelayStep
+  | SetVarStep
+  | QuitStep
+  | DllCallbackStep
+  | ProgrammingStep;
 
 export const ifStepSchema: z.ZodType<IfStep> = z.lazy(() =>
   z.object({
@@ -213,16 +314,31 @@ export const ifStepSchema: z.ZodType<IfStep> = z.lazy(() =>
   }),
 );
 
+export const loopStepSchema: z.ZodType<LoopStep> = z.lazy(() =>
+  z.object({
+    kind: z.literal("loop"),
+    ...stepBase,
+    while: conditionSchema.optional(),
+    maxIterations: z.number().int().positive(),
+    steps: z.array(processStepSchema),
+  }),
+);
+
 export const processStepSchema: z.ZodType<ProcessStep> = z.lazy(() =>
   z
     .discriminatedUnion("kind", [
       ecuServiceStepSchema,
+      securityAccessStepSchema,
       outputStepSchema,
       inputStepSchema,
       delayStepSchema,
       setVarStepSchema,
+      quitStepSchema,
+      dllCallbackStepSchema,
+      programmingStepSchema,
     ])
-    .or(ifStepSchema),
+    .or(ifStepSchema)
+    .or(loopStepSchema),
 ) as z.ZodType<ProcessStep>;
 
 export const processCategorySchema = z.enum([
@@ -234,6 +350,14 @@ export const processCategorySchema = z.enum([
   "Service",
 ]);
 
+export const processVariableSchema = z.object({
+  name: z.string().min(1),
+  type: z.enum(["uint", "int", "string", "bool", "array"]),
+  initial: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  description: z.string().optional(),
+});
+export type ProcessVariable = z.infer<typeof processVariableSchema>;
+
 export const serviceProcessSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -241,7 +365,14 @@ export const serviceProcessSchema = z.object({
   category: processCategorySchema,
   udsServices: z.array(z.string()).default([]),
   securityLevel: z.number().int().nonnegative().default(0),
+  /** Seed/key algorithm the legacy process declared for `securityLevel`. */
+  securityAlg: z.number().int().nonnegative().optional(),
   requiresVin: z.boolean().optional(),
+  description: z.string().optional(),
+  variables: z.array(processVariableSchema).default([]),
+  market: z.enum(["Oversea", "China"]).optional(),
+  /** Legacy XML this process was converted from. */
+  sourceFile: z.string().optional(),
   steps: z.array(processStepSchema).default([]),
 });
 export type ServiceProcess = z.infer<typeof serviceProcessSchema>;
@@ -254,6 +385,15 @@ export const programmingFlowSchema = z.object({
   type: z.string().min(1),
   ecus: z.array(z.string()).default([]),
   phases: z.array(z.string()).default([]),
+  sourceFile: z.string().optional(),
+  /** Encrypted legacy flows cannot be executed; they are listed for reference only. */
+  encrypted: z.boolean().optional(),
+  version: z.union([z.string(), z.number()]).optional(),
+  flowVersion: z.union([z.string(), z.number()]).optional(),
+  programmingLevelSAAlg: z.number().int().nonnegative().optional(),
+  extendLevelSAAlg: z.number().int().nonnegative().optional(),
+  blockLength: z.number().int().positive().optional(),
+  crc: z.union([z.string(), z.boolean()]).optional(),
 });
 export type ProgrammingFlow = z.infer<typeof programmingFlowSchema>;
 
@@ -277,12 +417,30 @@ export const menuNodeSchema: z.ZodType<MenuNode> = z.lazy(() =>
 
 /* ------------------------------------------------------------------ files */
 
+/** Vehicle-level DoIP entry point: where the tester connects and which gateway routes. */
+export const vehicleDoipSchema = z.object({
+  vehicleIp: z.string().min(1),
+  port: z.number().int().positive(),
+  testerAddress: z.number().int().min(0).max(0xffff),
+  functionalAddress: z.number().int().min(0).max(0xffff),
+  gatewayAddress: z.number().int().min(0).max(0xffff),
+  recommendedTesterIp: z.string().optional(),
+});
+export type VehicleDoip = z.infer<typeof vehicleDoipSchema>;
+
 export const vehicleMetaSchema = z.object({
   name: z.string().min(1),
   code: z.string().min(1),
   vinExample: z.string().optional(),
   bus: z.string().optional(),
+  doip: vehicleDoipSchema.optional(),
+  /** ECU id -> security level -> seed/key algorithm, harvested from the process XMLs. */
+  securityAccessTable: z
+    .record(z.string(), z.record(z.string(), z.number().int().nonnegative()))
+    .optional(),
+  markets: z.record(z.string(), z.string()).optional(),
 });
+export type VehicleMeta = z.infer<typeof vehicleMetaSchema>;
 
 export const ecusFileSchema = z.object({
   vehicle: vehicleMetaSchema,
@@ -399,6 +557,6 @@ export const EXPECTED_COUNTS = {
   drdbiDids: 1056,
   wdbiDids: 81,
   ioControls: 113,
-  routines: 148,
+  routines: 64,
   processes: 131,
 } as const;

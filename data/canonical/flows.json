@@ -1,0 +1,134 @@
+{
+ "flows": [
+  {
+   "id": "bms__rox-ems-reflash-flow-0-98",
+   "name": "ROX_MCU_Refresh_Flow",
+   "type": "Programming",
+   "ecus": [
+    "BMS"
+   ],
+   "phases": [
+    "Security access (level 3, ProgrammingLevel)",
+    "Download module 2",
+    "Download module 3",
+    "Download module 4",
+    "Download module 5",
+    "Download module 6",
+    "Download module 7",
+    "Download module 8",
+    "Download module 9",
+    "Download module 10",
+    "Download module 11"
+   ],
+   "sourceFile": "R11_Oversea/BMS/Programming/ROX_EMS_Reflash_Flow 0.98.xml",
+   "version": "0.8",
+   "flowVersion": "01",
+   "programmingLevelSAAlg": 9,
+   "extendLevelSAAlg": 1,
+   "blockLength": 255,
+   "crc": true
+  },
+  {
+   "id": "ems__rox-ems-reflash-flow-0-98",
+   "name": "ROX_MCU_Refresh_Flow",
+   "type": "Programming",
+   "ecus": [
+    "EMS"
+   ],
+   "phases": [
+    "Security access (level 3, ProgrammingLevel)",
+    "Download module 2",
+    "Download module 3",
+    "Download module 4",
+    "Download module 5",
+    "Download module 6",
+    "Download module 7",
+    "Download module 8",
+    "Download module 9",
+    "Download module 10",
+    "Download module 11"
+   ],
+   "sourceFile": "R11_Oversea/EMS/Programming/ROX_EMS_Reflash_Flow 0.98.xml",
+   "version": "0.8",
+   "flowVersion": "01",
+   "programmingLevelSAAlg": 9,
+   "extendLevelSAAlg": 1,
+   "blockLength": 255,
+   "crc": true
+  },
+  {
+   "id": "tbox__rox-tbox-unconscious-reflash-flow-0-57",
+   "name": "ROX_Unconscious_Refresh_Flow",
+   "type": "Programming",
+   "ecus": [
+    "TBOX"
+   ],
+   "phases": [
+    "Security access (level 3, ProgrammingLevel)",
+    "Download module 1",
+    "Security access (level 3, ProgrammingLevel)"
+   ],
+   "sourceFile": "R11_Oversea/TBOX/Programming/ROX_TBOX_Unconscious_Reflash_Flow 0.57.xml",
+   "version": "0.45",
+   "flowVersion": "01",
+   "programmingLevelSAAlg": 9,
+   "extendLevelSAAlg": 1,
+   "blockLength": 255,
+   "crc": true
+  },
+  {
+   "id": "r11-rox-mcu-reflash-flow-0-98-2",
+   "name": "ROX_MCU_Reflash_Flow 0.98 (2)",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11/MCU_Programming/ROX_MCU_Reflash_Flow 0.98 (2).xml",
+   "encrypted": true
+  },
+  {
+   "id": "r11-rox-unconscious-reflash-flow-0-56",
+   "name": "ROX_Unconscious_Reflash_Flow 0.56",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11/MPU_Programming/ROX_Unconscious_Reflash_Flow 0.56.xml",
+   "encrypted": true
+  },
+  {
+   "id": "r11en-rox-adcu-mcu-reflash-flow-0-98",
+   "name": "ROX_ADCU_MCU_Reflash_Flow 0.98",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11EN/MCU_Programming/ROX_ADCU_MCU_Reflash_Flow 0.98.xml",
+   "encrypted": true
+  },
+  {
+   "id": "r11en-rox-unconscious-reflash-flow-0-56-7",
+   "name": "ROX_Unconscious_Reflash_Flow 0.56 (7)",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11EN/MPU_Programming/ROX_Unconscious_Reflash_Flow 0.56 (7).xml",
+   "encrypted": true
+  },
+  {
+   "id": "r11h-rox-mcu-reflash-flow-0-98",
+   "name": "ROX_MCU_Reflash_Flow 0.98",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11h/MCU_Programming/ROX_MCU_Reflash_Flow 0.98.xml",
+   "encrypted": true
+  },
+  {
+   "id": "r11h-rox-unconscious-reflash-flow-0-56",
+   "name": "ROX_Unconscious_Reflash_Flow 0.56",
+   "type": "Programming (encrypted)",
+   "ecus": [],
+   "phases": [],
+   "sourceFile": "LKWorkspace/Vehicle_Flow/R11h/MPU_Programming/ROX_Unconscious_Reflash_Flow 0.56.xml",
+   "encrypted": true
+  }
+ ]
+}

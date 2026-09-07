@@ -1,0 +1,1170 @@
+{
+ "root": [
+  {
+   "id": "menu-1",
+   "label": "工程诊断",
+   "children": [
+    {
+     "id": "menu-22",
+     "label": "参数设置"
+    },
+    {
+     "id": "menu-23",
+     "label": "诊断服务"
+    },
+    {
+     "id": "menu-24",
+     "label": "物流数据"
+    },
+    {
+     "id": "menu-25",
+     "label": "故障码查询"
+    },
+    {
+     "id": "menu-26",
+     "label": "实时显示"
+    },
+    {
+     "id": "menu-27",
+     "label": "输入输出控制"
+    },
+    {
+     "id": "menu-28",
+     "label": "例程控制"
+    },
+    {
+     "id": "menu-29",
+     "label": "特殊流程"
+    },
+    {
+     "id": "menu-30",
+     "label": "控制器升级"
+    }
+   ]
+  },
+  {
+   "id": "menu-4",
+   "label": "诊断仪",
+   "children": [
+    {
+     "id": "menu-47",
+     "label": "诊断服务"
+    },
+    {
+     "id": "menu-48",
+     "label": "物流数据"
+    },
+    {
+     "id": "menu-49",
+     "label": "故障码查询"
+    },
+    {
+     "id": "menu-50",
+     "label": "实时显示"
+    },
+    {
+     "id": "menu-51",
+     "label": "输入输出控制"
+    },
+    {
+     "id": "menu-52",
+     "label": "例程控制"
+    },
+    {
+     "id": "menu-53",
+     "label": "特殊流程"
+    },
+    {
+     "id": "menu-54",
+     "label": "控制器升级"
+    }
+   ]
+  },
+  {
+   "id": "menu-ecus",
+   "label": "Service functions by ECU",
+   "children": [
+    {
+     "id": "menu-ecu-ACU",
+     "label": "ACU",
+     "ecuId": "ACU",
+     "children": [
+      {
+       "id": "menu-acu__acu-write-vin",
+       "label": "ACU VIN Writing Process",
+       "ecuId": "ACU",
+       "processId": "acu__acu-write-vin"
+      },
+      {
+       "id": "menu-acu__acu-reset",
+       "label": "R11_ACU_RESET",
+       "ecuId": "ACU",
+       "processId": "acu__acu-reset"
+      },
+      {
+       "id": "menu-acu__imu-calibration",
+       "label": "IMU Calibration",
+       "ecuId": "ACU",
+       "processId": "acu__imu-calibration"
+      },
+      {
+       "id": "menu-acu__write-config-word",
+       "label": "ACU Write Config Word",
+       "ecuId": "ACU",
+       "processId": "acu__write-config-word"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ADCU",
+     "label": "ADCU",
+     "ecuId": "ADCU",
+     "children": [
+      {
+       "id": "menu-adcu__ecu-reset",
+       "label": "ECU reset",
+       "ecuId": "ADCU",
+       "processId": "adcu__ecu-reset"
+      },
+      {
+       "id": "menu-adcu__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "ADCU",
+       "processId": "adcu__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ADCU_MCU",
+     "label": "ADCU_MCU",
+     "ecuId": "ADCU_MCU",
+     "children": [
+      {
+       "id": "menu-adcu_mcu__ecu-reset",
+       "label": "ECU_Reset",
+       "ecuId": "ADCU_MCU",
+       "processId": "adcu_mcu__ecu-reset"
+      },
+      {
+       "id": "menu-adcu_mcu__write-vin-process",
+       "label": "VIN Writing",
+       "ecuId": "ADCU_MCU",
+       "processId": "adcu_mcu__write-vin-process"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ADCU_Soc",
+     "label": "ADCU_Soc",
+     "ecuId": "ADCU_Soc",
+     "children": [
+      {
+       "id": "menu-adcu_soc__dynamic-calibration-of-surround-view-cameras",
+       "label": "Dynamic calibration of surround-view cameras",
+       "ecuId": "ADCU_Soc",
+       "processId": "adcu_soc__dynamic-calibration-of-surround-view-cameras"
+      },
+      {
+       "id": "menu-adcu_soc__ecu-reset",
+       "label": "ECU reset",
+       "ecuId": "ADCU_Soc",
+       "processId": "adcu_soc__ecu-reset"
+      },
+      {
+       "id": "menu-adcu_soc__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "ADCU_Soc",
+       "processId": "adcu_soc__write-vin"
+      },
+      {
+       "id": "menu-adcu_soc__calibration-of-the-front-64-camera",
+       "label": "calibration of the front-64 camera",
+       "ecuId": "ADCU_Soc",
+       "processId": "adcu_soc__calibration-of-the-front-64-camera"
+      },
+      {
+       "id": "menu-adcu_soc__calibration-of-the-front-view-120-camera",
+       "label": "calibration of the front-view 120 camera",
+       "ecuId": "ADCU_Soc",
+       "processId": "adcu_soc__calibration-of-the-front-view-120-camera"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-AMP",
+     "label": "AMP",
+     "ecuId": "AMP",
+     "children": [
+      {
+       "id": "menu-amp__amp-reset",
+       "label": "AMP_Reset",
+       "ecuId": "AMP",
+       "processId": "amp__amp-reset"
+      },
+      {
+       "id": "menu-amp__single-speaker-sound-test",
+       "label": "Single speaker sound test",
+       "ecuId": "AMP",
+       "processId": "amp__single-speaker-sound-test"
+      },
+      {
+       "id": "menu-amp__speaker-cycle-sound-test",
+       "label": "Speaker cycle sound test",
+       "ecuId": "AMP",
+       "processId": "amp__speaker-cycle-sound-test"
+      },
+      {
+       "id": "menu-amp__write-vin",
+       "label": "VIN Writing Process",
+       "ecuId": "AMP",
+       "processId": "amp__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ASCM_RL",
+     "label": "ASCM_RL",
+     "ecuId": "ASCM_RL",
+     "children": [
+      {
+       "id": "menu-ascm_rl__ascm-rl-learning",
+       "label": "ASCM_RL Seat learning",
+       "ecuId": "ASCM_RL",
+       "processId": "ascm_rl__ascm-rl-learning"
+      },
+      {
+       "id": "menu-ascm_rl__ascm-rl-reset",
+       "label": "\\ASCM_RL_RESET",
+       "ecuId": "ASCM_RL",
+       "processId": "ascm_rl__ascm-rl-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ASCM_RR",
+     "label": "ASCM_RR",
+     "ecuId": "ASCM_RR",
+     "children": [
+      {
+       "id": "menu-ascm_rr__ascm-rr-learning",
+       "label": "ASCM_RR Seat learning",
+       "ecuId": "ASCM_RR",
+       "processId": "ascm_rr__ascm-rr-learning"
+      },
+      {
+       "id": "menu-ascm_rr__ascm-rr-reset",
+       "label": "\\ASCM_RR_RESET",
+       "ecuId": "ASCM_RR",
+       "processId": "ascm_rr__ascm-rr-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ATC",
+     "label": "ATC",
+     "ecuId": "ATC",
+     "children": [
+      {
+       "id": "menu-atc__atc-compressor-check",
+       "label": "Compressor Check",
+       "ecuId": "ATC",
+       "processId": "atc__atc-compressor-check"
+      },
+      {
+       "id": "menu-atc__atc-reset",
+       "label": "ECU_Reset",
+       "ecuId": "ATC",
+       "processId": "atc__atc-reset"
+      },
+      {
+       "id": "menu-atc__circulation-damper-motor-inspection",
+       "label": "Circulation Damper Motor Inspection",
+       "ecuId": "ATC",
+       "processId": "atc__circulation-damper-motor-inspection"
+      },
+      {
+       "id": "menu-atc__electronic-expansion-valve-check",
+       "label": "Electronic Expansion Valve Check",
+       "ecuId": "ATC",
+       "processId": "atc__electronic-expansion-valve-check"
+      },
+      {
+       "id": "menu-atc__front-blower-inspection",
+       "label": "Front Blower Inspection",
+       "ecuId": "ATC",
+       "processId": "atc__front-blower-inspection"
+      },
+      {
+       "id": "menu-atc__front-mode-damper-motor-check",
+       "label": "Front Mode Damper Motor Check",
+       "ecuId": "ATC",
+       "processId": "atc__front-mode-damper-motor-check"
+      },
+      {
+       "id": "menu-atc__write-vin-process",
+       "label": "VIN Writing Process",
+       "ecuId": "ATC",
+       "processId": "atc__write-vin-process"
+      },
+      {
+       "id": "menu-atc__rear-mode-damper-motor-check",
+       "label": "rear mode damper motor check",
+       "ecuId": "ATC",
+       "processId": "atc__rear-mode-damper-motor-check"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-AVAS",
+     "label": "AVAS",
+     "ecuId": "AVAS",
+     "children": [
+      {
+       "id": "menu-avas__avas-reset",
+       "label": "AVAS reset",
+       "ecuId": "AVAS",
+       "processId": "avas__avas-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-BMS",
+     "label": "BMS",
+     "ecuId": "BMS",
+     "children": [
+      {
+       "id": "menu-bms__bms-write-vin-process",
+       "label": "VIN Writing Process",
+       "ecuId": "BMS",
+       "processId": "bms__bms-write-vin-process"
+      },
+      {
+       "id": "menu-bms__bms-reset",
+       "label": "R11_BMS_RESET",
+       "ecuId": "BMS",
+       "processId": "bms__bms-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-BTM",
+     "label": "BTM",
+     "ecuId": "BTM",
+     "children": [
+      {
+       "id": "menu-btm__btm-reset",
+       "label": "BTM_Reset",
+       "ecuId": "BTM",
+       "processId": "btm__btm-reset"
+      },
+      {
+       "id": "menu-btm__immo-security-constant-writing",
+       "label": "BTM write IMMO Config",
+       "ecuId": "BTM",
+       "processId": "btm__immo-security-constant-writing"
+      },
+      {
+       "id": "menu-btm__sk-brush-write",
+       "label": "BTM SK write",
+       "ecuId": "BTM",
+       "processId": "btm__sk-brush-write"
+      },
+      {
+       "id": "menu-btm__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "BTM",
+       "processId": "btm__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-CCU",
+     "label": "CCU",
+     "ecuId": "CCU",
+     "children": [
+      {
+       "id": "menu-ccu__ccu-writes-baseline-information",
+       "label": "CCU writes baseline information",
+       "ecuId": "CCU",
+       "processId": "ccu__ccu-writes-baseline-information"
+      },
+      {
+       "id": "menu-ccu__ccu-immo-security-constant-writing",
+       "label": "write IMMO",
+       "ecuId": "CCU",
+       "processId": "ccu__ccu-immo-security-constant-writing"
+      },
+      {
+       "id": "menu-ccu__ccu-reset",
+       "label": "CCU_RESET",
+       "ecuId": "CCU",
+       "processId": "ccu__ccu-reset"
+      },
+      {
+       "id": "menu-ccu__sk-brush-write",
+       "label": "Write SK",
+       "ecuId": "CCU",
+       "processId": "ccu__sk-brush-write"
+      },
+      {
+       "id": "menu-ccu__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "CCU",
+       "processId": "ccu__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-CDS",
+     "label": "CDS",
+     "ecuId": "CDS",
+     "children": [
+      {
+       "id": "menu-cds__ecu-reset",
+       "label": "CDS_Reset",
+       "ecuId": "CDS",
+       "processId": "cds__ecu-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-EMS",
+     "label": "EMS",
+     "ecuId": "EMS",
+     "children": [
+      {
+       "id": "menu-ems__ems-learning-dental-and-storage",
+       "label": "EMS Learning Dental",
+       "ecuId": "EMS",
+       "processId": "ems__ems-learning-dental-and-storage"
+      },
+      {
+       "id": "menu-ems__ems-write-vin-process",
+       "label": "VIN Writing",
+       "ecuId": "EMS",
+       "processId": "ems__ems-write-vin-process"
+      },
+      {
+       "id": "menu-ems__ems-reset",
+       "label": "EMS_Reset",
+       "ecuId": "EMS",
+       "processId": "ems__ems-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-EPS",
+     "label": "EPS",
+     "ecuId": "EPS",
+     "children": [
+      {
+       "id": "menu-eps__eps-sas-calibration",
+       "label": "SAS Calibration",
+       "ecuId": "EPS",
+       "processId": "eps__eps-sas-calibration"
+      },
+      {
+       "id": "menu-eps__eps-reset",
+       "label": "EPS_Reset",
+       "ecuId": "EPS",
+       "processId": "eps__eps-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-EPS_FD",
+     "label": "EPS_FD",
+     "ecuId": "EPS_FD",
+     "children": [
+      {
+       "id": "menu-eps_fd__eps-fd-reset",
+       "label": "ECU_Reset",
+       "ecuId": "EPS_FD",
+       "processId": "eps_fd__eps-fd-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-ESC",
+     "label": "ESC",
+     "ecuId": "ESC",
+     "children": [
+      {
+       "id": "menu-esc__enters-pcb-maintenance-mode",
+       "label": "Enters PCB maintenance mode",
+       "ecuId": "ESC",
+       "processId": "esc__enters-pcb-maintenance-mode"
+      },
+      {
+       "id": "menu-esc__exits-pcb-maintenance-mode",
+       "label": "Exits PCB maintenance mode",
+       "ecuId": "ESC",
+       "processId": "esc__exits-pcb-maintenance-mode"
+      },
+      {
+       "id": "menu-esc__imu-calibration",
+       "label": "IMU Calibration",
+       "ecuId": "ESC",
+       "processId": "esc__imu-calibration"
+      },
+      {
+       "id": "menu-esc__left-brake-clamping-process",
+       "label": "Left brake clamping process",
+       "ecuId": "ESC",
+       "processId": "esc__left-brake-clamping-process"
+      },
+      {
+       "id": "menu-esc__left-brake-release-process",
+       "label": "Left brake release process",
+       "ecuId": "ESC",
+       "processId": "esc__left-brake-release-process"
+      },
+      {
+       "id": "menu-esc__repair-bleeding",
+       "label": "Repair Bleeding",
+       "ecuId": "ESC",
+       "processId": "esc__repair-bleeding"
+      },
+      {
+       "id": "menu-esc__reset",
+       "label": "ESC_Reset",
+       "ecuId": "ESC",
+       "processId": "esc__reset"
+      },
+      {
+       "id": "menu-esc__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "ESC",
+       "processId": "esc__write-vin"
+      },
+      {
+       "id": "menu-esc__abpmi-calibration",
+       "label": "Calibration",
+       "ecuId": "ESC",
+       "processId": "esc__abpmi-calibration"
+      },
+      {
+       "id": "menu-esc__china-clear-esc-dtc__china",
+       "label": "China - Clear ESC DTC (Authorized)",
+       "ecuId": "ESC",
+       "processId": "esc__china-clear-esc-dtc__china"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-FMC",
+     "label": "FMC",
+     "ecuId": "FMC",
+     "children": [
+      {
+       "id": "menu-fmc__alternator-angular-index-calibration",
+       "label": "Alternator Angular Index Calibration",
+       "ecuId": "FMC",
+       "processId": "fmc__alternator-angular-index-calibration"
+      },
+      {
+       "id": "menu-fmc__ecu-reset",
+       "label": "FMC_Reset",
+       "ecuId": "FMC",
+       "processId": "fmc__ecu-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-GCU",
+     "label": "GCU",
+     "ecuId": "GCU",
+     "children": [
+      {
+       "id": "menu-gcu__alternator-angular-index-calibration",
+       "label": "Alternator Angular Index Calibration",
+       "ecuId": "GCU",
+       "processId": "gcu__alternator-angular-index-calibration"
+      },
+      {
+       "id": "menu-gcu__gcu-reset",
+       "label": "ECU Reset",
+       "ecuId": "GCU",
+       "processId": "gcu__gcu-reset"
+      },
+      {
+       "id": "menu-gcu__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "GCU",
+       "processId": "gcu__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-IB",
+     "label": "IB",
+     "ecuId": "IB",
+     "children": [
+      {
+       "id": "menu-ib__ecu-reset",
+       "label": "ECU_Reset",
+       "ecuId": "IB",
+       "processId": "ib__ecu-reset"
+      },
+      {
+       "id": "menu-ib__enter-maintenance-mode",
+       "label": "Enter maintenance mode",
+       "ecuId": "IB",
+       "processId": "ib__enter-maintenance-mode"
+      },
+      {
+       "id": "menu-ib__exiting-maintenance-mode",
+       "label": "Exiting maintenance mode",
+       "ecuId": "IB",
+       "processId": "ib__exiting-maintenance-mode"
+      },
+      {
+       "id": "menu-ib__right-brake-clamping",
+       "label": "right brake clamping",
+       "ecuId": "IB",
+       "processId": "ib__right-brake-clamping"
+      },
+      {
+       "id": "menu-ib__right-brake-release",
+       "label": "Right brake release",
+       "ecuId": "IB",
+       "processId": "ib__right-brake-release"
+      },
+      {
+       "id": "menu-ib__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "IB",
+       "processId": "ib__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-IBCM",
+     "label": "IBCM",
+     "ecuId": "IBCM",
+     "children": [
+      {
+       "id": "menu-ibcm__ecu-reset",
+       "label": "ECU_RESET",
+       "ecuId": "IBCM",
+       "processId": "ibcm__ecu-reset"
+      },
+      {
+       "id": "menu-ibcm__immo-security-constant-writing",
+       "label": "1",
+       "ecuId": "IBCM",
+       "processId": "ibcm__immo-security-constant-writing"
+      },
+      {
+       "id": "menu-ibcm__sk-brush-write",
+       "label": "wrtie SK",
+       "ecuId": "IBCM",
+       "processId": "ibcm__sk-brush-write"
+      },
+      {
+       "id": "menu-ibcm__sunroof-shade-self-learning",
+       "label": "Sunroof Shade Self-Learning",
+       "ecuId": "IBCM",
+       "processId": "ibcm__sunroof-shade-self-learning"
+      },
+      {
+       "id": "menu-ibcm__tpms-tire-pressure-matching",
+       "label": "TPMS tire pressure matching",
+       "ecuId": "IBCM",
+       "processId": "ibcm__tpms-tire-pressure-matching"
+      },
+      {
+       "id": "menu-ibcm__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "IBCM",
+       "processId": "ibcm__write-vin"
+      },
+      {
+       "id": "menu-ibcm__write-configword",
+       "label": "ACU Write Config Word",
+       "ecuId": "IBCM",
+       "processId": "ibcm__write-configword"
+      },
+      {
+       "id": "menu-ibcm__adds-new-key",
+       "label": "adds new key",
+       "ecuId": "IBCM",
+       "processId": "ibcm__adds-new-key"
+      },
+      {
+       "id": "menu-ibcm__deleting-keys",
+       "label": "deleting keys",
+       "ecuId": "IBCM",
+       "processId": "ibcm__deleting-keys"
+      },
+      {
+       "id": "menu-ibcm__windows-learning",
+       "label": "Window learning",
+       "ecuId": "IBCM",
+       "processId": "ibcm__windows-learning"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-IBS",
+     "label": "IBS",
+     "ecuId": "IBS",
+     "children": [
+      {
+       "id": "menu-ibs__ibs-reset",
+       "label": "IBS_Reset",
+       "ecuId": "IBS",
+       "processId": "ibs__ibs-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-IDCU",
+     "label": "IDCU",
+     "ecuId": "IDCU",
+     "children": [
+      {
+       "id": "menu-idcu__calibration-of-vehicle-pitch-and-roll-angles",
+       "label": "Calibration of vehicle pitch and roll angles",
+       "ecuId": "IDCU",
+       "processId": "idcu__calibration-of-vehicle-pitch-and-roll-angles"
+      },
+      {
+       "id": "menu-idcu__idcu-reset",
+       "label": "IDCU_RESET",
+       "ecuId": "IDCU",
+       "processId": "idcu__idcu-reset"
+      },
+      {
+       "id": "menu-idcu__reset-all-maintenance-intervals",
+       "label": "Reset All maintenance intervals",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-all-maintenance-intervals"
+      },
+      {
+       "id": "menu-idcu__reset-the-brake-fluid",
+       "label": "Reset the Brake fluid",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-brake-fluid"
+      },
+      {
+       "id": "menu-idcu__reset-the-coolant",
+       "label": "Reset the Coolant",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-coolant"
+      },
+      {
+       "id": "menu-idcu__reset-the-spark-plug",
+       "label": "Reset the Spark plug",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-spark-plug"
+      },
+      {
+       "id": "menu-idcu__reset-the-air-conditioning-filter",
+       "label": "Reset the air conditioning filter",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-air-conditioning-filter"
+      },
+      {
+       "id": "menu-idcu__reset-the-air-filter",
+       "label": "Reset the air filter",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-air-filter"
+      },
+      {
+       "id": "menu-idcu__reset-the-engine-oil-and-fiter",
+       "label": "Reset the engine oil and fiter",
+       "ecuId": "IDCU",
+       "processId": "idcu__reset-the-engine-oil-and-fiter"
+      },
+      {
+       "id": "menu-idcu__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "IDCU",
+       "processId": "idcu__write-vin"
+      },
+      {
+       "id": "menu-idcu__touch-screen-test",
+       "label": "touch screen test",
+       "ecuId": "IDCU",
+       "processId": "idcu__touch-screen-test"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-LHCM",
+     "label": "LHCM",
+     "ecuId": "LHCM",
+     "children": [
+      {
+       "id": "menu-lhcm__lhcm-reset",
+       "label": "LHCM_Reset",
+       "ecuId": "LHCM",
+       "processId": "lhcm__lhcm-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-MDCU",
+     "label": "MDCU",
+     "ecuId": "MDCU",
+     "children": [
+      {
+       "id": "menu-mdcu__ecu-reset",
+       "label": "MDCU_RESET",
+       "ecuId": "MDCU",
+       "processId": "mdcu__ecu-reset"
+      },
+      {
+       "id": "menu-mdcu__immo-security-constant-writing",
+       "label": "Write IMMO",
+       "ecuId": "MDCU",
+       "processId": "mdcu__immo-security-constant-writing"
+      },
+      {
+       "id": "menu-mdcu__sk-brush-write",
+       "label": "MDCU write SK",
+       "ecuId": "MDCU",
+       "processId": "mdcu__sk-brush-write"
+      },
+      {
+       "id": "menu-mdcu__write-config-word",
+       "label": "ACU Write Config Word",
+       "ecuId": "MDCU",
+       "processId": "mdcu__write-config-word"
+      },
+      {
+       "id": "menu-mdcu__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "MDCU",
+       "processId": "mdcu__write-vin"
+      },
+      {
+       "id": "menu-mdcu__water-pump-drive",
+       "label": "water Pump Drive",
+       "ecuId": "MDCU",
+       "processId": "mdcu__water-pump-drive"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-MRR_F",
+     "label": "MRR_F",
+     "ecuId": "MRR_F",
+     "children": [
+      {
+       "id": "menu-mrr_f__ecu-reset",
+       "label": "ESC_Reset",
+       "ecuId": "MRR_F",
+       "processId": "mrr_f__ecu-reset"
+      },
+      {
+       "id": "menu-mrr_f__midd-front-millimeter-wave-radar-calibration",
+       "label": "Midd Front Millimeter-wave radar calibration",
+       "ecuId": "MRR_F",
+       "processId": "mrr_f__midd-front-millimeter-wave-radar-calibration"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-PMS",
+     "label": "PMS",
+     "ecuId": "PMS",
+     "children": [
+      {
+       "id": "menu-pms__ecu-reset",
+       "label": "ECU_RESET",
+       "ecuId": "PMS",
+       "processId": "pms__ecu-reset"
+      },
+      {
+       "id": "menu-pms__write-config-word",
+       "label": "ACU Write Config Word",
+       "ecuId": "PMS",
+       "processId": "pms__write-config-word"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-RHCM",
+     "label": "RHCM",
+     "ecuId": "RHCM",
+     "children": [
+      {
+       "id": "menu-rhcm__rhcm-reset",
+       "label": "RHCM_Reset",
+       "ecuId": "RHCM",
+       "processId": "rhcm__rhcm-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-RMC",
+     "label": "RMC",
+     "ecuId": "RMC",
+     "children": [
+      {
+       "id": "menu-rmc__alternator-angular-index-calibration",
+       "label": "Alternator Angular Index Calibration",
+       "ecuId": "RMC",
+       "processId": "rmc__alternator-angular-index-calibration"
+      },
+      {
+       "id": "menu-rmc__ecu-reset",
+       "label": "RMC_Reset",
+       "ecuId": "RMC",
+       "processId": "rmc__ecu-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SCM_L",
+     "label": "SCM_L",
+     "ecuId": "SCM_L",
+     "children": [
+      {
+       "id": "menu-scm_l__scm-l-high-seat-learn",
+       "label": "SCM_L high seat learning",
+       "ecuId": "SCM_L",
+       "processId": "scm_l__scm-l-high-seat-learn"
+      },
+      {
+       "id": "menu-scm_l__scm-l-low-seat-learn",
+       "label": "SCM_L low seat learn",
+       "ecuId": "SCM_L",
+       "processId": "scm_l__scm-l-low-seat-learn"
+      },
+      {
+       "id": "menu-scm_l__scm-l-reset",
+       "label": "SCM_L_重置$$SCM_L_Reset",
+       "ecuId": "SCM_L",
+       "processId": "scm_l__scm-l-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SCM_R",
+     "label": "SCM_R",
+     "ecuId": "SCM_R",
+     "children": [
+      {
+       "id": "menu-scm_r__scm-r-high-seat-learn",
+       "label": "SCM_R High seat learn",
+       "ecuId": "SCM_R",
+       "processId": "scm_r__scm-r-high-seat-learn"
+      },
+      {
+       "id": "menu-scm_r__scm-r-low-seat-learn",
+       "label": "SCM_R Low seat learn",
+       "ecuId": "SCM_R",
+       "processId": "scm_r__scm-r-low-seat-learn"
+      },
+      {
+       "id": "menu-scm_r__scm-r-reset",
+       "label": "SCM_R_重置$$SCM_R_Reset",
+       "ecuId": "SCM_R",
+       "processId": "scm_r__scm-r-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SCU",
+     "label": "SCU",
+     "ecuId": "SCU",
+     "children": [
+      {
+       "id": "menu-scu__scu-reset",
+       "label": "SCU_Reset",
+       "ecuId": "SCU",
+       "processId": "scu__scu-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SRR_FL",
+     "label": "SRR_FL",
+     "ecuId": "SRR_FL",
+     "children": [
+      {
+       "id": "menu-srr_fl__ecu-reset",
+       "label": "ESC_Reset",
+       "ecuId": "SRR_FL",
+       "processId": "srr_fl__ecu-reset"
+      },
+      {
+       "id": "menu-srr_fl__front-left-millimeter-wave-radar-calibration",
+       "label": "Front Left Millimeter-wave radar calibration",
+       "ecuId": "SRR_FL",
+       "processId": "srr_fl__front-left-millimeter-wave-radar-calibration"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SRR_FR",
+     "label": "SRR_FR",
+     "ecuId": "SRR_FR",
+     "children": [
+      {
+       "id": "menu-srr_fr__ecu-reset",
+       "label": "ESC_Reset",
+       "ecuId": "SRR_FR",
+       "processId": "srr_fr__ecu-reset"
+      },
+      {
+       "id": "menu-srr_fr__front-right-millimeter-wave-radar-calibration",
+       "label": "Front Right Millimeter-wave radar calibration",
+       "ecuId": "SRR_FR",
+       "processId": "srr_fr__front-right-millimeter-wave-radar-calibration"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SRR_RL",
+     "label": "SRR_RL",
+     "ecuId": "SRR_RL",
+     "children": [
+      {
+       "id": "menu-srr_rl__ecu-reset",
+       "label": "ESC_Reset",
+       "ecuId": "SRR_RL",
+       "processId": "srr_rl__ecu-reset"
+      },
+      {
+       "id": "menu-srr_rl__rear-left-millimeter-wave-radar-calibration",
+       "label": "Rear left Millimeter-wave radar calibration",
+       "ecuId": "SRR_RL",
+       "processId": "srr_rl__rear-left-millimeter-wave-radar-calibration"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-SRR_RR",
+     "label": "SRR_RR",
+     "ecuId": "SRR_RR",
+     "children": [
+      {
+       "id": "menu-srr_rr__ecu-reset",
+       "label": "ESC_Reset",
+       "ecuId": "SRR_RR",
+       "processId": "srr_rr__ecu-reset"
+      },
+      {
+       "id": "menu-srr_rr__rear-right-millimeter-wave-radar-calibration",
+       "label": "Rear Right Millimeter-wave radar calibration",
+       "ecuId": "SRR_RR",
+       "processId": "srr_rr__rear-right-millimeter-wave-radar-calibration"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-TBOX",
+     "label": "TBOX",
+     "ecuId": "TBOX",
+     "children": [
+      {
+       "id": "menu-tbox__sk-brush-write",
+       "label": "TBOX write SK",
+       "ecuId": "TBOX",
+       "processId": "tbox__sk-brush-write"
+      },
+      {
+       "id": "menu-tbox__tbox-reset",
+       "label": "TBOX_RESET",
+       "ecuId": "TBOX",
+       "processId": "tbox__tbox-reset"
+      },
+      {
+       "id": "menu-tbox__write-immo",
+       "label": "TBOX IMMO write",
+       "ecuId": "TBOX",
+       "processId": "tbox__write-immo"
+      },
+      {
+       "id": "menu-tbox__write-vin",
+       "label": "VIN Writing",
+       "ecuId": "TBOX",
+       "processId": "tbox__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-TCU",
+     "label": "TCU",
+     "ecuId": "TCU",
+     "children": [
+      {
+       "id": "menu-tcu__tcu-reset",
+       "label": "R11_TCU_RESET",
+       "ecuId": "TCU",
+       "processId": "tcu__tcu-reset"
+      },
+      {
+       "id": "menu-tcu__write-config",
+       "label": "ACU Write Config Word",
+       "ecuId": "TCU",
+       "processId": "tcu__write-config"
+      },
+      {
+       "id": "menu-tcu__write-vin",
+       "label": "TCU VIN Writing",
+       "ecuId": "TCU",
+       "processId": "tcu__write-vin"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-TLCM_L",
+     "label": "TLCM_L",
+     "ecuId": "TLCM_L",
+     "children": [
+      {
+       "id": "menu-tlcm_l__tlcm-l-reset",
+       "label": "TLCM_L_Reset",
+       "ecuId": "TLCM_L",
+       "processId": "tlcm_l__tlcm-l-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-TLCM_R",
+     "label": "TLCM_R",
+     "ecuId": "TLCM_R",
+     "children": [
+      {
+       "id": "menu-tlcm_r__tlcm-r-reset",
+       "label": "TLCM_R_Reset",
+       "ecuId": "TLCM_R",
+       "processId": "tlcm_r__tlcm-r-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-WCM_L",
+     "label": "WCM_L",
+     "ecuId": "WCM_L",
+     "children": [
+      {
+       "id": "menu-wcm_l__wcm-l-reset",
+       "label": "WCM_L Reset",
+       "ecuId": "WCM_L",
+       "processId": "wcm_l__wcm-l-reset"
+      }
+     ]
+    },
+    {
+     "id": "menu-ecu-WCM_R",
+     "label": "WCM_R",
+     "ecuId": "WCM_R",
+     "children": [
+      {
+       "id": "menu-wcm_r__wcm-r-reset",
+       "label": "WCM_R Reset",
+       "ecuId": "WCM_R",
+       "processId": "wcm_r__wcm-r-reset"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
