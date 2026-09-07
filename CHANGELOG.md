@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Stage 1 — real-car support (canonical bundle, protocol v3)
+
+#### Added
+
+- **Canonical extraction ingested.** `data/canonical/*` from the legacy dealer tool, with
+  `tools/extract_canonical.py` and the 32-bit seed/key sidecar kept in the repo. Seed and
+  agent config regenerate to 42 ECUs, 589 RDBI / 1056 DRDBI / 81 WDBI DIDs, 113 IO controls,
+  64 routines and 131 processes, sharing one `dataChecksum`.
+- **Schema growth.** `securityAccess`, `loop`, `quit`, `dllCallback` and `programming` step
+  kinds, `setVar` expressions, condition chains, per-ECU timing/DoIP/type, vehicle DoIP and
+  security-access table.
+- **New agent methods** (protocol v3): `autoConnect`, `clearDtcsAuthorized`, `clearAllDtcs`
+  and `verifyRepair`.
+
+#### Changed
+
+- Security access levels and algorithms now come from canonical data (never hard-coded), the
+  seed/key sidecar is the default backend, and the `dll` backend calls the real
+  `GenerateKeyExOpt` export.
+- Discovery broadcasts on every IPv4 interface, matches the job VIN, falls back to a TCP
+  probe of `192.168.0.100:13400` and explains the missing `192.168.0.x` adapter.
+- Freeze frames tolerate NRC `0x12`/`0x31` as "unsupported", missing DTC responses no longer
+  abort a scan, and authorized clears never retry a locking NRC.
+
 ## [0.4.1] — 2026-09-04
 
 ### Batch 3b — cloud persistence, offline replay, translations

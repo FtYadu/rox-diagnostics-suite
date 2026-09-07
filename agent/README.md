@@ -42,25 +42,39 @@ crashes at import time. Install it with `npm install koffi` on the workshop PC.
 ## Security access (seed & key)
 
 The real algorithm ships as a licensed native `ROX_SeedKey.dll` that is **not** in this
-repository. Point the agent at your copy:
+repository. That DLL is a **32-bit** library exporting only
+`GenerateKeyExOpt(seed, seedLen, level, variant, options, key, maxKeyLen, &actualKeyLen)`,
+so a 64-bit agent cannot load it directly. The default backend therefore reaches it through
+the bundled 32-bit Python sidecar, with `ROX_SEEDKEY_DLL` pointing at the DLL:
 
 ```json
 {
   "security": {
-    "seedKey": { "backend": "dll", "dllPath": "C:/ROX/ROX_SeedKey.dll", "exportName": "ComputeKey" }
+    "seedKey": {
+      "backend": "sidecar",
+      "command": "py",
+      "args": ["-3-32", "agent/sidecar/rox_seedkey_sidecar.py"]
+    }
   }
 }
 ```
 
-Or run it out of process (any language, keeps the DLL out of the agent):
+The `dll` backend calls the same `GenerateKeyExOpt` export in-process and works **only with a
+64-bit build of the DLL**:
 
 ```json
-{ "security": { "seedKey": { "backend": "sidecar", "command": "python", "args": ["seedkey.py"] } } }
+{
+  "security": {
+    "seedKey": { "backend": "dll", "dllPath": "C:/ROX/ROX_SeedKey.dll", "exportName": "GenerateKeyExOpt" }
+  }
+}
 ```
 
 The sidecar reads `level seedHex alg` on stdin and writes `keyHex` to stdout.
-Level → sub-function pairs are fixed: 1→(01,02), 3→(03,04), 11→(0B,0C), 13→(0D,0E),
-programming→(11,12); algorithm 0/1 for extended levels, 9 for programming.
+Sub-functions are derived from the level itself — request seed = `level`, send key =
+`level + 1` for any odd level (1, 3, 5, 7, 9, 11, 13, 17, 19). The algorithm comes from the
+canonical `securityAccessTable[ecuId][level]`, falling back to a step's `saAlg`, then 1.
+The agent never guesses a key.
 
 ## Job logs
 
