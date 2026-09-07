@@ -1,7 +1,4 @@
-import {
-  processStepSchema,
-  type ProcessStep,
-} from "../../packages/canonical-schema/src/index.ts";
+import { processStepSchema, type ProcessStep } from "../../packages/canonical-schema/src/index.ts";
 import { loadCatalog } from "./config.ts";
 
 export type SeedProcess = {

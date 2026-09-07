@@ -84,9 +84,7 @@ const main = () => {
             ip: doip.vehicleIp,
             port: doip.port,
             gatewayAddress: hexWord(doip.gatewayAddress),
-            ...(doip.recommendedTesterIp
-              ? { recommendedTesterIp: doip.recommendedTesterIp }
-              : {}),
+            ...(doip.recommendedTesterIp ? { recommendedTesterIp: doip.recommendedTesterIp } : {}),
           },
         }
       : {}),

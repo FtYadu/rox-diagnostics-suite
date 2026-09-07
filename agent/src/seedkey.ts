@@ -71,9 +71,7 @@ export const saLevel = (level: number, lookup: SaLookup = {}): SaLevelRule => {
     );
   }
   const known = SA_LEVELS[level];
-  const fromTable = lookup.ecuId
-    ? lookup.accessTable?.[lookup.ecuId]?.[String(level)]
-    : undefined;
+  const fromTable = lookup.ecuId ? lookup.accessTable?.[lookup.ecuId]?.[String(level)] : undefined;
   const alg = fromTable ?? lookup.saAlg ?? known?.alg ?? 1;
   return { requestSeed: known?.requestSeed ?? level, sendKey: known?.sendKey ?? level + 1, alg };
 };

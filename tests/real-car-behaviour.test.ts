@@ -39,7 +39,9 @@ afterAll(() => {
 });
 
 /** Minimal transport that answers from a script of request-prefix -> response pairs. */
-const scriptedTransport = (script: Array<{ match: string; reply: string | UdsNegativeResponse }>) => {
+const scriptedTransport = (
+  script: Array<{ match: string; reply: string | UdsNegativeResponse }>,
+) => {
   const sent: string[] = [];
   const transport = {
     info: { vciName: "test", vciSerial: "0", protocolList: ["DoIP"] },
@@ -174,7 +176,10 @@ describe("ibcm adds new key", () => {
         return { ok: true, level };
       }),
       send: vi.fn(async (_ecuId: string, bytes: Uint8Array) => {
-        const hex = [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+        const hex = [...bytes]
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("")
+          .toUpperCase();
         order.push(`tx:${hex}`);
         if (hex.startsWith("3101")) return hexToBytes("71 01 04 CB 00");
         return hexToBytes("50 03");

@@ -148,7 +148,12 @@ const handlers: Record<string, Handler> = {
       const result = await session.clearDtcsAuthorized(ecuId);
       results.push(result);
       logger?.write("info", JSON.stringify({ type: "clearEcu", ...result }));
-      emit({ type: "clearEcu", ecuId, cleared: result.cleared, ...(result.nrc ? { nrc: result.nrc } : {}) });
+      emit({
+        type: "clearEcu",
+        ecuId,
+        cleared: result.cleared,
+        ...(result.nrc ? { nrc: result.nrc } : {}),
+      });
     }
     return {
       results,
