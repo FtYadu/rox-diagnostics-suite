@@ -6,6 +6,7 @@ import {
   Eraser,
   PenLine,
   RefreshCw,
+  Search,
   SlidersHorizontal,
   Upload,
 } from "lucide-react";
@@ -161,6 +162,12 @@ function EcuDetailPage() {
               <Link to="/ecus/$ecuId/io-control" params={{ ecuId: ecu.id }}>
                 <SlidersHorizontal className="size-4" />
                 IO control
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" className="rounded-full">
+              <Link to="/ecus/$ecuId/identifiers" params={{ ecuId: ecu.id }}>
+                <Search className="size-4" />
+                Identifiers
               </Link>
             </Button>
             <Button asChild variant="secondary" className="rounded-full">

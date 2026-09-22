@@ -231,6 +231,35 @@ const handlers: Record<string, Handler> = {
     return session.readFreezeFrame(ecu, asString(params["code"]));
   },
 
+  /** ReadDataByIdentifier (0x22) for a single identifier. */
+  readDid: async (params) => {
+    const { session } = await ensureLink();
+    const ecu = asString(params["ecu"]);
+    const did = Number(params["did"] ?? 0);
+    const didHex = did.toString(16).toUpperCase().padStart(4, "0");
+    await session.enterSession(ecu);
+    try {
+      const response = await session.sendRaw(ecu, `22 ${didHex.slice(0, 2)} ${didHex.slice(2)}`);
+      const bytes = response.trim().split(/\s+/);
+      return {
+        ok: true,
+        message: `0x${didHex} read`,
+        raw: bytes.slice(3).join(" "),
+        trace: session.takeTrace(),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        message: `0x${didHex} read failed`,
+        trace: session.takeTrace(),
+        error:
+          error instanceof UdsNegativeResponse
+            ? { nrc: error.nrcHex, meaning: error.meaning }
+            : { nrc: "0x00", meaning: (error as Error).message },
+      };
+    }
+  },
+
   readLiveData: async (params) => {
     const { session } = await ensureLink();
     const ecu = asString(params["ecu"]);

@@ -1,7 +1,8 @@
-import type { Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
+import type { Did, Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
 import { DID_LABELS, ecus as allEcus, getEcu, identDidsFor, vehicle } from "@/data/vehicle-data";
 import { buildRunnerSteps } from "@/features/processes/step-model";
 import { liveDataCatalog } from "./live-data";
+import { decodeDid, encodeDid } from "@/lib/did-codec";
 import { nrcMeaning } from "./types";
 import { clearEcusSequentially, compareRepair, scanEcusSequentially } from "./vehicle-ops";
 import type {
@@ -26,6 +27,8 @@ import type {
   ProgrammingProgressEvent,
   RoutineExecution,
   RoutineRequest,
+  ReadDidRequest,
+  ReadDidResult,
   SecurityAccessResult,
   TraceLine,
   WriteDidRequest,
@@ -66,6 +69,30 @@ const hex = (value: number, bytes = 1) =>
     .toUpperCase()
     .padStart(bytes * 2, "0")
     .slice(0, bytes * 2);
+
+/**
+ * Builds plausible bytes for an identifier that has no canonical expected
+ * value, honouring its declared type, range and byte length.
+ */
+const synthesizeDidBytes = (did: Did): number[] => {
+  const length = Math.max(1, did.length || 1);
+  if (did.type === "ascii") {
+    return encodeDid(did, `${did.label.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "0")}0001`);
+  }
+  if (did.type === "enum") {
+    const keys = Object.keys(did.enum ?? {});
+    const key = keys.length > 0 ? Number(keys[Math.floor(Math.random() * keys.length)]) : 0;
+    return Array.from({ length }, (_unused, index) => (key >> (8 * (length - 1 - index))) & 0xff);
+  }
+  if (did.type === "hex" || did.type === "bitfield") {
+    return Array.from({ length }, () => Math.floor(Math.random() * 256));
+  }
+  const min = did.min ?? 0;
+  const max = did.max ?? min + 100;
+  const scaled = (randomBetween(min, max) - (did.offset ?? 0)) / (did.factor ?? 1);
+  const value = Math.max(0, Math.round(scaled));
+  return Array.from({ length }, (_unused, index) => (value >> (8 * (length - 1 - index))) & 0xff);
+};
 
 const randomBytes = (count: number) =>
   Array.from({ length: count }, () => hex(Math.random() * 255)).join(" ");
@@ -515,6 +542,42 @@ export class SimulatorBridge implements DiagnosticBridge {
         label,
         value: String(value),
       })),
+    };
+  }
+
+  async readDid(request: ReadDidRequest): Promise<ReadDidResult> {
+    const { ecu, did } = request;
+    const didHex = `${hex(did >> 8)} ${hex(did & 0xff)}`;
+    const definition = [
+      ...(ecu.identDids ?? []),
+      ...(ecu.liveDids ?? []),
+      ...(ecu.writeDids ?? []),
+    ].find((candidate) => candidate.did === did);
+    const trace: TraceLine[] = [line("tx", `22 ${didHex}`)];
+    await wait(180);
+
+    if (!definition) {
+      const nrc = "0x31";
+      trace.push(line("rx", `7F 22 ${nrc.slice(2)}`));
+      return {
+        ok: false,
+        message: `Read rejected — ${nrc} ${nrcMeaning(nrc)}`,
+        trace,
+        error: { nrc, meaning: nrcMeaning(nrc) },
+      };
+    }
+
+    const bytes = definition.expected
+      ? encodeDid(definition, definition.expected)
+      : synthesizeDidBytes(definition);
+    const raw = bytes.map((byte) => hex(byte)).join(" ");
+    trace.push(line("rx", `62 ${didHex} ${raw}`));
+    return {
+      ok: true,
+      message: `${definition.label} read from ${ecu.id}`,
+      trace,
+      raw,
+      value: decodeDid(definition, bytes),
     };
   }
 

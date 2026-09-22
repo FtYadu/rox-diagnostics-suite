@@ -29,6 +29,7 @@ import { Route as ShellEcusIndexRouteImport } from './routes/_shell.ecus.index'
 import { Route as ShellEcusEcuIdRouteImport } from './routes/_shell.ecus.$ecuId'
 import { Route as ShellEcusEcuIdIndexRouteImport } from './routes/_shell.ecus.$ecuId.index'
 import { Route as ShellEcusEcuIdConfigurationRouteImport } from './routes/_shell.ecus.$ecuId.configuration'
+import { Route as ShellEcusEcuIdIdentifiersRouteImport } from './routes/_shell.ecus.$ecuId.identifiers'
 import { Route as ShellEcusEcuIdIoControlRouteImport } from './routes/_shell.ecus.$ecuId.io-control'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -133,6 +134,12 @@ const ShellEcusEcuIdConfigurationRoute =
     path: '/configuration',
     getParentRoute: () => ShellEcusEcuIdRoute,
   } as any)
+const ShellEcusEcuIdIdentifiersRoute =
+  ShellEcusEcuIdIdentifiersRouteImport.update({
+    id: '/identifiers',
+    path: '/identifiers',
+    getParentRoute: () => ShellEcusEcuIdRoute,
+  } as any)
 const ShellEcusEcuIdIoControlRoute = ShellEcusEcuIdIoControlRouteImport.update({
   id: '/io-control',
   path: '/io-control',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/ecus/': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/ecus/$ecuId/identifiers': typeof ShellEcusEcuIdIdentifiersRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/ecus': typeof ShellEcusIndexRoute
   '/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/ecus/$ecuId/identifiers': typeof ShellEcusEcuIdIdentifiersRoute
   '/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/ecus/$ecuId': typeof ShellEcusEcuIdIndexRoute
@@ -211,6 +220,7 @@ export interface FileRoutesById {
   '/_shell/ecus/$ecuId': typeof ShellEcusEcuIdRouteWithChildren
   '/_shell/ecus/': typeof ShellEcusIndexRoute
   '/_shell/ecus/$ecuId/configuration': typeof ShellEcusEcuIdConfigurationRoute
+  '/_shell/ecus/$ecuId/identifiers': typeof ShellEcusEcuIdIdentifiersRoute
   '/_shell/ecus/$ecuId/io-control': typeof ShellEcusEcuIdIoControlRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/_shell/ecus/$ecuId/': typeof ShellEcusEcuIdIndexRoute
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/ecus/$ecuId'
     | '/ecus/'
     | '/ecus/$ecuId/configuration'
+    | '/ecus/$ecuId/identifiers'
     | '/ecus/$ecuId/io-control'
     | '/api/public/payments/webhook'
     | '/ecus/$ecuId/'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/ecus'
     | '/ecus/$ecuId/configuration'
+    | '/ecus/$ecuId/identifiers'
     | '/ecus/$ecuId/io-control'
     | '/api/public/payments/webhook'
     | '/ecus/$ecuId'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
     | '/_shell/ecus/$ecuId'
     | '/_shell/ecus/'
     | '/_shell/ecus/$ecuId/configuration'
+    | '/_shell/ecus/$ecuId/identifiers'
     | '/_shell/ecus/$ecuId/io-control'
     | '/api/public/payments/webhook'
     | '/_shell/ecus/$ecuId/'
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellEcusEcuIdConfigurationRouteImport
       parentRoute: typeof ShellEcusEcuIdRoute
     }
+    '/_shell/ecus/$ecuId/identifiers': {
+      id: '/_shell/ecus/$ecuId/identifiers'
+      path: '/identifiers'
+      fullPath: '/ecus/$ecuId/identifiers'
+      preLoaderRoute: typeof ShellEcusEcuIdIdentifiersRouteImport
+      parentRoute: typeof ShellEcusEcuIdRoute
+    }
     '/_shell/ecus/$ecuId/io-control': {
       id: '/_shell/ecus/$ecuId/io-control'
       path: '/io-control'
@@ -459,12 +479,14 @@ declare module '@tanstack/react-router' {
 
 interface ShellEcusEcuIdRouteChildren {
   ShellEcusEcuIdConfigurationRoute: typeof ShellEcusEcuIdConfigurationRoute
+  ShellEcusEcuIdIdentifiersRoute: typeof ShellEcusEcuIdIdentifiersRoute
   ShellEcusEcuIdIoControlRoute: typeof ShellEcusEcuIdIoControlRoute
   ShellEcusEcuIdIndexRoute: typeof ShellEcusEcuIdIndexRoute
 }
 
 const ShellEcusEcuIdRouteChildren: ShellEcusEcuIdRouteChildren = {
   ShellEcusEcuIdConfigurationRoute: ShellEcusEcuIdConfigurationRoute,
+  ShellEcusEcuIdIdentifiersRoute: ShellEcusEcuIdIdentifiersRoute,
   ShellEcusEcuIdIoControlRoute: ShellEcusEcuIdIoControlRoute,
   ShellEcusEcuIdIndexRoute: ShellEcusEcuIdIndexRoute,
 }

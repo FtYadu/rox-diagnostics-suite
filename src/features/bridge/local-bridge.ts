@@ -23,6 +23,8 @@ import type {
   LiveDataSignal,
   ProgrammingProgressEvent,
   RoutineExecution,
+  ReadDidRequest,
+  ReadDidResult,
   RoutineRequest,
   SecurityAccessResult,
   WriteDidRequest,
@@ -390,6 +392,14 @@ export class LocalBridge implements DiagnosticBridge {
 
   readFreezeFrame(ecu: Ecu, code: string): Promise<FreezeFrame> {
     return this.call<FreezeFrame>("readFreezeFrame", { ecu: ecu.id, code });
+  }
+
+  /** ReadDataByIdentifier (0x22) for one identifier on a real control unit. */
+  readDid(request: ReadDidRequest): Promise<ReadDidResult> {
+    return this.call<ReadDidResult>("readDid", {
+      ecu: request.ecu.id,
+      did: request.did,
+    });
   }
 
   readLiveData(ecu: Ecu, dids: string[]): Promise<LiveDataSignal[]> {

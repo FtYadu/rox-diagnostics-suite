@@ -169,6 +169,21 @@ export type WriteDidResult = {
   previous?: string;
 };
 
+export type ReadDidRequest = { ecu: Ecu; did: number };
+
+export type ReadDidResult = {
+  ok: boolean;
+  message: string;
+  trace: TraceLine[];
+  error?: NegativeResponse;
+  /** Raw bytes as returned by the 62 response, space separated hex. */
+  raw?: string;
+  /** Decoded technician-facing value using the canonical scaling metadata. */
+  value?: string;
+};
+
+
+
 export type RoutineRequest = {
   ecu: Ecu;
   rid: number;
@@ -208,6 +223,8 @@ export type DiagnosticBridge = {
   runRoutineById(request: RoutineRequest): Promise<RoutineExecution>;
   /** InputOutputControlByIdentifier (0x2F). */
   ioControl(request: IoControlRequest): Promise<IoControlResult>;
+  /** ReadDataByIdentifier (0x22) for a single canonical identifier. */
+  readDid(request: ReadDidRequest): Promise<ReadDidResult>;
   /** WriteDataByIdentifier (0x2E) — v2 feature, gated behind a flag in the UI. */
   writeDid(request: WriteDidRequest): Promise<WriteDidResult>;
   startProgramming(
