@@ -1,8 +1,15 @@
 import type { Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
-import { DID_LABELS, getEcu, identDidsFor } from "@/data/vehicle-data";
+import { DID_LABELS, ecus as allEcus, getEcu, identDidsFor, vehicle } from "@/data/vehicle-data";
 import { buildRunnerSteps } from "@/features/processes/step-model";
 import { liveDataCatalog } from "./live-data";
 import { nrcMeaning } from "./types";
+import { clearEcusSequentially, compareRepair, scanEcusSequentially } from "./vehicle-ops";
+import type {
+  ClearAllResult,
+  VehicleScanOptions,
+  VehicleScanResult,
+  VerifyRepairResult,
+} from "./vehicle-ops";
 import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
 import type {
   ConnectionInfo,
@@ -16,6 +23,7 @@ import type {
   IoControlRequest,
   IoControlResult,
   LiveDataSignal,
+  DtcRecord,
   ProgrammingProgressEvent,
   RoutineExecution,
   RoutineRequest,
@@ -621,5 +629,29 @@ export class SimulatorBridge implements DiagnosticBridge {
       state: "done",
     });
     return { ok: true, message: `${flow.name} completed for ${flow.ecus.join(", ")}.` };
+  }
+
+  async autoConnect(vin?: string): Promise<ConnectionInfo & { vin: string }> {
+    const info = await this.connect();
+    return { ...info, vin: vin ?? vehicle.vinExample };
+  }
+
+  scanVehicle(options: VehicleScanOptions = {}): Promise<VehicleScanResult> {
+    return scanEcusSequentially((ecu) => this.readDtcs(ecu), allEcus, options);
+  }
+
+  clearAllDtcs(options: VehicleScanOptions = {}): Promise<ClearAllResult> {
+    const targets = (options.ecus ?? allEcus).filter(
+      (ecu) => (this.results.get(ecu.id)?.dtcs.length ?? 0) > 0,
+    );
+    return clearEcusSequentially((ecu) => this.clearDtcs(ecu), targets);
+  }
+
+  async verifyRepair(
+    before: DtcRecord[],
+    options: VehicleScanOptions = {},
+  ): Promise<VerifyRepairResult> {
+    const after = await this.scanVehicle(options);
+    return compareRepair(before, after.dtcs);
   }
 }
