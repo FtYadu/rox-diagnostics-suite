@@ -164,6 +164,12 @@ function EcuDetailPage() {
               </Link>
             </Button>
             <Button asChild variant="secondary" className="rounded-full">
+              <Link to="/ecus/$ecuId/identifiers" params={{ ecuId: ecu.id }}>
+                <Search className="size-4" />
+                Identifiers
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" className="rounded-full">
               <Link to="/ecus/$ecuId/configuration" params={{ ecuId: ecu.id }}>
                 <PenLine className="size-4" />
                 Configuration
