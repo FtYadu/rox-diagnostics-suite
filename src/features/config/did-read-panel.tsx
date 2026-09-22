@@ -80,7 +80,7 @@ export function DidReadPanel({ ecu }: { ecu: Ecu }) {
     const row = await readOne(did);
     setTraceOpen(true);
     appendEvent({
-      kind: "identification",
+      kind: "dtc-read",
       title: `Read ${did.label} · ${ecu.id}`,
       detail: `22 ${didHex(did.did)} → ${row.error ? row.error : `${row.value} (${row.raw || "no data"})`}`,
       ecuId: ecu.id,
@@ -186,7 +186,7 @@ export function DidReadPanel({ ecu }: { ecu: Ecu }) {
                 const row = rows.find((entry) => entry.did.did === did.did);
                 const match =
                   row && !row.error && did.expected
-                    ? compareToExpected(did, parseHex(row.raw))
+                    ? compareToExpected(did.expected, row.value).matches
                     : null;
                 return (
                   <tr key={did.did} className="border-t border-hairline/60">
@@ -227,7 +227,7 @@ export function DidReadPanel({ ecu }: { ecu: Ecu }) {
         </CardContent>
       </Card>
 
-      <TraceConsole lines={trace} open={traceOpen} onOpenChange={setTraceOpen} />
+      <TraceConsole trace={trace} open={traceOpen} onToggle={() => setTraceOpen((prev) => !prev)} />
     </div>
   );
 }
