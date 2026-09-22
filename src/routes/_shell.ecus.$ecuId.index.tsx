@@ -6,6 +6,7 @@ import {
   Eraser,
   PenLine,
   RefreshCw,
+  Search,
   SlidersHorizontal,
   Upload,
 } from "lucide-react";
