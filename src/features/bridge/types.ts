@@ -1,7 +1,21 @@
 import type { Dtc, Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
 import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
+import type {
+  ClearAllResult,
+  VehicleScanOptions,
+  VehicleScanResult,
+  VerifyRepairResult,
+} from "./vehicle-ops";
 
 export type { ProcessRunEvent, ProcessRunHandle, RunProcessOptions } from "./process-run";
+export type {
+  ClearAllResult,
+  ClearEcuOutcome,
+  ScanEcuOutcome,
+  VehicleScanOptions,
+  VehicleScanResult,
+  VerifyRepairResult,
+} from "./vehicle-ops";
 
 export type BridgeMode = "simulator" | "local";
 
