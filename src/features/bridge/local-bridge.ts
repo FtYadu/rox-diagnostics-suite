@@ -1,11 +1,20 @@
-import { dataChecksum as appDataChecksum } from "@/data/vehicle-data";
+import { dataChecksum as appDataChecksum, ecus as allEcus } from "@/data/vehicle-data";
 import type { Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
 import { fromAgentProcessEvent } from "./process-run";
+import { clearEcusSequentially, compareRepair, scanEcusSequentially } from "./vehicle-ops";
+import type {
+  ClearAllResult,
+  ScanEcuOutcome,
+  VehicleScanOptions,
+  VehicleScanResult,
+  VerifyRepairResult,
+} from "./vehicle-ops";
 import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
 import type {
   BridgeCompatibility,
   ConnectionInfo,
   DiagnosticBridge,
+  DtcRecord,
   EcuDtcResult,
   FreezeFrame,
   IdentificationEntry,
@@ -284,6 +293,99 @@ export class LocalBridge implements DiagnosticBridge {
 
   clearDtcs(ecu: Ecu, codes?: string[]): Promise<{ cleared: number }> {
     return this.call<{ cleared: number }>("clearDtcs", { ecu: ecu.id, codes: codes ?? null });
+  }
+
+  /** Discovery → routing activation → VIN (F190) from the CCU gateway. */
+  async autoConnect(vin?: string): Promise<ConnectionInfo & { vin: string }> {
+    const payload = await this.call<Record<string, unknown>>(
+      "autoConnect",
+      vin ? { vin } : {},
+      undefined,
+      30_000,
+    );
+    const info = normalizeInfo(payload);
+    return { ...info, vin: asString(payload["vin"], vin ?? "") };
+  }
+
+  /**
+   * Whole-vehicle scan. The v3 agent streams one event per control unit; an older
+   * agent that does not know the method falls back to the shared per-ECU sequence,
+   * so the calling screen sees the same progress either way.
+   */
+  async scanVehicle(options: VehicleScanOptions = {}): Promise<VehicleScanResult> {
+    const targets = options.ecus ?? allEcus;
+    try {
+      const reply = await this.call<{
+        results?: Array<{ ecuId: string; status?: string; dtcs?: DtcRecord[]; error?: string }>;
+        startedAt?: string;
+        finishedAt?: string;
+      }>(
+        "scanVehicle",
+        { ecus: targets.map((ecu) => ecu.id) },
+        (payload) => {
+          const event = payload as {
+            type?: string;
+            ecuId?: string;
+            state?: string;
+            dtcCount?: number;
+            done?: number;
+            total?: number;
+          };
+          if (event.type === "scanEcu" && event.ecuId) {
+            if (event.state === "running") options.onEcuStart?.(event.ecuId);
+            return;
+          }
+          if (event.type === "scanProgress") {
+            options.onProgress?.(event.done ?? 0, event.total ?? targets.length);
+          }
+        },
+        600_000,
+      );
+
+      const results: ScanEcuOutcome[] = (reply.results ?? []).map((entry) => ({
+        ecuId: entry.ecuId,
+        status: entry.status === "responded" ? "responded" : "silent",
+        dtcs: entry.dtcs ?? [],
+        ...(entry.error ? { error: entry.error } : {}),
+      }));
+      results.forEach((outcome) => options.onEcuDone?.(outcome));
+      return {
+        results,
+        dtcs: results.flatMap((entry) => entry.dtcs),
+        startedAt: reply.startedAt ?? new Date().toISOString(),
+        finishedAt: reply.finishedAt ?? new Date().toISOString(),
+      };
+    } catch {
+      return scanEcusSequentially((ecu) => this.readDtcs(ecu), allEcus, options);
+    }
+  }
+
+  /** Authorized clear across control units (10 03 → security access → 14 FF FF FF). */
+  async clearAllDtcs(options: VehicleScanOptions = {}): Promise<ClearAllResult> {
+    const targets = options.ecus ?? allEcus;
+    try {
+      const reply = await this.call<ClearAllResult>(
+        "clearAllDtcs",
+        { ecus: targets.map((ecu) => ecu.id) },
+        undefined,
+        300_000,
+      );
+      return {
+        results: reply.results ?? [],
+        cleared: reply.cleared ?? 0,
+        failed: reply.failed ?? 0,
+      };
+    } catch {
+      return clearEcusSequentially((ecu) => this.clearDtcs(ecu), targets);
+    }
+  }
+
+  async verifyRepair(
+    before: DtcRecord[],
+    options: VehicleScanOptions = {},
+  ): Promise<VerifyRepairResult> {
+    const after = await this.scanVehicle(options);
+    return compareRepair(before, after.dtcs);
   }
 
   readFreezeFrame(ecu: Ecu, code: string): Promise<FreezeFrame> {
