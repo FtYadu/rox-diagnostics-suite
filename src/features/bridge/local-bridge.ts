@@ -1,11 +1,20 @@
-import { dataChecksum as appDataChecksum } from "@/data/vehicle-data";
+import { dataChecksum as appDataChecksum, ecus as allEcus } from "@/data/vehicle-data";
 import type { Ecu, ProgrammingFlow, ServiceProcess } from "@/data/vehicle-data";
 import { fromAgentProcessEvent } from "./process-run";
+import { clearEcusSequentially, compareRepair, scanEcusSequentially } from "./vehicle-ops";
+import type {
+  ClearAllResult,
+  ScanEcuOutcome,
+  VehicleScanOptions,
+  VehicleScanResult,
+  VerifyRepairResult,
+} from "./vehicle-ops";
 import type { ProcessRunHandle, RunProcessOptions } from "./process-run";
 import type {
   BridgeCompatibility,
   ConnectionInfo,
   DiagnosticBridge,
+  DtcRecord,
   EcuDtcResult,
   FreezeFrame,
   IdentificationEntry,
