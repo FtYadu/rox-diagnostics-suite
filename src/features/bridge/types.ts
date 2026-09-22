@@ -180,6 +180,14 @@ export type RoutineRequest = {
 export type DiagnosticBridge = {
   readonly mode: BridgeMode;
   connect(): Promise<ConnectionInfo>;
+  /** Discovery + routing activation + VIN read; the simulator answers from seed data. */
+  autoConnect(vin?: string): Promise<ConnectionInfo & { vin: string }>;
+  /** Whole-vehicle DTC scan with per-ECU progress. */
+  scanVehicle(options?: VehicleScanOptions): Promise<VehicleScanResult>;
+  /** Authorized clear across the given (or all responding) control units. */
+  clearAllDtcs(options?: VehicleScanOptions): Promise<ClearAllResult>;
+  /** Re-scans and compares against a previous scan to confirm a repair. */
+  verifyRepair(before: DtcRecord[], options?: VehicleScanOptions): Promise<VerifyRepairResult>;
   readIdentification(ecu: Ecu): Promise<IdentificationEntry[]>;
   readDtcs(ecu: Ecu): Promise<EcuDtcResult>;
   /** Clears the whole fault memory (14 FF FF FF) or only the listed codes. */
