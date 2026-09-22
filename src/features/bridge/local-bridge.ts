@@ -23,6 +23,8 @@ import type {
   LiveDataSignal,
   ProgrammingProgressEvent,
   RoutineExecution,
+  ReadDidRequest,
+  ReadDidResult,
   RoutineRequest,
   SecurityAccessResult,
   WriteDidRequest,
