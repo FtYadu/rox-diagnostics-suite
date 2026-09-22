@@ -223,6 +223,8 @@ export type DiagnosticBridge = {
   runRoutineById(request: RoutineRequest): Promise<RoutineExecution>;
   /** InputOutputControlByIdentifier (0x2F). */
   ioControl(request: IoControlRequest): Promise<IoControlResult>;
+  /** ReadDataByIdentifier (0x22) for a single canonical identifier. */
+  readDid(request: ReadDidRequest): Promise<ReadDidResult>;
   /** WriteDataByIdentifier (0x2E) — v2 feature, gated behind a flag in the UI. */
   writeDid(request: WriteDidRequest): Promise<WriteDidResult>;
   startProgramming(
