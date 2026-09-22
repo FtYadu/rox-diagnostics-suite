@@ -23,7 +23,6 @@ import type {
   IoControlRequest,
   IoControlResult,
   LiveDataSignal,
-  DtcRecord,
   ProgrammingProgressEvent,
   RoutineExecution,
   RoutineRequest,
