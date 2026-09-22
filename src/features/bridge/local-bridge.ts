@@ -392,6 +392,14 @@ export class LocalBridge implements DiagnosticBridge {
     return this.call<FreezeFrame>("readFreezeFrame", { ecu: ecu.id, code });
   }
 
+  /** ReadDataByIdentifier (0x22) for one identifier on a real control unit. */
+  readDid(request: ReadDidRequest): Promise<ReadDidResult> {
+    return this.call<ReadDidResult>("readDid", {
+      ecu: request.ecu.id,
+      did: request.did,
+    });
+  }
+
   readLiveData(ecu: Ecu, dids: string[]): Promise<LiveDataSignal[]> {
     return this.call<LiveDataSignal[]>("readLiveData", { ecu: ecu.id, dids });
   }
