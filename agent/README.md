@@ -65,7 +65,11 @@ The `dll` backend calls the same `GenerateKeyExOpt` export in-process and works 
 ```json
 {
   "security": {
-    "seedKey": { "backend": "dll", "dllPath": "C:/ROX/ROX_SeedKey.dll", "exportName": "GenerateKeyExOpt" }
+    "seedKey": {
+      "backend": "dll",
+      "dllPath": "C:/ROX/ROX_SeedKey.dll",
+      "exportName": "GenerateKeyExOpt"
+    }
   }
 }
 ```

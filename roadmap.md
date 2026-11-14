@@ -1,12 +1,14 @@
 # ROX Diagnostics — roadmap
 
 ## In progress — Payments (subscription gate)
+
 - [x] Stripe products, checkout, portal, webhook, `subscriptions` table
 - [x] Supabase email/password sign-in + sign-up on `/`
 - [x] Shell gated on active subscription, billing menu in top bar
 - [ ] Verify paywall end to end with a confirmed auth user
 
 ## Batch 3b — close Batch 3 stubs
+
 - [ ] 1. Supabase: `dealers`, `profiles` (+ signup trigger), `jobs` (dealer scoped),
       `job_attachments`, private `job-logs` bucket, dealer-scoped RLS + role write policies,
       regenerate types
@@ -21,6 +23,7 @@
 - [ ] 5. CHANGELOG 0.4.1 (2026-09-04) + docs/SCOPE.md status
 
 ## Known stubs / deferred
+
 - Seed lacks `ioControls` / `writeDids` until canonical extraction lands
 - Agent refuses startup without canonical ECU mappings (`ROX_AGENT_ALLOW_OVERRIDE=1` to bypass)
 - Guided runner in Simulator still uses the legacy step builder for some processes

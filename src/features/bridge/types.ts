@@ -182,8 +182,6 @@ export type ReadDidResult = {
   value?: string;
 };
 
-
-
 export type RoutineRequest = {
   ecu: Ecu;
   rid: number;

@@ -6,3 +6,6 @@ pnpm-lock.yaml
 package-lock.json
 bun.lock
 routeTree.gen.ts
+data/canonical
+src/data/r11-oversea-data.json
+agent/config.json

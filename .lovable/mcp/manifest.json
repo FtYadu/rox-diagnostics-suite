@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://uzppdwipcbspaxhicieu.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -64,9 +62,7 @@
               "description": "Include the full DTC list (default true)."
             }
           },
-          "required": [
-            "ecuId"
-          ],
+          "required": ["ecuId"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
@@ -129,11 +125,7 @@
             },
             "status": {
               "type": "string",
-              "enum": [
-                "in-progress",
-                "completed",
-                "failed"
-              ]
+              "enum": ["in-progress", "completed", "failed"]
             },
             "limit": {
               "type": "integer",
@@ -164,9 +156,7 @@
               "description": "Job id, e.g. JOB-12345."
             }
           },
-          "required": [
-            "jobId"
-          ],
+          "required": ["jobId"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
@@ -206,11 +196,7 @@
               "description": "Related ECU id, if any."
             }
           },
-          "required": [
-            "jobId",
-            "title",
-            "detail"
-          ],
+          "required": ["jobId", "title", "detail"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
