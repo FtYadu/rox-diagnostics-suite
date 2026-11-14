@@ -7,6 +7,7 @@ ARCHITECTURE: The browser cannot talk to car hardware, so design a "Bridge" abst
 DESIGN — Apple inspired, premium, workshop-ready: San Francisco-style system font stack (-apple-system, Inter fallback), generous whitespace, large soft-rounded cards (16–20px radius), frosted-glass translucent sidebar and top bar (backdrop-blur), subtle 1px hairline borders, muted greys with one accent (deep blue #0A84FF) plus semantic green/amber/red for status. Light and dark mode (dark default: near-black #0B0B0F surfaces like macOS dark). Smooth micro-animations (framer-motion), pill segmented controls, macOS-style toolbars, SF-Symbols-like icons (lucide). Big readable numerals for status. It must look like a first-party Apple pro app (think Xcode/Instruments meets CarPlay), not a generic dashboard template.
 
 SCREENS for this first build:
+
 1. Sign-in screen (email/password, remember me, elegant hero on the left with the vehicle name).
 2. App shell: collapsible left sidebar (Dashboard, Vehicle, Health Scan, ECUs, Service Functions, Programming, Live Data, Reports, Job History, Settings), top bar with vehicle/VIN chip, bridge status pill (Simulator / Hardware connected / offline), VCI status, theme toggle, user menu.
 3. Dashboard: connection card (bridge + VCI + battery voltage), current vehicle card (VIN HJ4ABBHK4RN000080 example, model R11_Oversea), quick actions (Full Health Scan, Read All DTCs, Clear All DTCs, New Job), last 5 jobs, ECU domain overview donut (Body/Chassis/Powertrain/ADAS/Infotainment/Comfort/Connectivity/Safety).

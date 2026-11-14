@@ -77,7 +77,13 @@ const hex = (value: number, bytes = 1) =>
 const synthesizeDidBytes = (did: Did): number[] => {
   const length = Math.max(1, did.length || 1);
   if (did.type === "ascii") {
-    return encodeDid(did, `${did.label.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "0")}0001`);
+    return encodeDid(
+      did,
+      `${did.label
+        .slice(0, 4)
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "0")}0001`,
+    );
   }
   if (did.type === "enum") {
     const keys = Object.keys(did.enum ?? {});

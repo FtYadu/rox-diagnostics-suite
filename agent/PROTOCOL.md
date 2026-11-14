@@ -67,12 +67,12 @@ The flat `vciName` / `vciSerial` / `protocol` fields are kept for v1 agents.
 
 ### New in v3
 
-| Method                 | Params                        | Result                                                  |
-| ---------------------- | ----------------------------- | ------------------------------------------------------- |
-| `autoConnect`          | `{ vin? }`                    | handshake plus `{ vin, softwareBaseline, ecusMapped }`   |
-| `clearDtcsAuthorized`  | `{ ecu, session?, level? }`   | `{ ecuId, cleared, remaining[], nrc?, message? }`        |
-| `clearAllDtcs`         | `{ ecus?, jobId? }`           | `{ results[], cleared, failed }`, streams `clearEcu`     |
-| `verifyRepair`         | `{ before[], jobId? }`        | `{ before, after, resolved[], remaining[], new[], ok }`  |
+| Method                | Params                      | Result                                                  |
+| --------------------- | --------------------------- | ------------------------------------------------------- |
+| `autoConnect`         | `{ vin? }`                  | handshake plus `{ vin, softwareBaseline, ecusMapped }`  |
+| `clearDtcsAuthorized` | `{ ecu, session?, level? }` | `{ ecuId, cleared, remaining[], nrc?, message? }`       |
+| `clearAllDtcs`        | `{ ecus?, jobId? }`         | `{ results[], cleared, failed }`, streams `clearEcu`    |
+| `verifyRepair`        | `{ before[], jobId? }`      | `{ before, after, resolved[], remaining[], new[], ok }` |
 
 - `autoConnect` runs ISO 13400 vehicle identification on every IPv4 interface, activates
   routing, then reads VIN (`F190`) and identification from the CCU gateway `0x001A`. With no
